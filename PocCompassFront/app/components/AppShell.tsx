@@ -43,7 +43,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           </nav>
         </div>
       </header>
-      <main className="container-like py-6">{children}</main>
+      <main className="container-like py-4">{children}</main>
     </div>
   );
 }
