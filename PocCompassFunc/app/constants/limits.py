@@ -1,0 +1,40 @@
+"""Numeric thresholds. Every number here is defined in docs/SPEC.md — change the spec first."""
+
+# §4.1 AI batching
+TASKS_PER_AI_CALL = 5
+MAX_PARALLEL_AI_CALLS = 4
+
+# §4.2 verdict score bands
+ALIGNED_MIN = 70
+WEAK_MIN = 40
+UNNECESSARY_MAX_EXCLUSIVE = 60
+
+# §5.1 delay detection
+DELAY_GAP_THRESHOLD = 0.15
+
+# §5.2 schedule penalty multiplier
+SCHEDULE_PENALTY = 200
+
+# §5.4 month-over-month lookback
+DELTA_LOOKBACK_DAYS = 30
+
+# §5.5
+TOP_N = 5
+EVIDENCE_DECISIVE_POINTS = 40
+EVIDENCE_INCONCLUSIVE_POINTS = 15
+
+# §8
+EXTRACT_MAX_CHARS = 8000
+
+# §11 chat
+CHAT_HISTORY_FOR_AI = 20
+CHAT_MAX_OPERATIONS = 20
+CHAT_MESSAGE_MAX = 4000
+CHAT_LIST_MAX = 100
+
+# Text lengths
+TITLE_MAX = 100
+GOAL_MAX = 2000
+TEXT_MAX = 1000
+REASON_MAX = 200
+ACTION_MAX = 100

@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# git pre-commit (enabled by: git config core.hooksPath scripts/hooks)
+# 1) never commit secrets  2) never commit while the quick check fails
+ROOT="$(git rev-parse --show-toplevel)"
+bad="$(git diff --cached --name-only | grep -E '(^|/)(local\.settings\.json|\.env(\.local)?|envsetting\.json|secrets\.json)$')"
+if [ -n "$bad" ]; then
+  echo "pre-commit: secret files are staged. Unstage them:" >&2
+  echo "$bad" >&2
+  exit 1
+fi
+# Bicep's deployment-time AccountKey expressions are not committed key values.
+account_key='Account''Key='
+if git diff --cached -U0 | grep -E '^\+' | grep -vF 'AccountKey=${' | grep -qiE "(${account_key}|sig=[A-Za-z0-9%]{20,}|-----BEGIN (RSA )?PRIVATE KEY|\"?(api[_-]?key|client[_-]?secret)\"?\\s*[:=]\\s*\"[A-Za-z0-9+/_\\-]{20,}\")"; then
+  echo "pre-commit: something that looks like a secret is staged. Check 'git diff --cached'." >&2
+  exit 1
+fi
+"$ROOT/scripts/check.sh" || { echo "pre-commit: scripts/check.sh failed" >&2; exit 1; }

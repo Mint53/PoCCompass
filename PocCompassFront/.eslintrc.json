@@ -1,0 +1,10 @@
+{
+  "extends": "next/core-web-vitals",
+  "rules": {
+    "no-restricted-globals": ["error", { "name": "fetch", "message": "画面から直接 fetch しない。lib/api/client.ts の関数を使う（CLAUDE.md）" }],
+    "no-restricted-syntax": ["error", { "selector": "CallExpression[callee.name='alert']", "message": "alert() は使わない。useToast() を使う" }]
+  },
+  "overrides": [
+    { "files": ["lib/api/**/*.ts", "app/api/**/*.ts"], "rules": { "no-restricted-globals": "off" } }
+  ]
+}

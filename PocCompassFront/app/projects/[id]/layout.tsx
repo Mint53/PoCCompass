@@ -1,0 +1,102 @@
+"use client";
+
+import { ArrowLeft, Bot, CalendarClock, Loader2, Sparkles } from "lucide-react";
+import Link from "next/link";
+import { useParams, usePathname } from "next/navigation";
+import { useState } from "react";
+import { PROJECT_STATUS } from "@/lib/labels";
+import { cn, formatDate } from "@/lib/utils";
+import Badge from "../../components/ui/Badge";
+import Button from "../../components/ui/Button";
+import { ErrorState, LoadingState } from "../../components/ui/States";
+import ChatPanel, { ChatLauncher } from "./components/ChatPanel";
+import { ProjectProvider, useProjectLoader } from "./ProjectContext";
+
+export default function ProjectLayout({ children }: { children: React.ReactNode }) {
+  const { id } = useParams<{ id: string }>();
+  const pathname = usePathname();
+  const { value, error, retry } = useProjectLoader(id);
+  const [chatOpen, setChatOpen] = useState(false);
+
+  if (error) {
+    return (
+      <div className="space-y-4">
+        <Link href="/" className="inline-flex items-center gap-1 text-sm text-slate-600 hover:text-primary">
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+          取り組み一覧へ
+        </Link>
+        <ErrorState message={error.message} onRetry={error.notFound ? undefined : retry} />
+      </div>
+    );
+  }
+  if (!value) return <LoadingState />;
+
+  const { project, mode, evaluating, evaluate, items } = value;
+  const lb = mode.labels;
+  const base = `/projects/${project.id}`;
+  const tabs = [
+    { href: base, label: "ダッシュボード" },
+    { href: `${base}/design`, label: "設計" },
+    { href: `${base}/tasks`, label: `${lb.task}（${items.tasks.length}）` },
+    { href: `${base}/evidence`, label: lb.evidence },
+    { href: `${base}/report`, label: "判断レポート" },
+    { href: `${base}/settings`, label: "設定" },
+  ];
+  const status = PROJECT_STATUS[project.status];
+
+  return (
+    <ProjectProvider value={value}>
+      <div className="space-y-5">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="min-w-0 space-y-1.5">
+            <Link href="/" className="inline-flex items-center gap-1 text-sm text-slate-600 hover:text-primary">
+              <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+              取り組み一覧
+            </Link>
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge variant="brand">{mode.name}</Badge>
+              {status && <Badge variant={status.variant}>{status.label}</Badge>}
+              <span className="inline-flex items-center gap-1 text-xs text-slate-600">
+                <CalendarClock className="h-3.5 w-3.5" aria-hidden="true" />
+                {formatDate(project.start_date)} 〜 {lb.deadline} {formatDate(project.deadline)}
+              </span>
+            </div>
+            <h1 className="break-words text-2xl font-bold text-slate-900">{project.title}</h1>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="outline" onClick={() => setChatOpen(true)}>
+              <Bot className="h-4 w-4" aria-hidden="true" />
+              AI チャット
+            </Button>
+            <Button onClick={() => void evaluate()} disabled={evaluating} aria-busy={evaluating}>
+              {evaluating ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Sparkles className="h-4 w-4" aria-hidden="true" />}
+              {evaluating ? "AI が評価中（数十秒かかります）" : "AI で評価"}
+            </Button>
+          </div>
+        </div>
+
+        <nav className="-mx-1 flex gap-1 overflow-x-auto border-b border-slate-200 px-1" aria-label="取り組みのメニュー">
+          {tabs.map((t) => {
+            const active = t.href === base ? pathname === base : pathname.startsWith(t.href);
+            return (
+              <Link
+                key={t.href}
+                href={t.href}
+                className={cn(
+                  "-mb-px whitespace-nowrap border-b-2 px-3 py-2.5 text-sm font-medium",
+                  active ? "border-primary text-primary" : "border-transparent text-slate-600 hover:text-slate-900",
+                )}
+              >
+                {t.label}
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="animate-fade-in-up pb-20">{children}</div>
+      </div>
+      {!chatOpen && <ChatLauncher onOpen={() => setChatOpen(true)} />}
+      <ChatPanel open={chatOpen} onClose={() => setChatOpen(false)} />
+    </ProjectProvider>
+  );
+}

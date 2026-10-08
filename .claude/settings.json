@@ -1,0 +1,29 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/scripts/hooks/post-edit.sh\"",
+            "timeout": 60,
+            "statusMessage": "PoC Compass: lint / contract reminder"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/scripts/hooks/stop-check.sh\"",
+            "timeout": 300,
+            "statusMessage": "PoC Compass: scripts/check.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

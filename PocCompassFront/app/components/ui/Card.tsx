@@ -1,0 +1,26 @@
+import * as React from "react";
+import { cn } from "@/lib/utils";
+
+export default function Card({
+  title,
+  actions,
+  className,
+  children,
+}: {
+  title?: React.ReactNode;
+  actions?: React.ReactNode;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className={cn("rounded-2xl border border-slate-200 bg-white p-5 shadow-sm", className)}>
+      {(title || actions) && (
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+          {title && <h2 className="text-base font-bold text-primary">{title}</h2>}
+          {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
+        </div>
+      )}
+      {children}
+    </section>
+  );
+}

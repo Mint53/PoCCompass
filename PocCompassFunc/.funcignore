@@ -1,0 +1,13 @@
+.venv/
+.python_packages/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.localdata/
+tests/
+scripts/
+local.settings.json
+local.settings.json.example
+requirements-dev.txt
+pyproject.toml
+openapi.json

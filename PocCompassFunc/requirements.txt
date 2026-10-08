@@ -1,0 +1,7 @@
+# Runtime dependencies (Azure Functions installs these). Keep pinned.
+azure-functions==1.25.0
+fastapi==0.142.4
+pydantic==2.13.5
+azure-cosmos==4.17.1
+azure-identity==1.26.0
+openai==3.26.0

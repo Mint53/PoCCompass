@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "poc-compass-front",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "PocCompassFront", "run", "dev"],
+      "port": 3200
+    }
+  ]
+}

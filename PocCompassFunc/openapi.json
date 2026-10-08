@@ -1,0 +1,4035 @@
+{
+ "components": {
+  "schemas": {
+   "Alert": {
+    "properties": {
+     "alignment_score": {
+      "title": "Alignment Score",
+      "type": "integer"
+     },
+     "content_hash": {
+      "title": "Content Hash",
+      "type": "string"
+     },
+     "reason": {
+      "title": "Reason",
+      "type": "string"
+     },
+     "suggested_action": {
+      "title": "Suggested Action",
+      "type": "string"
+     },
+     "task_id": {
+      "title": "Task Id",
+      "type": "string"
+     },
+     "title": {
+      "title": "Title",
+      "type": "string"
+     },
+     "verdict": {
+      "$ref": "#/components/schemas/Verdict"
+     }
+    },
+    "required": [
+     "task_id",
+     "title",
+     "verdict",
+     "alignment_score",
+     "reason",
+     "suggested_action",
+     "content_hash"
+    ],
+    "title": "Alert",
+    "type": "object"
+   },
+   "Assumption": {
+    "properties": {
+     "created_at": {
+      "title": "Created At",
+      "type": "string"
+     },
+     "created_by": {
+      "title": "Created By",
+      "type": "string"
+     },
+     "id": {
+      "title": "Id",
+      "type": "string"
+     },
+     "priority": {
+      "$ref": "#/components/schemas/Priority",
+      "default": "medium"
+     },
+     "projectId": {
+      "title": "Projectid",
+      "type": "string"
+     },
+     "status": {
+      "$ref": "#/components/schemas/AssumptionStatus",
+      "default": "untested"
+     },
+     "text": {
+      "maxLength": 1000,
+      "minLength": 1,
+      "title": "Text",
+      "type": "string"
+     },
+     "type": {
+      "const": "assumption",
+      "default": "assumption",
+      "title": "Type",
+      "type": "string"
+     },
+     "updated_at": {
+      "title": "Updated At",
+      "type": "string"
+     }
+    },
+    "required": [
+     "type",
+     "text",
+     "status",
+     "priority",
+     "id",
+     "projectId",
+     "created_at",
+     "updated_at",
+     "created_by"
+    ],
+    "title": "Assumption",
+    "type": "object"
+   },
+   "AssumptionFields": {
+    "properties": {
+     "priority": {
+      "$ref": "#/components/schemas/Priority",
+      "default": "medium"
+     },
+     "status": {
+      "$ref": "#/components/schemas/AssumptionStatus",
+      "default": "untested"
+     },
+     "text": {
+      "maxLength": 1000,
+      "minLength": 1,
+      "title": "Text",
+      "type": "string"
+     },
+     "type": {
+      "const": "assumption",
+      "default": "assumption",
+      "title": "Type",
+      "type": "string"
+     }
+    },
+    "required": [
+     "text"
+    ],
+    "title": "AssumptionFields",
+    "type": "object"
+   },
+   "AssumptionSeed": {
+    "properties": {
+     "priority": {
+      "$ref": "#/components/schemas/Priority",
+      "default": "medium"
+     },
+     "text": {
+      "maxLength": 1000,
+      "minLength": 1,
+      "title": "Text",
+      "type": "string"
+     }
+    },
+    "required": [
+     "text"
+    ],
+    "title": "AssumptionSeed",
+    "type": "object"
+   },
+   "AssumptionStatus": {
+    "enum": [
+     "untested",
+     "testing",
+     "supported",
+     "rejected"
+    ],
+    "title": "AssumptionStatus",
+    "type": "string"
+   },
+   "BulkTaskCreate": {
+    "properties": {
+     "tasks": {
+      "items": {
+       "$ref": "#/components/schemas/TaskFields"
+      },
+      "maxItems": 50,
+      "minItems": 1,
+      "title": "Tasks",
+      "type": "array"
+     }
+    },
+    "required": [
+     "tasks"
+    ],
+    "title": "BulkTaskCreate",
+    "type": "object"
+   },
+   "CardLabels": {
+    "properties": {
+     "deadline_risk": {
+      "title": "Deadline Risk",
+      "type": "string"
+     },
+     "deadline_risk_hint": {
+      "title": "Deadline Risk Hint",
+      "type": "string"
+     },
+     "drift": {
+      "title": "Drift",
+      "type": "string"
+     },
+     "drift_hint": {
+      "title": "Drift Hint",
+      "type": "string"
+     },
+     "under_evidenced_title": {
+      "title": "Under Evidenced Title",
+      "type": "string"
+     },
+     "unnecessary": {
+      "title": "Unnecessary",
+      "type": "string"
+     },
+     "unnecessary_hint": {
+      "title": "Unnecessary Hint",
+      "type": "string"
+     },
+     "untested": {
+      "title": "Untested",
+      "type": "string"
+     },
+     "untested_hint": {
+      "title": "Untested Hint",
+      "type": "string"
+     },
+     "weak_tasks_title": {
+      "title": "Weak Tasks Title",
+      "type": "string"
+     }
+    },
+    "required": [
+     "drift",
+     "drift_hint",
+     "unnecessary",
+     "unnecessary_hint",
+     "deadline_risk",
+     "deadline_risk_hint",
+     "untested",
+     "untested_hint",
+     "weak_tasks_title",
+     "under_evidenced_title"
+    ],
+    "title": "CardLabels",
+    "type": "object"
+   },
+   "Cards": {
+    "properties": {
+     "deadline_risk": {
+      "title": "Deadline Risk",
+      "type": "integer"
+     },
+     "drift": {
+      "title": "Drift",
+      "type": "integer"
+     },
+     "unnecessary": {
+      "title": "Unnecessary",
+      "type": "integer"
+     },
+     "untested": {
+      "title": "Untested",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "drift",
+     "unnecessary",
+     "deadline_risk",
+     "untested"
+    ],
+    "title": "Cards",
+    "type": "object"
+   },
+   "ChatApply": {
+    "properties": {
+     "operation_indexes": {
+      "anyOf": [
+       {
+        "items": {
+         "type": "integer"
+        },
+        "type": "array"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Operation Indexes"
+     }
+    },
+    "title": "ChatApply",
+    "type": "object"
+   },
+   "ChatMessage": {
+    "properties": {
+     "content": {
+      "title": "Content",
+      "type": "string"
+     },
+     "created_at": {
+      "title": "Created At",
+      "type": "string"
+     },
+     "id": {
+      "title": "Id",
+      "type": "string"
+     },
+     "projectId": {
+      "title": "Projectid",
+      "type": "string"
+     },
+     "proposal": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/Proposal"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "role": {
+      "$ref": "#/components/schemas/ChatRole"
+     },
+     "user_email": {
+      "title": "User Email",
+      "type": "string"
+     }
+    },
+    "required": [
+     "id",
+     "projectId",
+     "user_email",
+     "role",
+     "content",
+     "created_at",
+     "proposal"
+    ],
+    "title": "ChatMessage",
+    "type": "object"
+   },
+   "ChatRole": {
+    "enum": [
+     "user",
+     "assistant"
+    ],
+    "title": "ChatRole",
+    "type": "string"
+   },
+   "ChatSend": {
+    "properties": {
+     "message": {
+      "minLength": 1,
+      "title": "Message",
+      "type": "string"
+     }
+    },
+    "required": [
+     "message"
+    ],
+    "title": "ChatSend",
+    "type": "object"
+   },
+   "ChatSendResponse": {
+    "properties": {
+     "assistant_message": {
+      "$ref": "#/components/schemas/ChatMessage"
+     },
+     "user_message": {
+      "$ref": "#/components/schemas/ChatMessage"
+     }
+    },
+    "required": [
+     "user_message",
+     "assistant_message"
+    ],
+    "title": "ChatSendResponse",
+    "type": "object"
+   },
+   "Criterion": {
+    "properties": {
+     "created_at": {
+      "title": "Created At",
+      "type": "string"
+     },
+     "created_by": {
+      "title": "Created By",
+      "type": "string"
+     },
+     "id": {
+      "title": "Id",
+      "type": "string"
+     },
+     "projectId": {
+      "title": "Projectid",
+      "type": "string"
+     },
+     "status": {
+      "$ref": "#/components/schemas/CriterionStatus",
+      "default": "not_met"
+     },
+     "target": {
+      "default": "",
+      "maxLength": 200,
+      "title": "Target",
+      "type": "string"
+     },
+     "text": {
+      "maxLength": 1000,
+      "minLength": 1,
+      "title": "Text",
+      "type": "string"
+     },
+     "type": {
+      "const": "criterion",
+      "default": "criterion",
+      "title": "Type",
+      "type": "string"
+     },
+     "updated_at": {
+      "title": "Updated At",
+      "type": "string"
+     }
+    },
+    "required": [
+     "type",
+     "text",
+     "target",
+     "status",
+     "id",
+     "projectId",
+     "created_at",
+     "updated_at",
+     "created_by"
+    ],
+    "title": "Criterion",
+    "type": "object"
+   },
+   "CriterionFields": {
+    "properties": {
+     "status": {
+      "$ref": "#/components/schemas/CriterionStatus",
+      "default": "not_met"
+     },
+     "target": {
+      "default": "",
+      "maxLength": 200,
+      "title": "Target",
+      "type": "string"
+     },
+     "text": {
+      "maxLength": 1000,
+      "minLength": 1,
+      "title": "Text",
+      "type": "string"
+     },
+     "type": {
+      "const": "criterion",
+      "default": "criterion",
+      "title": "Type",
+      "type": "string"
+     }
+    },
+    "required": [
+     "text"
+    ],
+    "title": "CriterionFields",
+    "type": "object"
+   },
+   "CriterionSeed": {
+    "properties": {
+     "target": {
+      "default": "",
+      "maxLength": 200,
+      "title": "Target",
+      "type": "string"
+     },
+     "text": {
+      "maxLength": 1000,
+      "minLength": 1,
+      "title": "Text",
+      "type": "string"
+     }
+    },
+    "required": [
+     "text"
+    ],
+    "title": "CriterionSeed",
+    "type": "object"
+   },
+   "CriterionStatus": {
+    "enum": [
+     "not_met",
+     "met"
+    ],
+    "title": "CriterionStatus",
+    "type": "string"
+   },
+   "Dashboard": {
+    "properties": {
+     "alerts": {
+      "items": {
+       "$ref": "#/components/schemas/Alert"
+      },
+      "title": "Alerts",
+      "type": "array"
+     },
+     "cards": {
+      "$ref": "#/components/schemas/Cards"
+     },
+     "deadline_risks": {
+      "items": {
+       "$ref": "#/components/schemas/DeadlineRiskItem"
+      },
+      "title": "Deadline Risks",
+      "type": "array"
+     },
+     "design_changed": {
+      "title": "Design Changed",
+      "type": "boolean"
+     },
+     "health": {
+      "$ref": "#/components/schemas/HealthView"
+     },
+     "last_evaluated_at": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Last Evaluated At"
+     },
+     "schedule": {
+      "$ref": "#/components/schemas/ScheduleView"
+     },
+     "stale_task_ids": {
+      "items": {
+       "type": "string"
+      },
+      "title": "Stale Task Ids",
+      "type": "array"
+     },
+     "trend": {
+      "items": {
+       "$ref": "#/components/schemas/TrendPoint"
+      },
+      "title": "Trend",
+      "type": "array"
+     },
+     "under_evidenced": {
+      "items": {
+       "$ref": "#/components/schemas/UnderEvidenced"
+      },
+      "title": "Under Evidenced",
+      "type": "array"
+     },
+     "unevaluated_task_ids": {
+      "items": {
+       "type": "string"
+      },
+      "title": "Unevaluated Task Ids",
+      "type": "array"
+     },
+     "weak_tasks": {
+      "items": {
+       "$ref": "#/components/schemas/WeakTask"
+      },
+      "title": "Weak Tasks",
+      "type": "array"
+     }
+    },
+    "required": [
+     "health",
+     "cards",
+     "schedule",
+     "weak_tasks",
+     "under_evidenced",
+     "deadline_risks",
+     "alerts",
+     "trend",
+     "stale_task_ids",
+     "unevaluated_task_ids",
+     "design_changed",
+     "last_evaluated_at"
+    ],
+    "title": "Dashboard",
+    "type": "object"
+   },
+   "DeadlineRiskItem": {
+    "properties": {
+     "item_id": {
+      "title": "Item Id",
+      "type": "string"
+     },
+     "kind": {
+      "title": "Kind",
+      "type": "string"
+     },
+     "text": {
+      "title": "Text",
+      "type": "string"
+     }
+    },
+    "required": [
+     "kind",
+     "item_id",
+     "text"
+    ],
+    "title": "DeadlineRiskItem",
+    "type": "object"
+   },
+   "Decision": {
+    "enum": [
+     "continue",
+     "pivot",
+     "stop"
+    ],
+    "title": "Decision",
+    "type": "string"
+   },
+   "DecisionFields": {
+    "properties": {
+     "decision": {
+      "$ref": "#/components/schemas/Decision"
+     },
+     "note": {
+      "default": "",
+      "maxLength": 1000,
+      "title": "Note",
+      "type": "string"
+     },
+     "type": {
+      "const": "decision",
+      "default": "decision",
+      "title": "Type",
+      "type": "string"
+     }
+    },
+    "required": [
+     "decision"
+    ],
+    "title": "DecisionFields",
+    "type": "object"
+   },
+   "DecisionItem": {
+    "properties": {
+     "created_at": {
+      "title": "Created At",
+      "type": "string"
+     },
+     "created_by": {
+      "title": "Created By",
+      "type": "string"
+     },
+     "decision": {
+      "$ref": "#/components/schemas/Decision"
+     },
+     "id": {
+      "title": "Id",
+      "type": "string"
+     },
+     "note": {
+      "default": "",
+      "maxLength": 1000,
+      "title": "Note",
+      "type": "string"
+     },
+     "projectId": {
+      "title": "Projectid",
+      "type": "string"
+     },
+     "type": {
+      "const": "decision",
+      "default": "decision",
+      "title": "Type",
+      "type": "string"
+     },
+     "updated_at": {
+      "title": "Updated At",
+      "type": "string"
+     }
+    },
+    "required": [
+     "type",
+     "decision",
+     "note",
+     "id",
+     "projectId",
+     "created_at",
+     "updated_at",
+     "created_by"
+    ],
+    "title": "DecisionItem",
+    "type": "object"
+   },
+   "Evaluation": {
+    "properties": {
+     "ai_calls": {
+      "default": 0,
+      "title": "Ai Calls",
+      "type": "integer"
+     },
+     "created_at": {
+      "title": "Created At",
+      "type": "string"
+     },
+     "design_hash": {
+      "title": "Design Hash",
+      "type": "string"
+     },
+     "id": {
+      "title": "Id",
+      "type": "string"
+     },
+     "model": {
+      "title": "Model",
+      "type": "string"
+     },
+     "projectId": {
+      "title": "Projectid",
+      "type": "string"
+     },
+     "task_results": {
+      "items": {
+       "$ref": "#/components/schemas/TaskResult"
+      },
+      "title": "Task Results",
+      "type": "array"
+     },
+     "trigger": {
+      "$ref": "#/components/schemas/EvaluationTrigger"
+     },
+     "unevaluated_task_ids": {
+      "items": {
+       "type": "string"
+      },
+      "title": "Unevaluated Task Ids",
+      "type": "array"
+     }
+    },
+    "required": [
+     "id",
+     "projectId",
+     "created_at",
+     "trigger",
+     "model",
+     "design_hash",
+     "task_results",
+     "ai_calls",
+     "unevaluated_task_ids"
+    ],
+    "title": "Evaluation",
+    "type": "object"
+   },
+   "EvaluationTrigger": {
+    "enum": [
+     "manual",
+     "scheduled"
+    ],
+    "title": "EvaluationTrigger",
+    "type": "string"
+   },
+   "Evidence": {
+    "properties": {
+     "assumption_id": {
+      "minLength": 1,
+      "title": "Assumption Id",
+      "type": "string"
+     },
+     "created_at": {
+      "title": "Created At",
+      "type": "string"
+     },
+     "created_by": {
+      "title": "Created By",
+      "type": "string"
+     },
+     "id": {
+      "title": "Id",
+      "type": "string"
+     },
+     "projectId": {
+      "title": "Projectid",
+      "type": "string"
+     },
+     "result": {
+      "$ref": "#/components/schemas/EvidenceResult"
+     },
+     "source": {
+      "default": "",
+      "maxLength": 500,
+      "title": "Source",
+      "type": "string"
+     },
+     "summary": {
+      "maxLength": 1000,
+      "minLength": 1,
+      "title": "Summary",
+      "type": "string"
+     },
+     "type": {
+      "const": "evidence",
+      "default": "evidence",
+      "title": "Type",
+      "type": "string"
+     },
+     "updated_at": {
+      "title": "Updated At",
+      "type": "string"
+     }
+    },
+    "required": [
+     "type",
+     "assumption_id",
+     "summary",
+     "result",
+     "source",
+     "id",
+     "projectId",
+     "created_at",
+     "updated_at",
+     "created_by"
+    ],
+    "title": "Evidence",
+    "type": "object"
+   },
+   "EvidenceFields": {
+    "properties": {
+     "assumption_id": {
+      "minLength": 1,
+      "title": "Assumption Id",
+      "type": "string"
+     },
+     "result": {
+      "$ref": "#/components/schemas/EvidenceResult"
+     },
+     "source": {
+      "default": "",
+      "maxLength": 500,
+      "title": "Source",
+      "type": "string"
+     },
+     "summary": {
+      "maxLength": 1000,
+      "minLength": 1,
+      "title": "Summary",
+      "type": "string"
+     },
+     "type": {
+      "const": "evidence",
+      "default": "evidence",
+      "title": "Type",
+      "type": "string"
+     }
+    },
+    "required": [
+     "assumption_id",
+     "summary",
+     "result"
+    ],
+    "title": "EvidenceFields",
+    "type": "object"
+   },
+   "EvidenceResult": {
+    "enum": [
+     "supports",
+     "refutes",
+     "inconclusive"
+    ],
+    "title": "EvidenceResult",
+    "type": "string"
+   },
+   "ExtractRequest": {
+    "properties": {
+     "text": {
+      "minLength": 1,
+      "title": "Text",
+      "type": "string"
+     }
+    },
+    "required": [
+     "text"
+    ],
+    "title": "ExtractRequest",
+    "type": "object"
+   },
+   "ExtractResponse": {
+    "properties": {
+     "tasks": {
+      "items": {
+       "$ref": "#/components/schemas/ExtractedTask"
+      },
+      "title": "Tasks",
+      "type": "array"
+     }
+    },
+    "required": [
+     "tasks"
+    ],
+    "title": "ExtractResponse",
+    "type": "object"
+   },
+   "ExtractedTask": {
+    "properties": {
+     "description": {
+      "default": "",
+      "title": "Description",
+      "type": "string"
+     },
+     "linked_assumption_ids": {
+      "items": {
+       "type": "string"
+      },
+      "title": "Linked Assumption Ids",
+      "type": "array"
+     },
+     "linked_criterion_ids": {
+      "items": {
+       "type": "string"
+      },
+      "title": "Linked Criterion Ids",
+      "type": "array"
+     },
+     "title": {
+      "title": "Title",
+      "type": "string"
+     }
+    },
+    "required": [
+     "title",
+     "description",
+     "linked_assumption_ids",
+     "linked_criterion_ids"
+    ],
+    "title": "ExtractedTask",
+    "type": "object"
+   },
+   "Feedback": {
+    "properties": {
+     "content_hash": {
+      "title": "Content Hash",
+      "type": "string"
+     },
+     "created_at": {
+      "title": "Created At",
+      "type": "string"
+     },
+     "created_by": {
+      "title": "Created By",
+      "type": "string"
+     },
+     "id": {
+      "title": "Id",
+      "type": "string"
+     },
+     "judgement": {
+      "$ref": "#/components/schemas/FeedbackJudgement"
+     },
+     "projectId": {
+      "title": "Projectid",
+      "type": "string"
+     },
+     "task_id": {
+      "title": "Task Id",
+      "type": "string"
+     },
+     "type": {
+      "const": "feedback",
+      "default": "feedback",
+      "title": "Type",
+      "type": "string"
+     },
+     "updated_at": {
+      "title": "Updated At",
+      "type": "string"
+     }
+    },
+    "required": [
+     "type",
+     "task_id",
+     "content_hash",
+     "judgement",
+     "id",
+     "projectId",
+     "created_at",
+     "updated_at",
+     "created_by"
+    ],
+    "title": "Feedback",
+    "type": "object"
+   },
+   "FeedbackCreate": {
+    "properties": {
+     "judgement": {
+      "$ref": "#/components/schemas/FeedbackJudgement"
+     },
+     "task_id": {
+      "title": "Task Id",
+      "type": "string"
+     }
+    },
+    "required": [
+     "task_id",
+     "judgement"
+    ],
+    "title": "FeedbackCreate",
+    "type": "object"
+   },
+   "FeedbackJudgement": {
+    "enum": [
+     "agree",
+     "dismiss"
+    ],
+    "title": "FeedbackJudgement",
+    "type": "string"
+   },
+   "HTTPValidationError": {
+    "properties": {
+     "detail": {
+      "items": {
+       "$ref": "#/components/schemas/ValidationError"
+      },
+      "title": "Detail",
+      "type": "array"
+     }
+    },
+    "title": "HTTPValidationError",
+    "type": "object"
+   },
+   "HealthComponents": {
+    "properties": {
+     "alignment": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Alignment"
+     },
+     "schedule": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Schedule"
+     },
+     "validation": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Validation"
+     },
+     "waste": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Waste"
+     }
+    },
+    "required": [
+     "alignment",
+     "validation",
+     "schedule",
+     "waste"
+    ],
+    "title": "HealthComponents",
+    "type": "object"
+   },
+   "HealthResponse": {
+    "properties": {
+     "ai_configured": {
+      "title": "Ai Configured",
+      "type": "boolean"
+     },
+     "status": {
+      "title": "Status",
+      "type": "string"
+     },
+     "storage": {
+      "title": "Storage",
+      "type": "string"
+     }
+    },
+    "required": [
+     "status",
+     "storage",
+     "ai_configured"
+    ],
+    "title": "HealthResponse",
+    "type": "object"
+   },
+   "HealthView": {
+    "properties": {
+     "components": {
+      "$ref": "#/components/schemas/HealthComponents"
+     },
+     "computed_at": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Computed At"
+     },
+     "delta_vs_last_month": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Delta Vs Last Month"
+     },
+     "score": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Score"
+     }
+    },
+    "required": [
+     "score",
+     "components",
+     "delta_vs_last_month",
+     "computed_at"
+    ],
+    "title": "HealthView",
+    "type": "object"
+   },
+   "ItemPatch": {
+    "description": "Partial update. The service merges it into the stored item and re-validates with the type's model.",
+    "properties": {
+     "clear_due_date": {
+      "default": false,
+      "title": "Clear Due Date",
+      "type": "boolean"
+     },
+     "clear_effort_hours": {
+      "default": false,
+      "title": "Clear Effort Hours",
+      "type": "boolean"
+     },
+     "description": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Description"
+     },
+     "due_date": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Due Date"
+     },
+     "effort_hours": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Effort Hours"
+     },
+     "linked_assumption_ids": {
+      "anyOf": [
+       {
+        "items": {
+         "type": "string"
+        },
+        "type": "array"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Linked Assumption Ids"
+     },
+     "linked_criterion_ids": {
+      "anyOf": [
+       {
+        "items": {
+         "type": "string"
+        },
+        "type": "array"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Linked Criterion Ids"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     },
+     "priority": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/Priority"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "result": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/EvidenceResult"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "source": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Source"
+     },
+     "status": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Status"
+     },
+     "summary": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Summary"
+     },
+     "target": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Target"
+     },
+     "text": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Text"
+     },
+     "title": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Title"
+     }
+    },
+    "title": "ItemPatch",
+    "type": "object"
+   },
+   "Mode": {
+    "enum": [
+     "poc",
+     "planning",
+     "improvement"
+    ],
+    "title": "Mode",
+    "type": "string"
+   },
+   "ModeDefinition": {
+    "properties": {
+     "card_labels": {
+      "$ref": "#/components/schemas/CardLabels"
+     },
+     "description": {
+      "maxLength": 300,
+      "title": "Description",
+      "type": "string"
+     },
+     "id": {
+      "$ref": "#/components/schemas/Mode"
+     },
+     "labels": {
+      "$ref": "#/components/schemas/ModeLabels"
+     },
+     "name": {
+      "maxLength": 30,
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+     },
+     "placeholders": {
+      "$ref": "#/components/schemas/Placeholders"
+     },
+     "prompt_guidance": {
+      "maxLength": 4000,
+      "title": "Prompt Guidance",
+      "type": "string"
+     },
+     "updated_at": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Updated At"
+     },
+     "updated_by": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Updated By"
+     },
+     "weights": {
+      "$ref": "#/components/schemas/Weights"
+     }
+    },
+    "required": [
+     "name",
+     "description",
+     "labels",
+     "card_labels",
+     "placeholders",
+     "weights",
+     "prompt_guidance",
+     "id",
+     "updated_at",
+     "updated_by"
+    ],
+    "title": "ModeDefinition",
+    "type": "object"
+   },
+   "ModeDefinitionBody": {
+    "properties": {
+     "card_labels": {
+      "$ref": "#/components/schemas/CardLabels"
+     },
+     "description": {
+      "maxLength": 300,
+      "title": "Description",
+      "type": "string"
+     },
+     "labels": {
+      "$ref": "#/components/schemas/ModeLabels"
+     },
+     "name": {
+      "maxLength": 30,
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+     },
+     "placeholders": {
+      "$ref": "#/components/schemas/Placeholders"
+     },
+     "prompt_guidance": {
+      "maxLength": 4000,
+      "title": "Prompt Guidance",
+      "type": "string"
+     },
+     "weights": {
+      "$ref": "#/components/schemas/Weights"
+     }
+    },
+    "required": [
+     "name",
+     "description",
+     "labels",
+     "card_labels",
+     "placeholders",
+     "weights",
+     "prompt_guidance"
+    ],
+    "title": "ModeDefinitionBody",
+    "type": "object"
+   },
+   "ModeLabels": {
+    "properties": {
+     "assumption": {
+      "title": "Assumption",
+      "type": "string"
+     },
+     "criterion": {
+      "title": "Criterion",
+      "type": "string"
+     },
+     "deadline": {
+      "title": "Deadline",
+      "type": "string"
+     },
+     "decision_continue": {
+      "title": "Decision Continue",
+      "type": "string"
+     },
+     "decision_pivot": {
+      "title": "Decision Pivot",
+      "type": "string"
+     },
+     "decision_stop": {
+      "title": "Decision Stop",
+      "type": "string"
+     },
+     "evidence": {
+      "title": "Evidence",
+      "type": "string"
+     },
+     "goal": {
+      "title": "Goal",
+      "type": "string"
+     },
+     "task": {
+      "title": "Task",
+      "type": "string"
+     }
+    },
+    "required": [
+     "goal",
+     "assumption",
+     "criterion",
+     "deadline",
+     "task",
+     "evidence",
+     "decision_continue",
+     "decision_pivot",
+     "decision_stop"
+    ],
+    "title": "ModeLabels",
+    "type": "object"
+   },
+   "Operation": {
+    "properties": {
+     "error": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Error"
+     },
+     "fields": {
+      "additionalProperties": true,
+      "title": "Fields",
+      "type": "object"
+     },
+     "item_id": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Item Id"
+     },
+     "op": {
+      "$ref": "#/components/schemas/OperationKind"
+     },
+     "result": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Result"
+     },
+     "result_message": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Result Message"
+     },
+     "summary": {
+      "title": "Summary",
+      "type": "string"
+     },
+     "target": {
+      "$ref": "#/components/schemas/OperationTarget"
+     }
+    },
+    "required": [
+     "op",
+     "target",
+     "item_id",
+     "fields",
+     "summary",
+     "error",
+     "result",
+     "result_message"
+    ],
+    "title": "Operation",
+    "type": "object"
+   },
+   "OperationKind": {
+    "enum": [
+     "create",
+     "update",
+     "delete"
+    ],
+    "title": "OperationKind",
+    "type": "string"
+   },
+   "OperationTarget": {
+    "enum": [
+     "assumption",
+     "criterion",
+     "task",
+     "evidence",
+     "project"
+    ],
+    "title": "OperationTarget",
+    "type": "string"
+   },
+   "Placeholders": {
+    "properties": {
+     "assumption": {
+      "title": "Assumption",
+      "type": "string"
+     },
+     "criterion": {
+      "title": "Criterion",
+      "type": "string"
+     },
+     "evidence": {
+      "title": "Evidence",
+      "type": "string"
+     },
+     "goal": {
+      "title": "Goal",
+      "type": "string"
+     },
+     "task": {
+      "title": "Task",
+      "type": "string"
+     },
+     "title": {
+      "title": "Title",
+      "type": "string"
+     }
+    },
+    "required": [
+     "title",
+     "goal",
+     "assumption",
+     "criterion",
+     "task",
+     "evidence"
+    ],
+    "title": "Placeholders",
+    "type": "object"
+   },
+   "Priority": {
+    "enum": [
+     "high",
+     "medium",
+     "low"
+    ],
+    "title": "Priority",
+    "type": "string"
+   },
+   "Project": {
+    "properties": {
+     "created_at": {
+      "title": "Created At",
+      "type": "string"
+     },
+     "deadline": {
+      "format": "date",
+      "title": "Deadline",
+      "type": "string"
+     },
+     "deleted": {
+      "default": false,
+      "title": "Deleted",
+      "type": "boolean"
+     },
+     "goal": {
+      "title": "Goal",
+      "type": "string"
+     },
+     "id": {
+      "title": "Id",
+      "type": "string"
+     },
+     "members": {
+      "items": {
+       "type": "string"
+      },
+      "title": "Members",
+      "type": "array"
+     },
+     "mode": {
+      "$ref": "#/components/schemas/Mode"
+     },
+     "owner_email": {
+      "title": "Owner Email",
+      "type": "string"
+     },
+     "start_date": {
+      "format": "date",
+      "title": "Start Date",
+      "type": "string"
+     },
+     "status": {
+      "$ref": "#/components/schemas/ProjectStatus",
+      "default": "active"
+     },
+     "summary": {
+      "$ref": "#/components/schemas/ProjectSummary"
+     },
+     "title": {
+      "title": "Title",
+      "type": "string"
+     },
+     "updated_at": {
+      "title": "Updated At",
+      "type": "string"
+     }
+    },
+    "required": [
+     "id",
+     "mode",
+     "title",
+     "goal",
+     "start_date",
+     "deadline",
+     "status",
+     "owner_email",
+     "members",
+     "deleted",
+     "created_at",
+     "updated_at",
+     "summary"
+    ],
+    "title": "Project",
+    "type": "object"
+   },
+   "ProjectCreate": {
+    "properties": {
+     "assumptions": {
+      "items": {
+       "$ref": "#/components/schemas/AssumptionSeed"
+      },
+      "title": "Assumptions",
+      "type": "array"
+     },
+     "criteria": {
+      "items": {
+       "$ref": "#/components/schemas/CriterionSeed"
+      },
+      "title": "Criteria",
+      "type": "array"
+     },
+     "deadline": {
+      "format": "date",
+      "title": "Deadline",
+      "type": "string"
+     },
+     "goal": {
+      "maxLength": 2000,
+      "minLength": 1,
+      "title": "Goal",
+      "type": "string"
+     },
+     "members": {
+      "items": {
+       "type": "string"
+      },
+      "title": "Members",
+      "type": "array"
+     },
+     "mode": {
+      "$ref": "#/components/schemas/Mode"
+     },
+     "start_date": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Start Date"
+     },
+     "title": {
+      "maxLength": 100,
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+     }
+    },
+    "required": [
+     "mode",
+     "title",
+     "goal",
+     "deadline"
+    ],
+    "title": "ProjectCreate",
+    "type": "object"
+   },
+   "ProjectItems": {
+    "properties": {
+     "assumptions": {
+      "items": {
+       "$ref": "#/components/schemas/Assumption"
+      },
+      "title": "Assumptions",
+      "type": "array"
+     },
+     "criteria": {
+      "items": {
+       "$ref": "#/components/schemas/Criterion"
+      },
+      "title": "Criteria",
+      "type": "array"
+     },
+     "decisions": {
+      "items": {
+       "$ref": "#/components/schemas/DecisionItem"
+      },
+      "title": "Decisions",
+      "type": "array"
+     },
+     "evidence": {
+      "items": {
+       "$ref": "#/components/schemas/Evidence"
+      },
+      "title": "Evidence",
+      "type": "array"
+     },
+     "feedback": {
+      "items": {
+       "$ref": "#/components/schemas/Feedback"
+      },
+      "title": "Feedback",
+      "type": "array"
+     },
+     "tasks": {
+      "items": {
+       "$ref": "#/components/schemas/Task"
+      },
+      "title": "Tasks",
+      "type": "array"
+     }
+    },
+    "required": [
+     "assumptions",
+     "criteria",
+     "tasks",
+     "evidence",
+     "decisions",
+     "feedback"
+    ],
+    "title": "ProjectItems",
+    "type": "object"
+   },
+   "ProjectStatus": {
+    "enum": [
+     "active",
+     "stopped",
+     "completed"
+    ],
+    "title": "ProjectStatus",
+    "type": "string"
+   },
+   "ProjectSummary": {
+    "description": "Snapshot of dashboard numbers stored on the project at evaluation time (for the list view).",
+    "properties": {
+     "deadline_risk": {
+      "default": 0,
+      "title": "Deadline Risk",
+      "type": "integer"
+     },
+     "drift": {
+      "default": 0,
+      "title": "Drift",
+      "type": "integer"
+     },
+     "evaluated_at": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Evaluated At"
+     },
+     "health_score": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Health Score"
+     },
+     "unnecessary": {
+      "default": 0,
+      "title": "Unnecessary",
+      "type": "integer"
+     },
+     "untested": {
+      "default": 0,
+      "title": "Untested",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "health_score",
+     "drift",
+     "unnecessary",
+     "deadline_risk",
+     "untested",
+     "evaluated_at"
+    ],
+    "title": "ProjectSummary",
+    "type": "object"
+   },
+   "ProjectUpdate": {
+    "properties": {
+     "deadline": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Deadline"
+     },
+     "goal": {
+      "anyOf": [
+       {
+        "maxLength": 2000,
+        "minLength": 1,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Goal"
+     },
+     "members": {
+      "anyOf": [
+       {
+        "items": {
+         "type": "string"
+        },
+        "type": "array"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Members"
+     },
+     "mode": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/Mode"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "start_date": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Start Date"
+     },
+     "status": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/ProjectStatus"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "title": {
+      "anyOf": [
+       {
+        "maxLength": 100,
+        "minLength": 1,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Title"
+     }
+    },
+    "title": "ProjectUpdate",
+    "type": "object"
+   },
+   "Proposal": {
+    "properties": {
+     "operations": {
+      "items": {
+       "$ref": "#/components/schemas/Operation"
+      },
+      "title": "Operations",
+      "type": "array"
+     },
+     "status": {
+      "$ref": "#/components/schemas/ProposalStatus"
+     }
+    },
+    "required": [
+     "status",
+     "operations"
+    ],
+    "title": "Proposal",
+    "type": "object"
+   },
+   "ProposalStatus": {
+    "enum": [
+     "pending",
+     "applied",
+     "partially_applied",
+     "discarded"
+    ],
+    "title": "ProposalStatus",
+    "type": "string"
+   },
+   "Report": {
+    "properties": {
+     "content": {
+      "$ref": "#/components/schemas/ReportContent"
+     },
+     "created_at": {
+      "title": "Created At",
+      "type": "string"
+     },
+     "created_by": {
+      "title": "Created By",
+      "type": "string"
+     },
+     "health_score": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Health Score"
+     },
+     "id": {
+      "title": "Id",
+      "type": "string"
+     },
+     "model": {
+      "title": "Model",
+      "type": "string"
+     },
+     "projectId": {
+      "title": "Projectid",
+      "type": "string"
+     }
+    },
+    "required": [
+     "id",
+     "projectId",
+     "created_at",
+     "created_by",
+     "model",
+     "health_score",
+     "content"
+    ],
+    "title": "Report",
+    "type": "object"
+   },
+   "ReportContent": {
+    "properties": {
+     "highlights": {
+      "items": {
+       "type": "string"
+      },
+      "title": "Highlights",
+      "type": "array"
+     },
+     "next_actions": {
+      "items": {
+       "type": "string"
+      },
+      "title": "Next Actions",
+      "type": "array"
+     },
+     "options": {
+      "items": {
+       "$ref": "#/components/schemas/ReportOption"
+      },
+      "title": "Options",
+      "type": "array"
+     },
+     "questions": {
+      "items": {
+       "type": "string"
+      },
+      "title": "Questions",
+      "type": "array"
+     },
+     "summary": {
+      "title": "Summary",
+      "type": "string"
+     }
+    },
+    "required": [
+     "summary",
+     "highlights",
+     "options",
+     "questions",
+     "next_actions"
+    ],
+    "title": "ReportContent",
+    "type": "object"
+   },
+   "ReportOption": {
+    "properties": {
+     "concerns": {
+      "items": {
+       "type": "string"
+      },
+      "title": "Concerns",
+      "type": "array"
+     },
+     "conditions": {
+      "items": {
+       "type": "string"
+      },
+      "title": "Conditions",
+      "type": "array"
+     },
+     "decision": {
+      "$ref": "#/components/schemas/Decision"
+     },
+     "supporting": {
+      "items": {
+       "type": "string"
+      },
+      "title": "Supporting",
+      "type": "array"
+     }
+    },
+    "required": [
+     "decision",
+     "supporting",
+     "concerns",
+     "conditions"
+    ],
+    "title": "ReportOption",
+    "type": "object"
+   },
+   "ScheduleView": {
+    "properties": {
+     "days_left": {
+      "title": "Days Left",
+      "type": "integer"
+     },
+     "delayed": {
+      "title": "Delayed",
+      "type": "boolean"
+     },
+     "elapsed": {
+      "title": "Elapsed",
+      "type": "number"
+     },
+     "progress": {
+      "title": "Progress",
+      "type": "number"
+     }
+    },
+    "required": [
+     "elapsed",
+     "progress",
+     "delayed",
+     "days_left"
+    ],
+    "title": "ScheduleView",
+    "type": "object"
+   },
+   "Task": {
+    "properties": {
+     "created_at": {
+      "title": "Created At",
+      "type": "string"
+     },
+     "created_by": {
+      "title": "Created By",
+      "type": "string"
+     },
+     "description": {
+      "default": "",
+      "maxLength": 1000,
+      "title": "Description",
+      "type": "string"
+     },
+     "due_date": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Due Date"
+     },
+     "effort_hours": {
+      "anyOf": [
+       {
+        "exclusiveMinimum": 0.0,
+        "maximum": 10000.0,
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Effort Hours"
+     },
+     "id": {
+      "title": "Id",
+      "type": "string"
+     },
+     "linked_assumption_ids": {
+      "items": {
+       "type": "string"
+      },
+      "title": "Linked Assumption Ids",
+      "type": "array"
+     },
+     "linked_criterion_ids": {
+      "items": {
+       "type": "string"
+      },
+      "title": "Linked Criterion Ids",
+      "type": "array"
+     },
+     "projectId": {
+      "title": "Projectid",
+      "type": "string"
+     },
+     "status": {
+      "$ref": "#/components/schemas/TaskStatus",
+      "default": "todo"
+     },
+     "title": {
+      "maxLength": 100,
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+     },
+     "type": {
+      "const": "task",
+      "default": "task",
+      "title": "Type",
+      "type": "string"
+     },
+     "updated_at": {
+      "title": "Updated At",
+      "type": "string"
+     }
+    },
+    "required": [
+     "type",
+     "title",
+     "description",
+     "status",
+     "effort_hours",
+     "due_date",
+     "linked_assumption_ids",
+     "linked_criterion_ids",
+     "id",
+     "projectId",
+     "created_at",
+     "updated_at",
+     "created_by"
+    ],
+    "title": "Task",
+    "type": "object"
+   },
+   "TaskFields": {
+    "properties": {
+     "description": {
+      "default": "",
+      "maxLength": 1000,
+      "title": "Description",
+      "type": "string"
+     },
+     "due_date": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Due Date"
+     },
+     "effort_hours": {
+      "anyOf": [
+       {
+        "exclusiveMinimum": 0.0,
+        "maximum": 10000.0,
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Effort Hours"
+     },
+     "linked_assumption_ids": {
+      "items": {
+       "type": "string"
+      },
+      "title": "Linked Assumption Ids",
+      "type": "array"
+     },
+     "linked_criterion_ids": {
+      "items": {
+       "type": "string"
+      },
+      "title": "Linked Criterion Ids",
+      "type": "array"
+     },
+     "status": {
+      "$ref": "#/components/schemas/TaskStatus",
+      "default": "todo"
+     },
+     "title": {
+      "maxLength": 100,
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+     },
+     "type": {
+      "const": "task",
+      "default": "task",
+      "title": "Type",
+      "type": "string"
+     }
+    },
+    "required": [
+     "title"
+    ],
+    "title": "TaskFields",
+    "type": "object"
+   },
+   "TaskResult": {
+    "properties": {
+     "alignment_score": {
+      "maximum": 100.0,
+      "minimum": 0.0,
+      "title": "Alignment Score",
+      "type": "integer"
+     },
+     "content_hash": {
+      "title": "Content Hash",
+      "type": "string"
+     },
+     "linked_assumption_ids": {
+      "items": {
+       "type": "string"
+      },
+      "title": "Linked Assumption Ids",
+      "type": "array"
+     },
+     "linked_criterion_ids": {
+      "items": {
+       "type": "string"
+      },
+      "title": "Linked Criterion Ids",
+      "type": "array"
+     },
+     "reason": {
+      "default": "",
+      "title": "Reason",
+      "type": "string"
+     },
+     "reused": {
+      "default": false,
+      "title": "Reused",
+      "type": "boolean"
+     },
+     "suggested_action": {
+      "default": "",
+      "title": "Suggested Action",
+      "type": "string"
+     },
+     "task_id": {
+      "title": "Task Id",
+      "type": "string"
+     },
+     "verdict": {
+      "$ref": "#/components/schemas/Verdict"
+     }
+    },
+    "required": [
+     "task_id",
+     "content_hash",
+     "alignment_score",
+     "verdict",
+     "linked_assumption_ids",
+     "linked_criterion_ids",
+     "reason",
+     "suggested_action",
+     "reused"
+    ],
+    "title": "TaskResult",
+    "type": "object"
+   },
+   "TaskStatus": {
+    "enum": [
+     "todo",
+     "doing",
+     "done"
+    ],
+    "title": "TaskStatus",
+    "type": "string"
+   },
+   "TrendPoint": {
+    "properties": {
+     "date": {
+      "title": "Date",
+      "type": "string"
+     },
+     "score": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Score"
+     }
+    },
+    "required": [
+     "date",
+     "score"
+    ],
+    "title": "TrendPoint",
+    "type": "object"
+   },
+   "UnderEvidenced": {
+    "properties": {
+     "assumption_id": {
+      "title": "Assumption Id",
+      "type": "string"
+     },
+     "evidence_count": {
+      "title": "Evidence Count",
+      "type": "integer"
+     },
+     "priority": {
+      "$ref": "#/components/schemas/Priority"
+     },
+     "shortage": {
+      "title": "Shortage",
+      "type": "integer"
+     },
+     "text": {
+      "title": "Text",
+      "type": "string"
+     }
+    },
+    "required": [
+     "assumption_id",
+     "text",
+     "priority",
+     "shortage",
+     "evidence_count"
+    ],
+    "title": "UnderEvidenced",
+    "type": "object"
+   },
+   "UserContext": {
+    "properties": {
+     "email": {
+      "title": "Email",
+      "type": "string"
+     },
+     "is_admin": {
+      "default": false,
+      "title": "Is Admin",
+      "type": "boolean"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     }
+    },
+    "required": [
+     "email",
+     "name",
+     "is_admin"
+    ],
+    "title": "UserContext",
+    "type": "object"
+   },
+   "ValidationError": {
+    "properties": {
+     "ctx": {
+      "title": "Context",
+      "type": "object"
+     },
+     "input": {
+      "title": "Input"
+     },
+     "loc": {
+      "items": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "integer"
+        }
+       ]
+      },
+      "title": "Location",
+      "type": "array"
+     },
+     "msg": {
+      "title": "Message",
+      "type": "string"
+     },
+     "type": {
+      "title": "Error Type",
+      "type": "string"
+     }
+    },
+    "required": [
+     "loc",
+     "msg",
+     "type"
+    ],
+    "title": "ValidationError",
+    "type": "object"
+   },
+   "Verdict": {
+    "enum": [
+     "aligned",
+     "weak",
+     "drift",
+     "unnecessary_candidate"
+    ],
+    "title": "Verdict",
+    "type": "string"
+   },
+   "WeakTask": {
+    "properties": {
+     "alignment_score": {
+      "title": "Alignment Score",
+      "type": "integer"
+     },
+     "gap": {
+      "title": "Gap",
+      "type": "integer"
+     },
+     "reason": {
+      "title": "Reason",
+      "type": "string"
+     },
+     "task_id": {
+      "title": "Task Id",
+      "type": "string"
+     },
+     "title": {
+      "title": "Title",
+      "type": "string"
+     },
+     "verdict": {
+      "$ref": "#/components/schemas/Verdict"
+     }
+    },
+    "required": [
+     "task_id",
+     "title",
+     "alignment_score",
+     "gap",
+     "verdict",
+     "reason"
+    ],
+    "title": "WeakTask",
+    "type": "object"
+   },
+   "Weights": {
+    "properties": {
+     "alignment": {
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Alignment",
+      "type": "number"
+     },
+     "schedule": {
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Schedule",
+      "type": "number"
+     },
+     "validation": {
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Validation",
+      "type": "number"
+     },
+     "waste": {
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Waste",
+      "type": "number"
+     }
+    },
+    "required": [
+     "alignment",
+     "validation",
+     "schedule",
+     "waste"
+    ],
+    "title": "Weights",
+    "type": "object"
+   }
+  }
+ },
+ "info": {
+  "title": "PoC Compass API",
+  "version": "1.0.0"
+ },
+ "openapi": "3.1.0",
+ "paths": {
+  "/api/health": {
+   "get": {
+    "operationId": "health_api_health_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HealthResponse"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Health",
+    "tags": [
+     "common"
+    ]
+   }
+  },
+  "/api/me": {
+   "get": {
+    "operationId": "me_api_me_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/UserContext"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Me",
+    "tags": [
+     "common"
+    ]
+   }
+  },
+  "/api/modes": {
+   "get": {
+    "operationId": "list_modes_api_modes_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/ModeDefinition"
+         },
+         "title": "Response List Modes Api Modes Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "List Modes",
+    "tags": [
+     "modes"
+    ]
+   }
+  },
+  "/api/modes/{mode_id}": {
+   "get": {
+    "operationId": "get_mode_api_modes__mode_id__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "mode_id",
+      "required": true,
+      "schema": {
+       "title": "Mode Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ModeDefinition"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Get Mode",
+    "tags": [
+     "modes"
+    ]
+   },
+   "put": {
+    "operationId": "update_mode_api_modes__mode_id__put",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "mode_id",
+      "required": true,
+      "schema": {
+       "title": "Mode Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ModeDefinitionBody"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ModeDefinition"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Update Mode",
+    "tags": [
+     "modes"
+    ]
+   }
+  },
+  "/api/modes/{mode_id}/reset": {
+   "post": {
+    "operationId": "reset_mode_api_modes__mode_id__reset_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "mode_id",
+      "required": true,
+      "schema": {
+       "title": "Mode Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ModeDefinition"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Reset Mode",
+    "tags": [
+     "modes"
+    ]
+   }
+  },
+  "/api/projects": {
+   "get": {
+    "operationId": "list_projects_api_projects_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "mode",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "$ref": "#/components/schemas/Mode"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Mode"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/Project"
+         },
+         "title": "Response List Projects Api Projects Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "List Projects",
+    "tags": [
+     "projects"
+    ]
+   },
+   "post": {
+    "operationId": "create_project_api_projects_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ProjectCreate"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Project"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Create Project",
+    "tags": [
+     "projects"
+    ]
+   }
+  },
+  "/api/projects/{project_id}": {
+   "delete": {
+    "operationId": "delete_project_api_projects__project_id__delete",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "project_id",
+      "required": true,
+      "schema": {
+       "title": "Project Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Delete Project",
+    "tags": [
+     "projects"
+    ]
+   },
+   "get": {
+    "operationId": "get_project_api_projects__project_id__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "project_id",
+      "required": true,
+      "schema": {
+       "title": "Project Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Project"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Get Project",
+    "tags": [
+     "projects"
+    ]
+   },
+   "patch": {
+    "operationId": "update_project_api_projects__project_id__patch",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "project_id",
+      "required": true,
+      "schema": {
+       "title": "Project Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ProjectUpdate"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Project"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Update Project",
+    "tags": [
+     "projects"
+    ]
+   }
+  },
+  "/api/projects/{project_id}/chat": {
+   "delete": {
+    "operationId": "clear_api_projects__project_id__chat_delete",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "project_id",
+      "required": true,
+      "schema": {
+       "title": "Project Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Clear",
+    "tags": [
+     "chat"
+    ]
+   },
+   "get": {
+    "operationId": "list_messages_api_projects__project_id__chat_get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "project_id",
+      "required": true,
+      "schema": {
+       "title": "Project Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/ChatMessage"
+         },
+         "title": "Response List Messages Api Projects  Project Id  Chat Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "List Messages",
+    "tags": [
+     "chat"
+    ]
+   },
+   "post": {
+    "operationId": "send_api_projects__project_id__chat_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "project_id",
+      "required": true,
+      "schema": {
+       "title": "Project Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ChatSend"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ChatSendResponse"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Send",
+    "tags": [
+     "chat"
+    ]
+   }
+  },
+  "/api/projects/{project_id}/chat/{message_id}/apply": {
+   "post": {
+    "operationId": "apply_api_projects__project_id__chat__message_id__apply_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "project_id",
+      "required": true,
+      "schema": {
+       "title": "Project Id",
+       "type": "string"
+      }
+     },
+     {
+      "in": "path",
+      "name": "message_id",
+      "required": true,
+      "schema": {
+       "title": "Message Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "anyOf": [
+         {
+          "$ref": "#/components/schemas/ChatApply"
+         },
+         {
+          "type": "null"
+         }
+        ],
+        "title": "Body"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ChatMessage"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Apply",
+    "tags": [
+     "chat"
+    ]
+   }
+  },
+  "/api/projects/{project_id}/chat/{message_id}/discard": {
+   "post": {
+    "operationId": "discard_api_projects__project_id__chat__message_id__discard_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "project_id",
+      "required": true,
+      "schema": {
+       "title": "Project Id",
+       "type": "string"
+      }
+     },
+     {
+      "in": "path",
+      "name": "message_id",
+      "required": true,
+      "schema": {
+       "title": "Message Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ChatMessage"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Discard",
+    "tags": [
+     "chat"
+    ]
+   }
+  },
+  "/api/projects/{project_id}/dashboard": {
+   "get": {
+    "operationId": "dashboard_api_projects__project_id__dashboard_get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "project_id",
+      "required": true,
+      "schema": {
+       "title": "Project Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Dashboard"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Dashboard",
+    "tags": [
+     "projects"
+    ]
+   }
+  },
+  "/api/projects/{project_id}/evaluations": {
+   "post": {
+    "operationId": "evaluate_api_projects__project_id__evaluations_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "project_id",
+      "required": true,
+      "schema": {
+       "title": "Project Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Evaluation"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Evaluate",
+    "tags": [
+     "projects"
+    ]
+   }
+  },
+  "/api/projects/{project_id}/evaluations/latest": {
+   "get": {
+    "operationId": "latest_evaluation_api_projects__project_id__evaluations_latest_get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "project_id",
+      "required": true,
+      "schema": {
+       "title": "Project Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "anyOf": [
+          {
+           "$ref": "#/components/schemas/Evaluation"
+          },
+          {
+           "type": "null"
+          }
+         ],
+         "title": "Response Latest Evaluation Api Projects  Project Id  Evaluations Latest Get"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Latest Evaluation",
+    "tags": [
+     "projects"
+    ]
+   }
+  },
+  "/api/projects/{project_id}/feedback": {
+   "post": {
+    "operationId": "add_feedback_api_projects__project_id__feedback_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "project_id",
+      "required": true,
+      "schema": {
+       "title": "Project Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/FeedbackCreate"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "discriminator": {
+          "mapping": {
+           "assumption": "#/components/schemas/Assumption",
+           "criterion": "#/components/schemas/Criterion",
+           "decision": "#/components/schemas/DecisionItem",
+           "evidence": "#/components/schemas/Evidence",
+           "feedback": "#/components/schemas/Feedback",
+           "task": "#/components/schemas/Task"
+          },
+          "propertyName": "type"
+         },
+         "oneOf": [
+          {
+           "$ref": "#/components/schemas/Assumption"
+          },
+          {
+           "$ref": "#/components/schemas/Criterion"
+          },
+          {
+           "$ref": "#/components/schemas/Task"
+          },
+          {
+           "$ref": "#/components/schemas/Evidence"
+          },
+          {
+           "$ref": "#/components/schemas/DecisionItem"
+          },
+          {
+           "$ref": "#/components/schemas/Feedback"
+          }
+         ],
+         "title": "Response Add Feedback Api Projects  Project Id  Feedback Post"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Add Feedback",
+    "tags": [
+     "items"
+    ]
+   }
+  },
+  "/api/projects/{project_id}/items": {
+   "get": {
+    "operationId": "list_items_api_projects__project_id__items_get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "project_id",
+      "required": true,
+      "schema": {
+       "title": "Project Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ProjectItems"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "List Items",
+    "tags": [
+     "items"
+    ]
+   },
+   "post": {
+    "operationId": "create_item_api_projects__project_id__items_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "project_id",
+      "required": true,
+      "schema": {
+       "title": "Project Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "discriminator": {
+         "mapping": {
+          "assumption": "#/components/schemas/AssumptionFields",
+          "criterion": "#/components/schemas/CriterionFields",
+          "decision": "#/components/schemas/DecisionFields",
+          "evidence": "#/components/schemas/EvidenceFields",
+          "task": "#/components/schemas/TaskFields"
+         },
+         "propertyName": "type"
+        },
+        "oneOf": [
+         {
+          "$ref": "#/components/schemas/AssumptionFields"
+         },
+         {
+          "$ref": "#/components/schemas/CriterionFields"
+         },
+         {
+          "$ref": "#/components/schemas/TaskFields"
+         },
+         {
+          "$ref": "#/components/schemas/EvidenceFields"
+         },
+         {
+          "$ref": "#/components/schemas/DecisionFields"
+         }
+        ],
+        "title": "Body"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "discriminator": {
+          "mapping": {
+           "assumption": "#/components/schemas/Assumption",
+           "criterion": "#/components/schemas/Criterion",
+           "decision": "#/components/schemas/DecisionItem",
+           "evidence": "#/components/schemas/Evidence",
+           "feedback": "#/components/schemas/Feedback",
+           "task": "#/components/schemas/Task"
+          },
+          "propertyName": "type"
+         },
+         "oneOf": [
+          {
+           "$ref": "#/components/schemas/Assumption"
+          },
+          {
+           "$ref": "#/components/schemas/Criterion"
+          },
+          {
+           "$ref": "#/components/schemas/Task"
+          },
+          {
+           "$ref": "#/components/schemas/Evidence"
+          },
+          {
+           "$ref": "#/components/schemas/DecisionItem"
+          },
+          {
+           "$ref": "#/components/schemas/Feedback"
+          }
+         ],
+         "title": "Response Create Item Api Projects  Project Id  Items Post"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Create Item",
+    "tags": [
+     "items"
+    ]
+   }
+  },
+  "/api/projects/{project_id}/items/bulk": {
+   "post": {
+    "operationId": "bulk_create_api_projects__project_id__items_bulk_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "project_id",
+      "required": true,
+      "schema": {
+       "title": "Project Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/BulkTaskCreate"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "discriminator": {
+           "mapping": {
+            "assumption": "#/components/schemas/Assumption",
+            "criterion": "#/components/schemas/Criterion",
+            "decision": "#/components/schemas/DecisionItem",
+            "evidence": "#/components/schemas/Evidence",
+            "feedback": "#/components/schemas/Feedback",
+            "task": "#/components/schemas/Task"
+           },
+           "propertyName": "type"
+          },
+          "oneOf": [
+           {
+            "$ref": "#/components/schemas/Assumption"
+           },
+           {
+            "$ref": "#/components/schemas/Criterion"
+           },
+           {
+            "$ref": "#/components/schemas/Task"
+           },
+           {
+            "$ref": "#/components/schemas/Evidence"
+           },
+           {
+            "$ref": "#/components/schemas/DecisionItem"
+           },
+           {
+            "$ref": "#/components/schemas/Feedback"
+           }
+          ]
+         },
+         "title": "Response Bulk Create Api Projects  Project Id  Items Bulk Post",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Bulk Create",
+    "tags": [
+     "items"
+    ]
+   }
+  },
+  "/api/projects/{project_id}/items/{item_id}": {
+   "delete": {
+    "operationId": "delete_item_api_projects__project_id__items__item_id__delete",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "project_id",
+      "required": true,
+      "schema": {
+       "title": "Project Id",
+       "type": "string"
+      }
+     },
+     {
+      "in": "path",
+      "name": "item_id",
+      "required": true,
+      "schema": {
+       "title": "Item Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Delete Item",
+    "tags": [
+     "items"
+    ]
+   },
+   "patch": {
+    "operationId": "update_item_api_projects__project_id__items__item_id__patch",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "project_id",
+      "required": true,
+      "schema": {
+       "title": "Project Id",
+       "type": "string"
+      }
+     },
+     {
+      "in": "path",
+      "name": "item_id",
+      "required": true,
+      "schema": {
+       "title": "Item Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ItemPatch"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "discriminator": {
+          "mapping": {
+           "assumption": "#/components/schemas/Assumption",
+           "criterion": "#/components/schemas/Criterion",
+           "decision": "#/components/schemas/DecisionItem",
+           "evidence": "#/components/schemas/Evidence",
+           "feedback": "#/components/schemas/Feedback",
+           "task": "#/components/schemas/Task"
+          },
+          "propertyName": "type"
+         },
+         "oneOf": [
+          {
+           "$ref": "#/components/schemas/Assumption"
+          },
+          {
+           "$ref": "#/components/schemas/Criterion"
+          },
+          {
+           "$ref": "#/components/schemas/Task"
+          },
+          {
+           "$ref": "#/components/schemas/Evidence"
+          },
+          {
+           "$ref": "#/components/schemas/DecisionItem"
+          },
+          {
+           "$ref": "#/components/schemas/Feedback"
+          }
+         ],
+         "title": "Response Update Item Api Projects  Project Id  Items  Item Id  Patch"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Update Item",
+    "tags": [
+     "items"
+    ]
+   }
+  },
+  "/api/projects/{project_id}/reports": {
+   "get": {
+    "operationId": "list_reports_api_projects__project_id__reports_get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "project_id",
+      "required": true,
+      "schema": {
+       "title": "Project Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/Report"
+         },
+         "title": "Response List Reports Api Projects  Project Id  Reports Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "List Reports",
+    "tags": [
+     "projects"
+    ]
+   },
+   "post": {
+    "operationId": "create_report_api_projects__project_id__reports_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "project_id",
+      "required": true,
+      "schema": {
+       "title": "Project Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Report"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Create Report",
+    "tags": [
+     "projects"
+    ]
+   }
+  },
+  "/api/projects/{project_id}/tasks/extract": {
+   "post": {
+    "operationId": "extract_tasks_api_projects__project_id__tasks_extract_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "project_id",
+      "required": true,
+      "schema": {
+       "title": "Project Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ExtractRequest"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ExtractResponse"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Extract Tasks",
+    "tags": [
+     "projects"
+    ]
+   }
+  }
+ }
+}

@@ -1,0 +1,36 @@
+# --- secrets (never commit) ---
+local.settings.json
+.env
+.env.*
+!.env.example
+envsetting.json
+infra/parameters/secrets.json
+*.pfx
+*-sa-key*.json
+
+# --- python ---
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.python_packages/
+
+# --- node / next ---
+node_modules/
+.next/
+.next-dev/
+out/
+*.tsbuildinfo
+next-env.d.ts
+
+# --- local runtime data / build artifacts ---
+.localdata/
+.azure/
+dist/
+*.zip
+*.log
+.next-dev/
+.harness/
+.func-dev.log
+.front-dev.log
