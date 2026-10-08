@@ -46,14 +46,14 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
 
   return (
     <ProjectProvider value={value}>
-      <div className="space-y-5">
+      <div className="space-y-3">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0 space-y-1.5">
-            <Link href="/" className="inline-flex items-center gap-1 text-sm text-slate-600 hover:text-primary">
-              <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-              取り組み一覧
-            </Link>
             <div className="flex flex-wrap items-center gap-2">
+              <Link href="/" className="inline-flex items-center gap-1 text-sm text-slate-600 hover:text-primary">
+                <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+                取り組み一覧
+              </Link>
               <Badge variant="brand">{mode.name}</Badge>
               {status && <Badge variant={status.variant}>{status.label}</Badge>}
               <span className="inline-flex items-center gap-1 text-xs text-slate-600">
@@ -61,7 +61,7 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
                 {formatDate(project.start_date)} 〜 {lb.deadline} {formatDate(project.deadline)}
               </span>
             </div>
-            <h1 className="break-words text-2xl font-bold text-slate-900">{project.title}</h1>
+            <h1 className="break-words text-xl font-bold text-slate-900">{project.title}</h1>
           </div>
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" onClick={() => setChatOpen(true)}>
@@ -99,7 +99,7 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
           })}
         </nav>
 
-        <div className="animate-fade-in-up pb-20">{children}</div>
+        <div className="animate-fade-in-up pb-1">{children}</div>
       </div>
       {!chatOpen && <ChatLauncher onOpen={() => setChatOpen(true)} />}
       <ChatPanel open={chatOpen} onClose={() => setChatOpen(false)} />

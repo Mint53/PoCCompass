@@ -86,7 +86,7 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {(pending > 0 || dash.design_changed || !dash.last_evaluated_at) && (
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3" role="status">
           <p className="flex items-start gap-2 text-sm text-amber-900">
@@ -106,10 +106,10 @@ export default function DashboardPage() {
       )}
 
       <Card title={`${mode.name}健全度ダッシュボード`}>
-        <div className="grid gap-4 lg:grid-cols-[260px_minmax(0,1fr)]">
-          <div className="flex flex-col items-center gap-2 rounded-xl border border-slate-200 p-4">
+        <div className="grid gap-4 lg:grid-cols-[200px_minmax(0,1fr)]">
+          <div className="flex flex-col items-center justify-center gap-1 rounded-xl border border-slate-200 p-3">
             <p className="text-sm font-semibold text-slate-700">Health Score</p>
-            <ScoreRing score={dash.health.score} />
+            <ScoreRing score={dash.health.score} size={104} />
             <p className={cn("text-sm font-bold", delta == null ? "text-slate-500" : delta >= 0 ? "text-emerald-600" : "text-rose-600")}>
               {delta == null ? "先月比 比較データなし" : `先月比 ${delta >= 0 ? "+" : ""}${delta}`}
             </p>
@@ -123,20 +123,20 @@ export default function DashboardPage() {
                 key={c.label}
                 href={c.href}
                 className={cn(
-                  "flex flex-col items-center gap-1 rounded-xl border border-t-4 border-slate-200 p-4 text-center transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-ring",
+                  "flex flex-col items-center justify-center gap-0.5 rounded-xl border border-t-4 border-slate-200 p-2 text-center transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-ring",
                   c.value > 0 ? c.accent : "border-t-slate-200",
                 )}
               >
                 <p className="text-sm font-semibold text-slate-800">{c.label}</p>
-                <p className={cn("text-4xl font-bold tabular-nums", c.value > 0 ? c.color : "text-slate-400")}>
+                <p className={cn("text-3xl font-bold tabular-nums", c.value > 0 ? c.color : "text-slate-400")}>
                   {c.value}
                   <span className="ml-0.5 text-sm font-medium">件</span>
                 </p>
                 <p className="text-xs text-slate-600">{c.hint}</p>
               </a>
             ))}
-            <div className="col-span-2 rounded-xl border border-slate-200 p-4 xl:col-span-4">
-              <p className="mb-2 text-sm font-semibold text-slate-700">スコアの内訳（0〜100）</p>
+            <div className="col-span-2 rounded-xl border border-slate-200 px-3 py-2 xl:col-span-4">
+              <p className="mb-1 text-sm font-semibold text-slate-700">スコアの内訳（0〜100）</p>
               <div className="grid gap-x-6 sm:grid-cols-2">
                 {COMPONENT_LABELS.map(({ key, label }) => {
                   const v = dash.health.components[key];
@@ -160,7 +160,9 @@ export default function DashboardPage() {
         </div>
       </Card>
 
-      <Card title={`AI からの指摘（${dash.alerts.length} 件）`} id="alerts">
+      <div className="grid gap-4 lg:h-[calc(100vh-33.5rem)] lg:min-h-[16rem] lg:grid-cols-3">
+      <Card className="flex min-h-0 flex-col" title={`AI からの指摘（${dash.alerts.length} 件）`} id="alerts">
+<div className="min-h-0 flex-1 overflow-y-auto">
         {dash.alerts.length === 0 ? (
           <p className="flex items-center justify-center gap-2 py-6 text-sm text-emerald-700">
             <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
@@ -169,7 +171,7 @@ export default function DashboardPage() {
         ) : (
           <ul className="divide-y divide-slate-100">
             {dash.alerts.map((a) => (
-              <li key={a.task_id} className="flex flex-col gap-3 py-4 md:flex-row md:items-start md:justify-between">
+              <li key={a.task_id} className="flex flex-col gap-2 py-3">
                 <div className="min-w-0 space-y-1.5">
                   <div className="flex flex-wrap items-center gap-2">
                     <Badge variant={VERDICT_LABEL[a.verdict].variant}>
@@ -186,7 +188,7 @@ export default function DashboardPage() {
                     </p>
                   )}
                 </div>
-                <div className="flex shrink-0 gap-2">
+                <div className="flex shrink-0 flex-wrap gap-2">
                   <Button variant="outline" size="sm" disabled={sending === a.task_id} onClick={() => void feedback(a.task_id, "agree")} title="指摘のとおり。記録だけ残す">
                     <ThumbsUp className="h-4 w-4" aria-hidden="true" />
                     指摘どおり
@@ -200,10 +202,12 @@ export default function DashboardPage() {
             ))}
           </ul>
         )}
+</div>
       </Card>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card title={cl.weak_tasks_title}>
+        <div className="grid min-h-0 gap-4 lg:grid-rows-2">
+        <Card className="flex min-h-0 flex-col" title={cl.weak_tasks_title}>
+<div className="min-h-0 flex-1 overflow-y-auto">
           {dash.weak_tasks.length === 0 ? (
             <p className="py-6 text-center text-sm text-slate-500">評価済みの{lb.task}がありません。</p>
           ) : (
@@ -214,8 +218,10 @@ export default function DashboardPage() {
               <p className="mt-2 text-xs text-slate-600">バーが長いほど{lb.goal}との紐づきが弱い（100 − 整合スコア）</p>
             </div>
           )}
+</div>
         </Card>
-        <Card title={cl.under_evidenced_title} id="under-evidenced">
+        <Card className="flex min-h-0 flex-col" title={cl.under_evidenced_title} id="under-evidenced">
+<div className="min-h-0 flex-1 overflow-y-auto">
           {dash.under_evidenced.length === 0 ? (
             <p className="py-6 text-center text-sm text-slate-500">検証中・未検証の{lb.assumption}はありません。</p>
           ) : (
@@ -233,11 +239,13 @@ export default function DashboardPage() {
               <p className="mt-2 text-xs text-slate-600">優先度の高い順。{lb.evidence}を登録すると減ります。</p>
             </div>
           )}
+</div>
         </Card>
-      </div>
+        </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card title={`${cl.deadline_risk}（${dash.deadline_risks.length} 件）`} id="deadline-risks">
+        <div className="grid min-h-0 gap-4 lg:grid-rows-2">
+        <Card className="flex min-h-0 flex-col" title={`${cl.deadline_risk}（${dash.deadline_risks.length} 件）`} id="deadline-risks">
+<div className="min-h-0 flex-1 overflow-y-auto">
           {dash.deadline_risks.length === 0 ? (
             <p className="py-6 text-center text-sm text-slate-500">期限リスクはありません。</p>
           ) : (
@@ -255,16 +263,16 @@ export default function DashboardPage() {
               ))}
             </ul>
           )}
+</div>
         </Card>
-        <Card title="健全度の推移">
+        <Card className="flex min-h-0 flex-col" title="健全度の推移">
+<div className="min-h-0 flex-1 overflow-y-auto">
           <TrendLine points={dash.trend} />
+</div>
         </Card>
+        </div>
       </div>
 
-      <p className="flex items-center gap-2 border-t border-dashed border-slate-200 pt-4 text-sm text-primary">
-        <Lightbulb className="h-4 w-4" aria-hidden="true" />
-        「進捗」ではなく「{lb.goal}に合っているか」を AI が見張ります。判断は人が行い、指摘が当たらない場合は「問題ない（除外）」を押してください。
-      </p>
     </div>
   );
 }
