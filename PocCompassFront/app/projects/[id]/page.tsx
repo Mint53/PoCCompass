@@ -160,7 +160,7 @@ export default function DashboardPage() {
         </div>
       </Card>
 
-      <div className="grid gap-4 lg:h-[calc(100vh-33.5rem)] lg:min-h-[16rem] lg:grid-cols-3">
+      <div className="grid gap-4 lg:h-[calc(100vh-34rem)] lg:min-h-[16rem] lg:grid-cols-3">
       <Card className="flex min-h-0 flex-col" title={`AI からの指摘（${dash.alerts.length} 件）`} id="alerts">
 <div className="min-h-0 flex-1 overflow-y-auto">
         {dash.alerts.length === 0 ? (

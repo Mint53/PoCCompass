@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Bot, CalendarClock, Loader2, Sparkles } from "lucide-react";
+import { ArrowLeft, CalendarClock, Loader2, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import { useState } from "react";
@@ -68,10 +68,6 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
             <h1 className="break-words text-xl font-bold text-slate-900">{project.title}</h1>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button variant="outline" onClick={() => setChatOpen(true)}>
-              <Bot className="h-4 w-4" aria-hidden="true" />
-              AI チャット
-            </Button>
             <Button onClick={() => void evaluate()} disabled={evaluating} aria-busy={evaluating}>
               {evaluating ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Sparkles className="h-4 w-4" aria-hidden="true" />}
               {evaluating ? "AI が評価中（数十秒かかります）" : "AI で評価"}

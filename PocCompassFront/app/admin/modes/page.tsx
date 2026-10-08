@@ -134,7 +134,7 @@ export default function AdminModesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">モード設定</h1>
+        <h1 className="text-xl font-bold text-slate-900">モード設定</h1>
         <p className="mt-1 text-sm text-slate-600">
           モードごとの項目名・入力例・AI への指示・健全度の重みを変更できます。変更は全ての取り組みに即時反映されます。
         </p>
