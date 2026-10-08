@@ -94,7 +94,7 @@ def prepare_update(repos: Repos, project_id: str, item_id: str, patch: ItemPatch
     doc = repos.items.get(project_id, item_id)
     if not doc or doc["type"] in (ItemType.FEEDBACK.value,):
         raise NotFound("項目が見つかりません。画面を再読み込みしてください。")
-    changes = patch.model_dump(mode="json", exclude_unset=True, exclude={"clear_effort_hours", "clear_due_date"})
+    changes = patch.model_dump(mode="json", exclude_unset=True, exclude={"clear_effort_hours", "clear_due_date", "clear_start_date"})
     changes = {k: v for k, v in changes.items() if v is not None}
     model = CREATE_MODELS[doc["type"]]
     allowed = set(model.model_fields) - {"type"}
@@ -107,6 +107,8 @@ def prepare_update(repos: Repos, project_id: str, item_id: str, patch: ItemPatch
         merged["effort_hours"] = None
     if patch.clear_due_date and "due_date" in allowed:
         merged["due_date"] = None
+    if patch.clear_start_date and "start_date" in allowed:
+        merged["start_date"] = None
     try:
         fields = model.model_validate(merged).model_dump(mode="json")
     except ValidationError as e:

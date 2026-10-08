@@ -47,7 +47,7 @@ function NewProjectForm() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">新しい取り組み</h1>
+          <h1 className="text-xl font-bold text-slate-900">新しい取り組み</h1>
           <p className="mt-1 text-sm text-slate-600">どの種類の取り組みですか？ 選んだモードに合わせて項目名と AI の判定基準が変わります。</p>
         </div>
         <div className="grid gap-4 md:grid-cols-3">
@@ -123,7 +123,7 @@ function NewProjectForm() {
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           モードを選び直す
         </Button>
-        <h1 className="text-2xl font-bold text-slate-900">新しい取り組み（{def.name}）</h1>
+        <h1 className="text-xl font-bold text-slate-900">新しい取り組み（{def.name}）</h1>
       </div>
 
       <Card title="基本情報">

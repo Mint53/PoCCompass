@@ -11,7 +11,7 @@ export function LoadingState({ title = "読み込み中です", description }: {
     <div className="flex flex-col items-center justify-center gap-3 py-20 text-center" role="status" aria-live="polite">
       <Loader2 className="h-7 w-7 animate-spin text-primary" aria-hidden="true" />
       <p className="text-sm font-medium text-slate-800">{title}</p>
-      {description && <p className="max-w-md text-sm text-slate-500">{description}</p>}
+      {description && <p className="max-w-md text-sm text-slate-600">{description}</p>}
     </div>
   );
 }

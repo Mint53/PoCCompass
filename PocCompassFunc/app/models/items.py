@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import date
 from typing import Annotated, Literal
 
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, model_validator
 
 from app.constants.enums import (
     AssumptionStatus,
@@ -60,6 +60,7 @@ class TaskFields(ApiModel):
     description: str = Field(default="", max_length=TEXT_MAX)
     status: TaskStatus = TaskStatus.TODO
     effort_hours: float | None = Field(default=None, gt=0, le=10000)
+    start_date: date | None = None
     due_date: date | None = None
     linked_assumption_ids: list[str] = Field(default_factory=list)
     linked_criterion_ids: list[str] = Field(default_factory=list)
@@ -68,6 +69,12 @@ class TaskFields(ApiModel):
     @classmethod
     def _strip_title(cls, v: str) -> str:
         return _strip_required(v)
+
+    @model_validator(mode="after")
+    def _start_before_due(self) -> TaskFields:
+        if self.start_date and self.due_date and self.start_date > self.due_date:
+            raise ValueError("開始日は期日以前にしてください")
+        return self
 
 
 class EvidenceFields(ApiModel):
@@ -121,6 +128,7 @@ class ItemPatch(ApiModel):
     title: str | None = None
     description: str | None = None
     effort_hours: float | None = None
+    start_date: date | None = None
     due_date: date | None = None
     linked_assumption_ids: list[str] | None = None
     linked_criterion_ids: list[str] | None = None
@@ -130,6 +138,7 @@ class ItemPatch(ApiModel):
     note: str | None = None
     clear_effort_hours: bool = False
     clear_due_date: bool = False
+    clear_start_date: bool = False
 
 
 class BulkTaskCreate(ApiModel):

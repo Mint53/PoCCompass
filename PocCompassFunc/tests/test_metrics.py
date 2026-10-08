@@ -125,3 +125,23 @@ def test_delta_uses_newest_snapshot_older_than_30_days():  # §5.4
     assert metrics.delta_vs_last_month(70, snaps, date(2026, 1, 1)) == 10
     assert metrics.delta_vs_last_month(70, [], date(2026, 1, 1)) is None
     assert metrics.delta_vs_last_month(None, snaps, date(2026, 1, 1)) is None
+
+
+def test_verdict_counts_add_up_to_task_count():  # §12.1
+    a, b, c, d = task("a"), task("b"), task("c"), task("d")
+    ev = evaluation(result(a, 90, "aligned"), result(b, 20, "drift"), result(c, 50, "weak"))
+    dash = metrics.compute_dashboard(PROJECT, [a, b, c, d], ev, [], W, date(2026, 1, 5))
+    vc = dash.verdict_counts
+    assert (vc.aligned, vc.weak, vc.drift, vc.unnecessary, vc.dismissed, vc.pending) == (1, 1, 1, 0, 0, 1)
+
+
+def test_dismissed_task_is_counted_apart_and_evidence_tally():  # §12.1, §12.2
+    a = task("a")
+    fb = item("feedback", "f", task_id="a", content_hash=task_content_hash(a), judgement="dismiss")
+    as_ = item("assumption", "as1", text="仮説", status="testing", priority="high")
+    e1 = item("evidence", "e1", assumption_id="as1", summary="s", result="supports")
+    e2 = item("evidence", "e2", assumption_id="as1", summary="s", result="inconclusive")
+    dash = metrics.compute_dashboard(PROJECT, [a, fb, as_, e1, e2], evaluation(result(a, 10, "drift")), [], W, date(2026, 1, 5))
+    assert dash.verdict_counts.dismissed == 1 and dash.verdict_counts.drift == 0
+    t = dash.evidence_tally[0]
+    assert (t.supports, t.refutes, t.inconclusive) == (1, 0, 1)

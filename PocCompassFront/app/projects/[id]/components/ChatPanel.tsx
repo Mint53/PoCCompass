@@ -327,16 +327,64 @@ export default function ChatPanel({ open, onClose }: { open: boolean; onClose: (
   );
 }
 
+const LAUNCHER_KEY = "poc-compass.chat-launcher-collapsed";
+
+/**
+ * Small floating entry to the AI chat. It stays out of the way: icon-only and faded until hovered,
+ * and can be tucked into a thin edge tab (remembered per browser).
+ */
 export function ChatLauncher({ onOpen }: { onOpen: () => void }) {
+  const [collapsed, setCollapsed] = useState(false);
+  useEffect(() => {
+    try {
+      setCollapsed(window.localStorage.getItem(LAUNCHER_KEY) === "1");
+    } catch {
+      // storage unavailable: keep default
+    }
+  }, []);
+  const setAndStore = (v: boolean) => {
+    setCollapsed(v);
+    try {
+      window.localStorage.setItem(LAUNCHER_KEY, v ? "1" : "0");
+    } catch {
+      // ignore
+    }
+  };
+
+  if (collapsed) {
+    return (
+      <button
+        type="button"
+        onClick={() => setAndStore(false)}
+        className="fixed bottom-24 right-0 z-40 flex h-12 w-5 items-center justify-center rounded-l-md bg-primary/70 text-primary-foreground hover:w-7 hover:bg-primary focus:outline-none focus:ring-2 focus:ring-ring"
+        aria-label="AI に相談・編集のボタンを表示"
+        title="AI に相談・編集を表示"
+      >
+        <MessageSquare className="h-3.5 w-3.5" aria-hidden="true" />
+      </button>
+    );
+  }
   return (
-    <button
-      type="button"
-      onClick={onOpen}
-      className="fixed bottom-5 right-5 z-50 flex h-14 items-center gap-2 rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-      aria-label="AI チャットを開く"
-    >
-      <MessageSquare className="h-5 w-5" aria-hidden="true" />
-      <span className="hidden sm:inline">AI に相談・編集</span>
-    </button>
+    <div className="group fixed bottom-4 right-4 z-40 flex items-center gap-1 opacity-70 transition-opacity focus-within:opacity-100 hover:opacity-100">
+      <button
+        type="button"
+        onClick={() => setAndStore(true)}
+        className="hidden h-6 w-6 items-center justify-center rounded-full bg-white/90 text-slate-500 shadow hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-ring group-hover:flex group-focus-within:flex"
+        aria-label="ボタンを端にしまう"
+        title="端にしまう"
+      >
+        <X className="h-3.5 w-3.5" aria-hidden="true" />
+      </button>
+      <button
+        type="button"
+        onClick={onOpen}
+        className="flex h-11 items-center gap-2 rounded-full bg-primary px-3 text-sm font-semibold text-primary-foreground shadow-md hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+        aria-label="AI に相談・編集を開く"
+        title="AI に相談・編集"
+      >
+        <MessageSquare className="h-5 w-5" aria-hidden="true" />
+        <span className="hidden group-hover:inline group-focus-within:inline">AI に相談・編集</span>
+      </button>
+    </div>
   );
 }
