@@ -33,6 +33,8 @@ export function ScoreRing({ score, size = 132 }: { score: number | null; size?: 
   );
 }
 
+const TONE_BAR = { brand: "bg-primary", slate: "bg-slate-400", rose: "bg-rose-500", amber: "bg-amber-500" } as const;
+
 /** Single-series horizontal bar row. Value is printed next to the bar; full text in the tooltip. */
 export function BarRow({
   label,
@@ -46,7 +48,7 @@ export function BarRow({
   value: number;
   max?: number;
   valueLabel: string;
-  tone?: "brand" | "slate";
+  tone?: "brand" | "slate" | "rose" | "amber";
   tooltip?: string;
 }) {
   const pct = Math.max(0, Math.min(100, (value / max) * 100));
@@ -55,11 +57,11 @@ export function BarRow({
       <span className="truncate text-sm text-slate-700">{label}</span>
       <div className="h-2.5 w-full rounded-full bg-slate-100">
         <div
-          className={cn("h-2.5 rounded-full transition-[width] group-hover:opacity-80", tone === "brand" ? "bg-primary" : "bg-slate-400")}
+          className={cn("h-2.5 rounded-full transition-[width] group-hover:opacity-80", TONE_BAR[tone])}
           style={{ width: `${pct}%` }}
         />
       </div>
-      <span className="text-right text-xs tabular-nums text-slate-600">{valueLabel}</span>
+      <span className="text-right text-sm tabular-nums text-slate-700">{valueLabel}</span>
     </div>
   );
 }
@@ -81,11 +83,12 @@ export function TrendLine({ points }: { points: { date: string; score: number | 
       {[0, 50, 100].map((v) => (
         <g key={v}>
           <line x1={pad.l} x2={w - pad.r} y1={y(v)} y2={y(v)} stroke="rgb(226 232 240)" strokeWidth={1} />
-          <text x={pad.l - 6} y={y(v) + 4} textAnchor="end" fontSize={10} fill="rgb(100 116 139)">
+          <text x={pad.l - 6} y={y(v) + 4} textAnchor="end" fontSize={11} fill="rgb(71 85 105)">
             {v}
           </text>
         </g>
       ))}
+      <path d={`${path} L${x(data.length - 1)},${y(0)} L${x(0)},${y(0)} Z`} fill="rgb(var(--primary))" fillOpacity={0.08} />
       <path d={path} fill="none" stroke="rgb(var(--primary))" strokeWidth={2} />
       {data.map((p, i) => (
         <g key={p.date}>
