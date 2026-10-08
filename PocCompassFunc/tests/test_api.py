@@ -251,3 +251,14 @@ def test_scheduled_run_skips_stopped_and_survives_failure(repos, llm, client):
     llm.fail = True
     client.patch(f"/api/projects/{p1['id']}", json={"goal": "変更"}, headers=OWNER)
     assert run_scheduled(repos, lambda: llm) == {"ok": 0, "failed": 1}
+
+
+def test_task_start_date_roundtrip_and_order(client):  # §3.2
+    pid = make_project(client)["id"]
+    t = add_task(client, pid, "作業", start_date="2026-10-01", due_date="2026-10-05")
+    assert t["start_date"] == "2026-10-01"
+    bad = {"type": "task", "title": "逆", "start_date": "2026-10-09", "due_date": "2026-10-05"}
+    r = client.post(f"/api/projects/{pid}/items", json=bad, headers=OWNER)
+    assert r.status_code == 400
+    r = client.patch(f"/api/projects/{pid}/items/{t['id']}", json={"clear_start_date": True}, headers=OWNER)
+    assert r.json()["start_date"] is None

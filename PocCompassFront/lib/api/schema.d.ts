@@ -548,6 +548,8 @@ export interface components {
             deadline_risks: components["schemas"]["DeadlineRiskItem"][];
             /** Design Changed */
             design_changed: boolean;
+            /** Evidence Tally */
+            evidence_tally: components["schemas"]["EvidenceTally"][];
             health: components["schemas"]["HealthView"];
             /** Last Evaluated At */
             last_evaluated_at: string | null;
@@ -560,6 +562,7 @@ export interface components {
             under_evidenced: components["schemas"]["UnderEvidenced"][];
             /** Unevaluated Task Ids */
             unevaluated_task_ids: string[];
+            verdict_counts: components["schemas"]["VerdictCounts"];
             /** Weak Tasks */
             weak_tasks: components["schemas"]["WeakTask"][];
         };
@@ -694,6 +697,19 @@ export interface components {
          * @enum {string}
          */
         EvidenceResult: "supports" | "refutes" | "inconclusive";
+        /** EvidenceTally */
+        EvidenceTally: {
+            /** Assumption Id */
+            assumption_id: string;
+            /** Inconclusive */
+            inconclusive: number;
+            /** Refutes */
+            refutes: number;
+            /** Supports */
+            supports: number;
+            /** Text */
+            text: string;
+        };
         /** ExtractRequest */
         ExtractRequest: {
             /** Text */
@@ -802,6 +818,11 @@ export interface components {
              * @default false
              */
             clear_effort_hours?: boolean;
+            /**
+             * Clear Start Date
+             * @default false
+             */
+            clear_start_date?: boolean;
             /** Description */
             description?: string | null;
             /** Due Date */
@@ -818,6 +839,8 @@ export interface components {
             result?: components["schemas"]["EvidenceResult"] | null;
             /** Source */
             source?: string | null;
+            /** Start Date */
+            start_date?: string | null;
             /** Status */
             status?: string | null;
             /** Summary */
@@ -1141,6 +1164,8 @@ export interface components {
             linked_criterion_ids: string[];
             /** Projectid */
             projectId: string;
+            /** Start Date */
+            start_date: string | null;
             /** @default todo */
             status: components["schemas"]["TaskStatus"];
             /** Title */
@@ -1168,6 +1193,8 @@ export interface components {
             linked_assumption_ids?: string[];
             /** Linked Criterion Ids */
             linked_criterion_ids?: string[];
+            /** Start Date */
+            start_date?: string | null;
             /** @default todo */
             status?: components["schemas"]["TaskStatus"];
             /** Title */
@@ -1261,6 +1288,21 @@ export interface components {
          * @enum {string}
          */
         Verdict: "aligned" | "weak" | "drift" | "unnecessary_candidate";
+        /** VerdictCounts */
+        VerdictCounts: {
+            /** Aligned */
+            aligned: number;
+            /** Dismissed */
+            dismissed: number;
+            /** Drift */
+            drift: number;
+            /** Pending */
+            pending: number;
+            /** Unnecessary */
+            unnecessary: number;
+            /** Weak */
+            weak: number;
+        };
         /** WeakTask */
         WeakTask: {
             /** Alignment Score */

@@ -32,11 +32,13 @@ from app.models.dashboard import (
     Cards,
     Dashboard,
     DeadlineRiskItem,
+    EvidenceTally,
     HealthComponents,
     HealthView,
     ScheduleView,
     TrendPoint,
     UnderEvidenced,
+    VerdictCounts,
     WeakTask,
 )
 
@@ -247,6 +249,28 @@ def compute_dashboard(project: dict, items: list[dict], evaluation: dict | None,
         for v in sorted(active_problem, key=lambda v: v.result["alignment_score"])
     ]
 
+    # analysis charts (SPEC §12): dismissed tasks are shown apart so the bars add up to the task count
+    dismissed = sum(1 for v in views if v.result and v.dismissed)
+    by_verdict = {k.value: 0 for k in Verdict}
+    for v in views:
+        if v.result and not v.dismissed:
+            by_verdict[v.result["verdict"]] += 1
+    verdict_counts = VerdictCounts(
+        aligned=by_verdict[Verdict.ALIGNED.value], weak=by_verdict[Verdict.WEAK.value],
+        drift=by_verdict[Verdict.DRIFT.value], unnecessary=by_verdict[Verdict.UNNECESSARY.value],
+        dismissed=dismissed, pending=sum(1 for v in views if v.result is None),
+    )
+    tally: dict[str, dict[str, int]] = {a["id"]: {r.value: 0 for r in EvidenceResult} for a in by_type.assumptions}
+    for e in by_type.evidence:
+        if e["assumption_id"] in tally:
+            tally[e["assumption_id"]][e["result"]] += 1
+    evidence_tally = [
+        EvidenceTally(assumption_id=a["id"], text=a["text"], supports=tally[a["id"]][EvidenceResult.SUPPORTS.value],
+                      refutes=tally[a["id"]][EvidenceResult.REFUTES.value],
+                      inconclusive=tally[a["id"]][EvidenceResult.INCONCLUSIVE.value])
+        for a in by_type.assumptions
+    ]
+
     current_design = design_hash(project["goal"], by_type.assumptions, by_type.criteria)
     return Dashboard(
         health=HealthView(score=score, components=comps, delta_vs_last_month=delta_vs_last_month(score, snapshots, today),
@@ -257,6 +281,8 @@ def compute_dashboard(project: dict, items: list[dict], evaluation: dict | None,
         under_evidenced=under[:TOP_N],
         deadline_risks=risks,
         alerts=alerts,
+        verdict_counts=verdict_counts,
+        evidence_tally=evidence_tally,
         trend=[TrendPoint(date=s["date"], score=s.get("score")) for s in snapshots[-90:]],
         stale_task_ids=[v.task["id"] for v in views if v.has_stale_result],
         unevaluated_task_ids=[v.task["id"] for v in views if v.result is None and not v.has_stale_result],

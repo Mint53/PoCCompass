@@ -70,6 +70,23 @@ class ScheduleView(ApiModel):
     days_left: int
 
 
+class VerdictCounts(ApiModel):
+    aligned: int
+    weak: int
+    drift: int
+    unnecessary: int
+    dismissed: int
+    pending: int
+
+
+class EvidenceTally(ApiModel):
+    assumption_id: str
+    text: str
+    supports: int
+    refutes: int
+    inconclusive: int
+
+
 class Dashboard(ApiModel):
     health: HealthView
     cards: Cards
@@ -79,6 +96,8 @@ class Dashboard(ApiModel):
     deadline_risks: list[DeadlineRiskItem]
     alerts: list[Alert]
     trend: list[TrendPoint]
+    verdict_counts: VerdictCounts
+    evidence_tally: list[EvidenceTally]
     stale_task_ids: list[str]
     unevaluated_task_ids: list[str]
     design_changed: bool

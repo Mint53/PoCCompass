@@ -50,6 +50,7 @@ export default function TasksPage() {
         await api.updateItem(project.id, editing.task.id, {
           ...d,
           clear_effort_hours: d.effort_hours == null,
+          clear_start_date: d.start_date == null,
           clear_due_date: d.due_date == null,
         });
         toast({ tone: "success", message: `${lb.task}を更新しました。` });
@@ -168,6 +169,7 @@ export default function TasksPage() {
                         </span>
                       ))}
                       {t.effort_hours != null && <span className="rounded bg-slate-100 px-1.5 py-0.5 text-slate-700">工数 {t.effort_hours}h</span>}
+                      {t.start_date && <span className="rounded bg-slate-100 px-1.5 py-0.5 text-slate-700">開始 {formatDate(t.start_date)}</span>}
                       {t.due_date && <span className="rounded bg-slate-100 px-1.5 py-0.5 text-slate-700">期日 {formatDate(t.due_date)}</span>}
                     </div>
                     {r && !changed && r.verdict !== "aligned" && (

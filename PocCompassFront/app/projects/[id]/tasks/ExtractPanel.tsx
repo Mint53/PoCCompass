@@ -42,7 +42,7 @@ export default function ExtractPanel({ onClose }: { onClose: () => void }) {
     try {
       await api.bulkCreateTasks(
         project.id,
-        chosen.map(({ checked: _checked, ...t }) => ({ type: "task", status: "todo", effort_hours: null, due_date: null, ...t })),
+        chosen.map(({ checked: _checked, ...t }) => ({ type: "task", status: "todo", effort_hours: null, start_date: null, due_date: null, ...t })),
       );
       toast({ tone: "success", message: `${chosen.length} 件の${lb.task}を登録しました。「AI で評価」で判定できます。` });
       await reloadItems();
