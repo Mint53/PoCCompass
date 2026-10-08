@@ -89,7 +89,7 @@ function AssumptionBlock({ a, evidence }: { a: Assumption; evidence: Evidence[] 
           <h2 className="break-words font-semibold text-slate-900">{a.text}</h2>
         </div>
         <div className="flex shrink-0 items-center gap-2">
-          <Select aria-label={`${a.text} の検証状態`} className="w-32" value={a.status} options={[...ASSUMPTION_STATUS]} onChange={(e) => void setStatus(e.target.value)} />
+          <Select aria-label={`${a.text} の検証状態`} className="w-36" value={a.status} options={[...ASSUMPTION_STATUS]} onChange={(e) => void setStatus(e.target.value)} />
           <Button variant="outline" size="sm" onClick={() => setOpen((v) => !v)} aria-expanded={open}>
             <Plus className="h-4 w-4" aria-hidden="true" />
             {lb.evidence}を追加
