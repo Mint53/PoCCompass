@@ -12,8 +12,11 @@ param appLocation string = 'japanwest'
 @description('リソース名のプレフィックス（小文字・数字・ハイフン）')
 param namePrefix string = 'poc-compass'
 
-@description('App Service Plan の SKU（Web と Functions で共有）')
-param appServiceSku string = 'B1'
+@description('Web と Functions で共有する既存 Linux App Service Plan の名前')
+param appServicePlanName string = 'icc-gain-app-service-plan-linux-02'
+
+@description('共有する既存 App Service Plan があるリソース グループ名')
+param appServicePlanResourceGroup string = 'icc-gain-shared-rg'
 
 @description('AI Foundry にデプロイするモデル')
 param modelName string = 'gpt-5.4'
@@ -46,7 +49,8 @@ module resources 'modules/resources.bicep' = {
     location: location
     appLocation: appLocation
     namePrefix: namePrefix
-    appServiceSku: appServiceSku
+    appServicePlanName: appServicePlanName
+    appServicePlanResourceGroup: appServicePlanResourceGroup
     modelName: modelName
     modelVersion: modelVersion
     modelSkuName: modelSkuName

@@ -14,7 +14,7 @@
 |---|---|---|
 | 画面（Next.js, Entra ID ログイン） | `poc-compass-web-5etqg`（App Service, Linux Node 20） | Japan West |
 | API（Functions Python 3.11） | `poc-compass-func-5etqg` | Japan West |
-| 共有 App Service Plan | `poc-compass-plan`（B1） | Japan West |
+| 共有 App Service Plan | `icc-gain-app-service-plan-linux-02`（既存 Plan、RG: `icc-gain-shared-rg`） | Plan の実リージョン |
 | DB | `poc-compass-cosmos-5etqg`（Cosmos DB サーバーレス, DB `poc-compass`, キー認証無効） | Japan East |
 | AI | `poc-compass-foundry-5etqg`（AI Foundry, デプロイ `gpt-5.4` GlobalStandard 50K TPM, キー認証無効） | Japan East |
 | シークレット | `pcc-kv-5etqg`（Key Vault, RBAC） | Japan East |
@@ -22,6 +22,7 @@
 | ログイン | Entra ID アプリ登録「PoC Compass」（clientId は `infra/parameters/prod.bicepparam`） | — |
 
 - App Service は Japan East の VM クォータ（4/4）が上限のため Japan West に置いた。
+- App Service Plan は `icc-gain-shared-rg` の既存 Plan を参照する。`poc-compass-plan` は Bicep の管理対象外であり、付け替え後の稼働確認が済むまで削除しない。
 - Functions → Cosmos / Foundry はマネージド ID（キーなし）。Web → Functions は Functions のホストキー `frontend`（Key Vault `backend-function-key`）を Next.js サーバー側で付与。
 
 ## 通常のデプロイ
@@ -39,6 +40,29 @@
 ```bash
 ./scripts/deploy.sh infra
 ```
+
+## App Service リソースの再作成（共有 Plan への移行）
+
+対象: `poc-compass-func-5etqg` と `poc-compass-web-5etqg` を削除・再作成し、既存の Linux Plan
+`icc-gain-shared-rg/icc-gain-app-service-plan-linux-02` へ移行する。Cosmos DB、Key Vault、AI Foundry は削除しない。
+
+前提: Azure CLI に対象サブスクリプションの Owner としてログイン済みであること。再作成中は API と画面が停止する。
+
+```bash
+./scripts/recreate-app-services.sh
+```
+
+**成功判定**: `事前確認 OK` と Bicep の what-if が表示され、削除・再作成を伴わず終了する。共有 Plan の Linux 属性・リージョン、旧 Plan の利用サイトが 2 個だけであることを検査する。
+
+```bash
+./scripts/recreate-app-services.sh --apply
+```
+
+`RECREATE` と入力すると、古いマネージド ID のロール割り当てを削除してから両 App を再作成し、API／Web のコードを再デプロイする。社内 SSL 検査の証明書を SCM が信頼しない環境では、この 2 回のパッケージ配布に限り Azure CLI の証明書検証を無効化する。最後に旧 Plan `poc-compass-plan` を削除する。
+
+**成功判定**: `完了:` が表示され、Function が 2 個以上、Web App が `Running`、両 App の Plan が共有先 Plan と一致する。
+
+**失敗時**: 旧 Plan は両 App の再作成と Plan 一致を確認した後にしか削除しない。旧 Plan が残っている場合は `infra/parameters/prod.bicepparam` の共有 Plan 設定を元に戻し、`./scripts/deploy.sh infra` を実行して復旧する。旧 Plan 削除後は、同名の Linux Plan を Japan West に作成して同じ設定へ戻してから再デプロイする。
 
 成功判定:
 

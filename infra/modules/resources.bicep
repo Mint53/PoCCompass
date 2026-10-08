@@ -3,7 +3,8 @@ targetScope = 'resourceGroup'
 param location string
 param appLocation string
 param namePrefix string
-param appServiceSku string
+param appServicePlanName string
+param appServicePlanResourceGroup string
 param modelName string
 param modelVersion string
 param modelSkuName string
@@ -15,7 +16,6 @@ param authClientId string
 var suffix = take(uniqueString(resourceGroup().id), 5)
 var webAppName = '${namePrefix}-web-${suffix}'
 var functionAppName = '${namePrefix}-func-${suffix}'
-var planName = '${namePrefix}-plan'
 var cosmosName = '${namePrefix}-cosmos-${suffix}'
 var foundryName = '${namePrefix}-foundry-${suffix}'
 var foundryProjectName = 'poc-compass'
@@ -190,12 +190,9 @@ resource storageConnectionSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' 
 
 // ---------------- App Service ----------------
 
-resource plan 'Microsoft.Web/serverfarms@2023-12-01' = {
-  name: planName
-  location: appLocation
-  kind: 'linux'
-  sku: { name: appServiceSku }
-  properties: { reserved: true }
+resource plan 'Microsoft.Web/serverfarms@2023-12-01' existing = {
+  name: appServicePlanName
+  scope: resourceGroup(appServicePlanResourceGroup)
 }
 
 resource functionApp 'Microsoft.Web/sites@2023-12-01' = {

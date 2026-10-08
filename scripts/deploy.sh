@@ -45,7 +45,7 @@ with zipfile.ZipFile(r'../.harness/api.zip', 'w', zipfile.ZIP_DEFLATED) as z:
                 p = os.path.join(base, f)
                 z.write(p, p.replace(os.sep, '/'))
 ")
-  az functionapp deployment source config-zip -g "$RG" -n "$func" --src "$pkg" --build-remote true --timeout 900 -o none
+  env -u MSYS_NO_PATHCONV az functionapp deployment source config-zip -g "$RG" -n "$func" --src "$pkg" --build-remote true --timeout 900 -o none
   # Host key used by the Next.js proxy. Rotated on every API deploy and stored only in Key Vault.
   local kv key; kv="$(out keyVaultName)"
   key="$(openssl rand -hex 32)"
@@ -77,7 +77,7 @@ with zipfile.ZipFile(r'../web.zip', 'w', zipfile.ZIP_DEFLATED) as z:
             p = os.path.join(base, f)
             z.write(p, os.path.relpath(p, '.'))
 ")
-  az webapp deploy -g "$RG" -n "$web" --src-path "$pkg" --type zip --async false
+  env -u MSYS_NO_PATHCONV az webapp deploy -g "$RG" -n "$web" --src-path "$pkg" --type zip --async false
   echo "Web deployed: $(out webAppUrl)"
 }
 
