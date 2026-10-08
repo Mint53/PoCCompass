@@ -73,7 +73,14 @@ export default function AdminModesPage() {
   const [busy, setBusy] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
 
+  // Re-sync after save/reset reloads the definitions. Tab switches go through selectMode so the form and
+  // the save target change in the same render (an effect alone leaves one render where they disagree).
   useEffect(() => setBody(toBody(def)), [def]);
+
+  const selectMode = (id: Mode) => {
+    setCurrent(id);
+    setBody(toBody(modes.find((m) => m.id === id)!));
+  };
 
   if (!me.is_admin) {
     return <EmptyState title="管理者のみ利用できます" description="モード定義の編集は管理者（ADMIN_EMAILS に登録されたユーザー）のみ行えます。" />;
@@ -139,7 +146,7 @@ export default function AdminModesPage() {
             type="button"
             role="tab"
             aria-selected={current === m.id}
-            onClick={() => setCurrent(m.id)}
+            onClick={() => selectMode(m.id)}
             className={cn(
               "h-10 rounded-full border px-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-ring",
               current === m.id ? "border-primary bg-primary text-primary-foreground" : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50",
