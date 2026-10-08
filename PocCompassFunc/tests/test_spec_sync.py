@@ -48,6 +48,7 @@ def test_thresholds_match_spec():
     assert f"最大 {limits.EXTRACT_MAX_CHARS} 字" in SPEC
     assert f"| {limits.ALIGNED_MIN}〜100 |" in SPEC
     assert f"| {limits.WEAK_MIN}〜{limits.ALIGNED_MIN - 1} |" in SPEC
+    assert f"最大 **{limits.COMPASS_MAX_FRAMES}** 枚" in SPEC
 
 
 def test_verdicts_documented():

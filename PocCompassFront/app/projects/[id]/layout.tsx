@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, CalendarClock, Loader2, Sparkles } from "lucide-react";
+import { ArrowLeft, CalendarClock, CircleHelp, Loader2, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import { useState } from "react";
@@ -10,6 +10,7 @@ import Badge from "../../components/ui/Badge";
 import Button from "../../components/ui/Button";
 import { ErrorState, LoadingState } from "../../components/ui/States";
 import ChatPanel, { ChatLauncher } from "./components/ChatPanel";
+import GuideDialog from "./components/GuideDialog";
 import { ProjectProvider, useProjectLoader } from "./ProjectContext";
 
 export default function ProjectLayout({ children }: { children: React.ReactNode }) {
@@ -17,6 +18,7 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
   const pathname = usePathname();
   const { value, error, retry } = useProjectLoader(id);
   const [chatOpen, setChatOpen] = useState(false);
+  const [guideOpen, setGuideOpen] = useState(false);
 
   if (error) {
     return (
@@ -36,6 +38,7 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
   const base = `/projects/${project.id}`;
   const tabs = [
     { href: base, label: "ダッシュボード" },
+    { href: `${base}/compass`, label: "羅針盤" },
     { href: `${base}/analysis`, label: "分析" },
     { href: `${base}/wbs`, label: "WBS" },
     { href: `${base}/design`, label: "設計" },
@@ -46,7 +49,7 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
   ];
   const status = PROJECT_STATUS[project.status];
   // SPEC §12.3: these screens fit the viewport at 100% zoom; their content scrolls inside, not the page.
-  const fit = pathname === `${base}/analysis` || pathname === `${base}/wbs`;
+  const fit = pathname === `${base}/analysis` || pathname === `${base}/wbs` || pathname === `${base}/compass`;
 
   return (
     <ProjectProvider value={value}>
@@ -75,7 +78,7 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
           </div>
         </div>
 
-        <nav className="sticky top-14 z-30 -mx-1 flex shrink-0 gap-1 overflow-x-auto border-b border-slate-200 bg-background/95 px-1 backdrop-blur" aria-label="取り組みのメニュー">
+        <nav className="sticky top-14 z-30 flex shrink-0 gap-1 overflow-x-auto rounded-2xl bg-slate-100/95 p-1 ring-1 ring-slate-200/70 backdrop-blur" aria-label="取り組みのメニュー">
           {tabs.map((t) => {
             const active = t.href === base ? pathname === base : pathname.startsWith(t.href);
             return (
@@ -84,8 +87,8 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
                 href={t.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "-mb-px inline-flex items-center gap-1.5 whitespace-nowrap border-b-2 px-3 py-3 text-sm font-medium",
-                  active ? "border-primary font-bold text-primary" : "border-transparent text-slate-600 hover:border-slate-300 hover:text-slate-900",
+                  "inline-flex items-center gap-1.5 whitespace-nowrap rounded-xl px-3.5 py-2 text-sm font-semibold transition",
+                  active ? "bg-white text-primary shadow-sm" : "text-slate-600 hover:bg-white/60 hover:text-slate-900",
                 )}
               >
                 {t.label}
@@ -97,10 +100,19 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
               </Link>
             );
           })}
+          <button
+            type="button"
+            onClick={() => setGuideOpen(true)}
+            className="ml-auto inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl px-3.5 py-2 text-sm font-semibold text-primary transition hover:bg-white focus:outline-none focus-visible:ring-4 focus-visible:ring-primary/25"
+          >
+            <CircleHelp className="h-4 w-4" aria-hidden="true" />
+            使い方
+          </button>
         </nav>
 
         <div className={cn("animate-fade-in-up", fit ? "min-h-0 flex-1" : "pb-1")}>{children}</div>
       </div>
+      <GuideDialog open={guideOpen} onClose={() => setGuideOpen(false)} labels={lb} />
       {!chatOpen && <ChatLauncher onOpen={() => setChatOpen(true)} />}
       <ChatPanel open={chatOpen} onClose={() => setChatOpen(false)} />
     </ProjectProvider>

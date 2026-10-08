@@ -21,7 +21,7 @@ const COMPONENT_LABELS = [
 function Panel({ title, children, className }: { title: string; children: React.ReactNode; className?: string }) {
   return (
     <Card title={title} className={cn("flex min-h-0 flex-col !p-4 [&>div:first-child]:!mb-2", className)}>
-      <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">{children}</div>
     </Card>
   );
 }
@@ -69,7 +69,7 @@ export default function AnalysisPage() {
         </Panel>
 
         <Panel title="健全度の構成（0〜100）">
-          <div className="flex h-full min-h-[11rem] items-center justify-center">
+          <div className="flex min-h-[11rem] flex-1 items-center justify-center">
             <Radar axes={COMPONENT_LABELS.map(({ key, label }) => ({ label, value: dash.health.components[key] }))} />
           </div>
         </Panel>

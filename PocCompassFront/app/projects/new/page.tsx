@@ -9,6 +9,7 @@ import { cn, todayIso } from "@/lib/utils";
 import ListEditor, { type ListRow } from "../../components/ListEditor";
 import Button from "../../components/ui/Button";
 import Card from "../../components/ui/Card";
+import DateField from "../../components/ui/DateField";
 import Field from "../../components/ui/Field";
 import Input from "../../components/ui/Input";
 import { LoadingState } from "../../components/ui/States";
@@ -136,10 +137,10 @@ function NewProjectForm() {
           </Field>
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="開始日" htmlFor="start">
-              <Input id="start" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} disabled={saving} />
+              <DateField id="start" value={startDate} onChange={setStartDate} disabled={saving} />
             </Field>
             <Field label={lb.deadline} htmlFor="deadline" required error={errors.deadline}>
-              <Input id="deadline" type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} disabled={saving} />
+              <DateField id="deadline" value={deadline} min={startDate || undefined} onChange={setDeadline} disabled={saving} />
             </Field>
           </div>
         </div>

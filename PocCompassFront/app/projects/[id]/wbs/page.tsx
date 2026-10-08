@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useMemo } from "react";
 import { todayIso } from "@/lib/utils";
 import { EmptyState } from "../../../components/ui/States";
-import Gantt, { isOverdue, type GanttGroup } from "../components/Gantt";
+import { TASK_STATUS, labelOf } from "@/lib/labels";
+import Gantt, { STATUS_BAR, isOverdue, type GanttGroup } from "../components/Gantt";
 import { useProject } from "../ProjectContext";
 
 export default function WbsPage() {
@@ -49,10 +50,21 @@ export default function WbsPage() {
   const undated = items.tasks.filter((t) => !t.start_date && !t.due_date).length;
   return (
     <div className="flex h-full min-h-0 flex-col gap-2">
-      <p className="shrink-0 text-xs text-slate-600">
-        帯は開始日〜期日（開始日なしは期日の 1 日のみ）。赤い点線が今日。{overdue > 0 && <span className="font-bold text-rose-700"> 遅延 {overdue} 件。</span>}
-        {undated > 0 && ` 日程未設定 ${undated} 件。`}
-      </p>
+      <div className="flex shrink-0 flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-600">
+        <span>帯は開始日〜期日（開始日なしは期日の 1 日のみ）</span>
+        {(["todo", "doing", "done"] as const).map((s) => (
+          <span key={s} className="inline-flex items-center gap-1.5">
+            <span className={`h-2.5 w-4 rounded-sm ${STATUS_BAR[s]}`} aria-hidden="true" />
+            {labelOf(TASK_STATUS, s)}
+          </span>
+        ))}
+        <span className="inline-flex items-center gap-1.5">
+          <span className="h-2.5 w-4 rounded-sm bg-slate-300 ring-2 ring-rose-600" aria-hidden="true" />
+          遅延
+        </span>
+        {overdue > 0 && <span className="font-bold text-rose-700">遅延 {overdue} 件</span>}
+        {undated > 0 && <span>日程未設定 {undated} 件</span>}
+      </div>
       <div className="min-h-0 flex-1">
         <Gantt groups={groups} rangeStart={project.start_date} rangeEnd={project.deadline} today={today} />
       </div>

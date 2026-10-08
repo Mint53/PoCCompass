@@ -34,11 +34,11 @@ export function StackedBar({ segments, emptyText }: { segments: Segment[]; empty
 
 /** Radar chart for 0-100 axes. A null value is drawn at the center and labelled 対象なし. */
 export function Radar({ axes }: { axes: { label: string; value: number | null }[] }) {
-  const w = 300;
-  const h = 190;
+  const w = 380;
+  const h = 250;
   const cx = w / 2;
   const cy = h / 2;
-  const r = 56;
+  const r = 78;
   const n = axes.length;
   const pt = (i: number, ratio: number) => {
     const a = -Math.PI / 2 + (i * 2 * Math.PI) / n;
@@ -57,16 +57,18 @@ export function Radar({ axes }: { axes: { label: string; value: number | null }[
       <polygon points={data} fill="rgb(var(--primary) / 0.18)" stroke="rgb(var(--primary))" strokeWidth={2} />
       {axes.map((ax, i) => {
         const [x, y] = pt(i, Math.max(0, Math.min(100, ax.value ?? 0)) / 100);
-        const [lx, ly] = pt(i, 1.32);
+        const [px] = pt(i, 1);
+        const side = Math.abs(px - cx) < 8 ? "middle" : px < cx ? "end" : "start";
+        const [lx, ly] = pt(i, side === "middle" ? 1.36 : 1.16);
         return (
           <g key={ax.label}>
             <circle cx={x} cy={y} r={3.5} fill="rgb(var(--primary))" stroke="white" strokeWidth={1.5}>
               <title>{`${ax.label}: ${ax.value == null ? "対象なし" : Math.round(ax.value)}`}</title>
             </circle>
-            <text x={lx} y={ly - 2} textAnchor="middle" fontSize={10} fill="rgb(51 65 85)">
+            <text x={lx} y={ly - 2} textAnchor={side} fontSize={12} fill="rgb(51 65 85)">
               {ax.label}
             </text>
-            <text x={lx} y={ly + 10} textAnchor="middle" fontSize={10} fontWeight={700} fill="rgb(15 23 42)">
+            <text x={lx} y={ly + 12} textAnchor={side} fontSize={13} fontWeight={700} fill="rgb(15 23 42)">
               {ax.value == null ? "対象なし" : Math.round(ax.value)}
             </text>
           </g>

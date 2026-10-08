@@ -180,6 +180,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/projects/{project_id}/compass": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Compass */
+        get: operations["compass_api_projects__project_id__compass_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/projects/{project_id}/dashboard": {
         parameters: {
             query?: never;
@@ -479,6 +496,63 @@ export interface components {
         ChatSendResponse: {
             assistant_message: components["schemas"]["ChatMessage"];
             user_message: components["schemas"]["ChatMessage"];
+        };
+        /** Compass */
+        Compass: {
+            /** Attention Count */
+            attention_count: number;
+            /** Delta Vs Last Month */
+            delta_vs_last_month: number | null;
+            /** Frames */
+            frames: components["schemas"]["CompassFrame"][];
+            /** Health Score */
+            health_score: number | null;
+            /** Sectors */
+            sectors: components["schemas"]["CompassSector"][];
+            /** Tasks */
+            tasks: components["schemas"]["CompassTask"][];
+        };
+        /** CompassFrame */
+        CompassFrame: {
+            /** Date */
+            date: string;
+            /** Health Score */
+            health_score: number | null;
+            /** Is Current */
+            is_current: boolean;
+        };
+        /** CompassPoint */
+        CompassPoint: {
+            /** Score */
+            score: number;
+            verdict: components["schemas"]["Verdict"];
+        };
+        /** CompassSector */
+        CompassSector: {
+            /** Id */
+            id: string;
+            priority: components["schemas"]["Priority"];
+            /** Text */
+            text: string;
+        };
+        /** CompassTask */
+        CompassTask: {
+            feedback: components["schemas"]["FeedbackJudgement"] | null;
+            /** Needs Attention */
+            needs_attention: boolean;
+            /** Points */
+            points: (components["schemas"]["CompassPoint"] | null)[];
+            /** Reason */
+            reason: string;
+            /** Sector Id */
+            sector_id: string | null;
+            status: components["schemas"]["TaskStatus"];
+            /** Suggested Action */
+            suggested_action: string;
+            /** Task Id */
+            task_id: string;
+            /** Title */
+            title: string;
         };
         /** Criterion */
         Criterion: {
@@ -1803,6 +1877,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ChatMessage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    compass_api_projects__project_id__compass_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Compass"];
                 };
             };
             /** @description Validation Error */

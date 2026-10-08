@@ -54,6 +54,11 @@ class EvaluationRepository:
                            descending=True, limit=1)
         return rows[0] if rows else None
 
+    def recent(self, project_id: str, limit: int) -> list[dict]:
+        """Newest first."""
+        return self.s.find(Container.EVALUATIONS, partition_key=project_id, order_by="created_at",
+                           descending=True, limit=limit)
+
     def save(self, doc: dict) -> dict:
         return self.s.upsert(Container.EVALUATIONS, doc)
 

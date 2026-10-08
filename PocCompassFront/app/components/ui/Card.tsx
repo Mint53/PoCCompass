@@ -15,10 +15,10 @@ export default function Card({
   children: React.ReactNode;
 }) {
   return (
-    <section id={id} className={cn("scroll-mt-32 rounded-2xl border border-slate-200 bg-white p-4 card-shadow", className)}>
+    <section id={id} className={cn("scroll-mt-32 rounded-2xl border border-slate-200/80 bg-white p-5 card-shadow", className)}>
       {(title || actions) && (
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-          {title && <h2 className="text-base font-bold text-slate-900">{title}</h2>}
+          {title && <h2 className="text-[15px] font-bold tracking-tight text-slate-900">{title}</h2>}
           {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
         </div>
       )}

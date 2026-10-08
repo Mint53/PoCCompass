@@ -8,7 +8,7 @@ const Input = forwardRef<HTMLInputElement, Props>(({ className, ...props }, ref)
     ref={ref}
     {...props}
     className={cn(
-      "h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-ring disabled:bg-slate-100",
+      "h-10 w-full rounded-xl border border-slate-200 bg-white px-3.5 text-sm text-slate-900 shadow-sm transition placeholder:text-slate-400 hover:border-slate-300 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/15 disabled:bg-slate-100 disabled:text-slate-500",
       className,
     )}
   />

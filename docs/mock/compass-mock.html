@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PoC Compass — 羅針盤ビュー モック</title>
+<style>
+  :root {
+    --ink: #0f172a; --sub: #64748b; --line: #e8ecf3; --brand: #4f46e5; --warn: #f43f5e; --calm: #94a3b8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; color: var(--ink);
+    font: 15px/1.7 "Noto Sans JP","Yu Gothic UI",Meiryo,sans-serif;
+    background: radial-gradient(1200px 700px at 30% 10%, #f4f3ff 0%, #fff 55%);
+  }
+  .note { text-align: center; font-size: 11px; color: var(--sub); padding: 6px; }
+  .wrap { max-width: 1280px; margin: 0 auto; padding: 8px 32px 32px; display: grid; grid-template-columns: minmax(0,1fr) 360px; gap: 40px; align-items: center; min-height: calc(100vh - 40px); }
+  @media (max-width: 960px) { .wrap { grid-template-columns: 1fr; gap: 16px; } }
+
+  .eyebrow { font-size: 13px; color: var(--sub); letter-spacing: .04em; }
+  h1 { margin: 2px 0 0; font-size: 34px; line-height: 1.3; font-weight: 800; letter-spacing: -.01em; }
+  h1 em { font-style: normal; color: var(--warn); }
+  .meta { margin-top: 6px; color: var(--sub); font-size: 14px; display: flex; gap: 16px; flex-wrap: wrap; }
+  .meta b { color: var(--ink); font-size: 18px; font-variant-numeric: tabular-nums; }
+  svg { width: 100%; height: auto; display: block; max-height: 62vh; margin-top: 4px; }
+  .ring { fill: none; stroke: var(--line); }
+  .ring.out { stroke: #dfe4ee; }
+  .rim { font-size: 11px; fill: #a3adbf; letter-spacing: .08em; }
+  .core { fill: var(--brand); }
+  .core-t { fill: #fff; font-size: 13px; font-weight: 700; }
+  .tether { stroke: var(--brand); stroke-opacity: .12; stroke-width: 1.5; transition: all .8s cubic-bezier(.3,.8,.3,1); }
+  .dot { cursor: pointer; transition: transform .8s cubic-bezier(.3,.8,.3,1); outline: none; }
+  .dot .b { transition: fill .5s, r .2s; stroke: #fff; stroke-width: 3; fill: var(--calm); }
+  .dot.ok .b { fill: #818cf8; }
+  .dot.bad .b { fill: var(--warn); }
+  .dot.none .b { fill: #fff; stroke: var(--calm); stroke-width: 2; stroke-dasharray: 3 3; }
+  .dot .pulse { fill: var(--warn); opacity: 0; }
+  .dot.bad .pulse { animation: pulse 2.4s ease-out infinite; }
+  @keyframes pulse { 0% { opacity: .35; r: 12; } 100% { opacity: 0; r: 30; } }
+  .dot:hover .b, .dot:focus-visible .b, .dot.sel .b { r: 17; }
+  .dot.sel .b { stroke: var(--ink); stroke-width: 3; }
+  .dot:focus-visible .b { stroke: var(--brand); }
+  .dot text { font-size: 13px; font-weight: 700; fill: var(--ink); paint-order: stroke; stroke: #fff; stroke-width: 4px; opacity: 0; transition: opacity .2s; pointer-events: none; }
+  .dot:hover text, .dot.sel text, .dot:focus-visible text { opacity: 1; }
+
+  .time { display: flex; align-items: center; gap: 14px; margin-top: 6px; }
+  .play { width: 40px; height: 40px; border-radius: 50%; border: 0; background: var(--ink); color: #fff; font-size: 13px; cursor: pointer; flex: none; }
+  .play:focus-visible, .btn:focus-visible { outline: 3px solid rgb(79 70 229 / .45); outline-offset: 2px; }
+  .track { position: relative; flex: 1; height: 48px; margin: 0 24px; }
+  .track::before { content: ""; position: absolute; left: 0; right: 0; top: 19px; height: 2px; background: var(--line); }
+  .stop { position: absolute; top: 0; transform: translateX(-50%); background: none; border: 0; cursor: pointer; padding: 0 8px; text-align: center; font: inherit; color: var(--sub); font-size: 12px; height: 48px; }
+  .stop i { display: block; width: 12px; height: 12px; margin: 14px auto 4px; border-radius: 50%; background: #fff; border: 2px solid #cdd5e3; transition: all .3s; }
+  .stop.on { color: var(--ink); font-weight: 700; }
+  .stop.on i { background: var(--brand); border-color: var(--brand); transform: scale(1.4); }
+  .stop:focus-visible { outline: 3px solid rgb(79 70 229 / .45); border-radius: 6px; }
+
+  .card { background: #fff; border-radius: 24px; padding: 28px; box-shadow: 0 1px 2px rgb(15 23 42 / .04), 0 24px 48px -24px rgb(15 23 42 / .22); min-height: 400px; display: flex; flex-direction: column; }
+  .tag { font-size: 13px; font-weight: 700; color: var(--warn); }
+  .tag.calm { color: var(--brand); } .tag.none { color: var(--sub); }
+  .card h2 { margin: 6px 0 14px; font-size: 22px; line-height: 1.45; }
+  .score { display: flex; align-items: baseline; gap: 8px; }
+  .score b { font-size: 44px; line-height: 1; font-variant-numeric: tabular-nums; }
+  .score span { color: var(--sub); font-size: 13px; }
+  .bar { height: 6px; background: #eef1f6; border-radius: 9px; margin: 10px 0 18px; overflow: hidden; }
+  .bar i { display: block; height: 100%; background: var(--warn); border-radius: 9px; transition: width .6s; }
+  .bar.calm i { background: #818cf8; }
+  .why { color: #334155; font-size: 14px; }
+  .sug { margin-top: 14px; padding: 14px 16px; background: #f5f4ff; border-radius: 14px; font-size: 14px; color: #3730a3; }
+  .sug small { display: block; color: var(--sub); margin-bottom: 2px; }
+  .actions { margin-top: auto; padding-top: 22px; display: flex; gap: 10px; }
+  .btn { flex: 1; height: 46px; border-radius: 12px; border: 1px solid #d5dbe7; background: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+  .btn.main { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .hint { margin: 10px 0 0; text-align: center; font-size: 12px; color: var(--sub); }
+  .done { margin: auto; text-align: center; color: var(--sub); }
+  .done .big { font-size: 40px; }
+  .done b { display: block; color: var(--ink); font-size: 18px; margin: 4px 0; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<div class="note">デザイン案のモックです。数値は実画面から読み取ったサンプル（過去の推移は仮値）。保存・AI 呼び出しはしません。</div>
+<div class="wrap">
+  <section aria-label="羅針盤">
+    <div class="eyebrow">顧客問い合わせ自動分類 PoC</div>
+    <h1 id="headline"></h1>
+    <div class="meta"><span>健全度 <b id="hs">65</b> / 100</span><span id="hd"></span></div>
+    <svg id="svg" viewBox="-300 -260 600 520" role="img" aria-label="目的を中心に、タスクを目的との近さで並べた図。中心に近いほど目的に合っています。"></svg>
+    <div class="time">
+      <button class="play" id="play" type="button" aria-label="推移を再生">▶</button>
+      <div class="track" id="track"></div>
+    </div>
+  </section>
+
+  <aside class="card" id="card" aria-live="polite"></aside>
+</div>
+
+<script>
+const SECT = [
+  { n: '仮説1', t: '問い合わせの7割は定型で、AIが正しく分類できる', a: -45 },
+  { n: '仮説2', t: '自動振り分けで一次対応の時間が半減する', a: 45 },
+  { n: '仮説3', t: 'オペレーターはAI分類結果を信頼して使い続ける', a: 135 },
+  { n: 'ひも付けなし', t: '', a: 225 },
+];
+const SNAPS = ['9/20', '10/01', '10/05', '10/08'];
+const HEALTH = [58, 66, 52, 65];
+const TASKS = [
+  { id: 1, s: 0, title: '過去問い合わせ300件に正解ラベルを付ける', h: [null, 88, 90, null] },
+  { id: 2, s: 0, title: '分類モデルの精度評価スクリプトを作成する', h: [80, 90, 94, 95] },
+  { id: 3, s: 1, title: '試行チームの一次対応時間計測を準備する', h: [70, 85, 90, 92] },
+  { id: 4, s: 2, title: 'オペレーター5名にAI分類結果の信頼度をヒアリングする', h: [null, null, null, null] },
+  { id: 5, s: 3, title: '英語・中国語の多言語対応を実装する', h: [72, 55, 38, 20], bad: '目的逸脱の疑い',
+    why: '多言語対応は今回の成功条件に含まれておらず、問い合わせ分類が成立するかを3か月で見極める上で必須ではありません。',
+    prop: '対象言語を絞り、まず現行の主要言語で精度と時間削減の検証を優先する。' },
+  { id: 6, s: 3, title: '通知メール文面の個別カスタマイズを検討する', h: [60, 48, 35, 25], bad: '不要機能候補',
+    why: '自動振り分け通知の運用補助にはなりますが、仮説の検証や成功条件の判定に個別文面までは必要ありません。',
+    prop: '固定文面で試行し、効果検証後に必要が出たら追加で検討する。' },
+];
+const NS = 'http://www.w3.org/2000/svg';
+const $ = id => document.getElementById(id);
+const mk = (n, a = {}, p) => { const e = document.createElementNS(NS, n); for (const k in a) e.setAttribute(k, a[k]); p && p.appendChild(e); return e; };
+const rad = d => d * Math.PI / 180;
+const R0 = 62, R1 = 230;
+const rOf = s => R0 + (1 - s / 100) * (R1 - R0);
+let t = 3, sel = null, timer = null;
+const handled = {};
+
+/* static layer: three quiet rings + rim labels */
+const svg = $('svg');
+[R0 + 40, (R0 + R1) / 2, R1].forEach((r, i) => mk('circle', { class: 'ring' + (i === 2 ? ' out' : ''), r, cx: 0, cy: 0 }, svg));
+SECT.forEach(s => {
+  const x = Math.cos(rad(s.a)) * (R1 + 18), y = Math.sin(rad(s.a)) * (R1 + 18);
+  mk('text', { class: 'rim', x, y: y + 4, 'text-anchor': x > 0 ? 'start' : 'end' }, svg).textContent = s.n;
+});
+mk('circle', { class: 'core', r: R0 - 14 }, svg);
+mk('text', { class: 'core-t', x: 0, y: 5, 'text-anchor': 'middle' }, svg).textContent = '目的';
+const layer = mk('g', {}, svg);
+
+const ang = {};
+SECT.forEach((s, si) => {
+  const m = TASKS.filter(x => x.s === si);
+  m.forEach((tk, i) => { ang[tk.id] = s.a + (m.length === 1 ? 0 : (i - (m.length - 1) / 2) * 34); });
+});
+const nodes = {};
+TASKS.forEach(tk => {
+  const tether = mk('line', { class: 'tether', x1: 0, y1: 0, x2: 0, y2: 0 }, layer);
+  const g = mk('g', { class: 'dot', tabindex: 0, role: 'button' }, layer);
+  mk('circle', { class: 'pulse', r: 12 }, g);
+  mk('circle', { class: 'b', r: 13 }, g);
+  const lab = mk('text', { y: -22, 'text-anchor': 'middle' }, g);
+  lab.textContent = tk.title.length > 16 ? tk.title.slice(0, 15) + '…' : tk.title;
+  g.addEventListener('click', () => pick(tk.id));
+  g.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(tk.id); } });
+  nodes[tk.id] = { g, tether };
+});
+
+/* time track */
+SNAPS.forEach((s, i) => {
+  const b = document.createElement('button');
+  b.className = 'stop'; b.type = 'button'; b.style.left = (i / (SNAPS.length - 1)) * 100 + '%';
+  b.innerHTML = `<i></i>${s}`; b.setAttribute('aria-label', `${s} の状態を見る`);
+  b.onclick = () => { stop(); t = i; draw(); };
+  $('track').appendChild(b);
+});
+function stop() { clearInterval(timer); timer = null; $('play').textContent = '▶'; $('play').setAttribute('aria-label', '推移を再生'); }
+$('play').onclick = () => {
+  if (timer) return stop();
+  t = 0; draw(); $('play').textContent = '■'; $('play').setAttribute('aria-label', '再生を停止');
+  timer = setInterval(() => { if (t >= 3) return stop(); t++; draw(); }, 1500);
+};
+
+const isBad = (tk, i) => (i === 3 ? !!tk.bad && !handled[tk.id] : tk.h[i] != null && tk.h[i] < 50);
+const open = () => TASKS.filter(x => x.bad && !handled[x.id]);
+
+function draw() {
+  TASKS.forEach(tk => {
+    const s = tk.h[t], r = s == null ? 205 : rOf(s), a = rad(ang[tk.id]);
+    const x = Math.cos(a) * r, y = Math.sin(a) * r, n = nodes[tk.id];
+    n.g.style.transform = `translate(${x}px, ${y}px)`;
+    n.tether.setAttribute('x2', x); n.tether.setAttribute('y2', y);
+    n.g.setAttribute('class', 'dot ' + (s == null ? 'none' : isBad(tk, t) ? 'bad' : 'ok') + (sel === tk.id ? ' sel' : ''));
+    n.g.setAttribute('aria-label', `${tk.title}。${s == null ? '未評価' : '整合 ' + s}`);
+  });
+  const nb = TASKS.filter(tk => tk.h[t] != null && isBad(tk, t)).length;
+  $('headline').innerHTML = nb ? `<em>${nb}件</em>が、目的から<br>ズレています` : '目的から、<br>ぶれていません';
+  $('hs').textContent = HEALTH[t];
+  const d = t ? HEALTH[t] - HEALTH[t - 1] : null;
+  $('hd').textContent = d == null ? '最初の評価' : `前回より ${d >= 0 ? '▲' : '▼'}${Math.abs(d)}`;
+  [...$('track').children].forEach((b, i) => b.classList.toggle('on', i === t));
+  card();
+}
+function pick(id) { sel = sel === id ? null : id; draw(); }
+
+function card() {
+  const c = $('card'), tk = TASKS.find(x => x.id === sel);
+  if (!tk) {
+    const next = open()[0];
+    c.innerHTML = next
+      ? `<div class="tag">次に見ること</div><h2>${next.title}</h2><p class="why">${next.bad}。AI の指摘と提案を確認できます。点をクリックしても開けます。</p>
+         <div class="actions"><button class="btn main" type="button" id="go">確認する</button></div>`
+      : `<div class="done"><div class="big">🎯</div><b>判断待ちはありません</b>気になる点があれば、点をクリックして詳しく見られます。</div>`;
+    const go = $('go'); if (go) go.onclick = () => pick(next.id);
+    return;
+  }
+  const s = tk.h[t], bad = s != null && isBad(tk, t), sc = SECT[tk.s];
+  const tag = s == null ? '未評価' : bad ? tk.bad || '要確認' : '目的に合っています';
+  const act = bad && t === 3 && tk.bad && !handled[tk.id];
+  c.innerHTML = `
+    <div class="tag ${s == null ? 'none' : bad ? '' : 'calm'}">${tag}</div>
+    <h2>${tk.title}</h2>
+    <div class="score"><b>${s ?? '—'}</b><span>目的との近さ（100 が最も近い）</span></div>
+    <div class="bar ${bad ? '' : 'calm'}"><i style="width:${s ?? 0}%"></i></div>
+    ${act ? `<div class="why">${tk.why}</div><div class="sug"><small>AI の提案</small>${tk.prop}</div>
+      <div class="actions"><button class="btn main" id="ap" type="button">提案を適用</button><button class="btn" id="sk" type="button">見送る</button></div>
+      <p class="hint">キーボード: A 適用 ／ S 見送り ・ 適用するまでデータは変わりません</p>`
+    : `<div class="why">${s == null ? 'AI で評価すると、ここに目的との近さが表示されます。' : bad ? 'この時点では要確認の状態でした。' : `${sc.n}${sc.t ? '「' + sc.t + '」' : ''}に沿った作業です。`}</div>
+      <div class="actions"><button class="btn" id="bk" type="button">閉じる</button></div>`}`;
+  const on = (id, f) => { const e = $(id); if (e) e.onclick = f; };
+  on('ap', () => resolve(tk, '適用しました'));
+  on('sk', () => resolve(tk, '見送りました'));
+  on('bk', () => pick(tk.id));
+}
+function resolve(tk, msg) {
+  handled[tk.id] = msg; sel = null; draw();
+  const nx = open()[0];
+  $('card').innerHTML = `<div class="done"><div class="big">✓</div><b>${msg}（モック）</b>${nx ? `残り ${open().length} 件` : 'ぶれゼロになりました。'}</div>${nx ? '<div class="actions"><button class="btn main" id="nx" type="button">次を見る</button></div>' : ''}`;
+  const b = $('nx'); if (b) b.onclick = () => pick(nx.id);
+}
+document.addEventListener('keydown', e => {
+  const tk = TASKS.find(x => x.id === sel); if (!tk || !$('ap')) return;
+  if (e.key.toLowerCase() === 'a') resolve(tk, '適用しました'); else if (e.key.toLowerCase() === 's') resolve(tk, '見送りました');
+});
+draw();
+</script>
+</body>
+</html>

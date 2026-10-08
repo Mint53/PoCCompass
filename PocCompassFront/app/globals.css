@@ -36,6 +36,8 @@
   }
   body {
     @apply bg-background text-foreground;
+    background-image: radial-gradient(1100px 600px at 20% -5%, rgb(238 242 255 / 0.9), transparent 70%);
+    background-attachment: fixed;
     font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", Meiryo, sans-serif;
   }
 }
@@ -47,7 +49,7 @@
     margin-right: auto;
   }
   .card-shadow {
-    box-shadow: 0 2px 8px -2px rgb(0 0 0 / 0.05), 0 0 4px -2px rgb(0 0 0 / 0.02);
+    box-shadow: 0 1px 2px rgb(15 23 42 / 0.04), 0 12px 24px -16px rgb(15 23 42 / 0.14);
   }
 }
 
@@ -57,4 +59,103 @@
 }
 .animate-fade-in-up {
   animation: fade-in-up 0.2s ease-out both;
+}
+
+@keyframes pop {
+  from { opacity: 0; transform: translateY(-4px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.animate-pop {
+  animation: pop 0.14s ease-out both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-pop { animation: none; }
+}
+
+/* Staggered entrance: set --i on the element (index) to cascade. */
+.stagger {
+  animation: fade-in-up 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, rgb(241 245 249) 25%, rgb(226 232 240 / 0.7) 50%, rgb(241 245 249) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s linear infinite;
+}
+/* Jumping to a card from a summary tile flashes the target. */
+@keyframes flash-ring {
+  0% { box-shadow: 0 0 0 0 rgb(var(--ring) / 0.55); }
+  100% { box-shadow: 0 0 0 14px rgb(var(--ring) / 0); }
+}
+/* Drawn on a pseudo-element so the card's own entrance animation (.stagger) is never replayed when :target changes. */
+.flash-target { position: relative; }
+.flash-target:target::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  animation: flash-ring 1.1s ease-out 1;
+}
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  .stagger, .skeleton, .flash-target:target::after { animation: none; }
+  html { scroll-behavior: auto; }
+}
+
+/* Slim, quiet scrollbars for cards that scroll inside. */
+.thin-scroll {
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+.thin-scroll::-webkit-scrollbar { width: 6px; }
+.thin-scroll::-webkit-scrollbar-track { background: transparent; }
+.thin-scroll::-webkit-scrollbar-thumb { background: rgb(203 213 225); border-radius: 9999px; }
+.thin-scroll::-webkit-scrollbar-thumb:hover { background: rgb(148 163 184); }
+.thin-scroll::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
+/* Firefox has no ::-webkit-scrollbar */
+@supports not selector(::-webkit-scrollbar) {
+  .thin-scroll { scrollbar-width: thin; scrollbar-color: rgb(203 213 225) transparent; }
+}
+
+/* ---- usage guide scenes (components/GuideDialog) ---- */
+@keyframes guide-type { from { width: 0; } }
+.guide-type { animation: guide-type 0.9s ease-out both; }
+@keyframes guide-reveal { from { opacity: 0; transform: translateY(8px) scale(0.96); } }
+.guide-reveal { animation: guide-reveal 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes guide-press {
+  0%, 45% { transform: scale(1); }
+  58% { transform: scale(0.9); filter: brightness(0.9); }
+  75%, 100% { transform: scale(1); }
+}
+.guide-press { animation: guide-press 1.1s ease-in-out both; }
+@keyframes guide-cursor {
+  0% { transform: translate(40px, 30px); opacity: 0; }
+  30% { opacity: 1; }
+  55%, 100% { transform: translate(2px, -2px); opacity: 1; }
+}
+.guide-cursor { animation: guide-cursor 0.9s ease-out both; }
+@keyframes guide-drift { from { transform: translate(0, 0); } to { transform: translate(var(--x1), var(--y1)); } }
+.guide-drift { animation: guide-drift 1.3s cubic-bezier(0.22, 1, 0.36, 1) both; transform: translate(var(--x1), var(--y1)); }
+@keyframes guide-ping { 0% { opacity: 0.7; transform: scale(0.6); } 100% { opacity: 0; transform: scale(1.9); } }
+.guide-ping { transform-box: fill-box; transform-origin: center; animation: guide-ping 1.6s ease-out 1.3s infinite; }
+@keyframes guide-pressed {
+  0%, 50% { transform: scale(1); }
+  62% { transform: scale(0.94); }
+  100% { transform: scale(1); background: #0f172a; color: #fff; border-color: #0f172a; }
+}
+.guide-pressed { animation: guide-pressed 1.4s ease-in-out 0.6s both; }
+@keyframes guide-cursor2 {
+  0% { transform: translate(46px, 34px); opacity: 0; }
+  35% { opacity: 1; }
+  100% { transform: translate(0, 0); opacity: 1; }
+}
+.guide-cursor2 { animation: guide-cursor2 1.4s ease-out 0.4s both; }
+@media (prefers-reduced-motion: reduce) {
+  .guide-type, .guide-reveal, .guide-press, .guide-cursor, .guide-cursor2, .guide-ping, .guide-pressed { animation: none; }
+  .guide-drift { animation: none; }
 }
