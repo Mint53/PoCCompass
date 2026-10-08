@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { Assumption, Criterion, Task, TaskFields } from "@/lib/api/client";
 import { TASK_STATUS } from "@/lib/labels";
 import Button from "../../../components/ui/Button";
+import DateField from "../../../components/ui/DateField";
 import Field from "../../../components/ui/Field";
 import Input from "../../../components/ui/Input";
 import Select from "../../../components/ui/Select";
@@ -132,10 +133,10 @@ export default function TaskForm({
           />
         </Field>
         <Field label="開始日（任意）" htmlFor="task-start" hint="WBS の帯の開始位置">
-          <Input id="task-start" type="date" value={d.start_date ?? ""} max={d.due_date ?? undefined} onChange={(e) => set({ start_date: e.target.value || null })} disabled={saving} />
+          <DateField id="task-start" clearable value={d.start_date ?? ""} max={d.due_date ?? undefined} onChange={(v) => set({ start_date: v || null })} disabled={saving} />
         </Field>
         <Field label="期日（任意）" htmlFor="task-due">
-          <Input id="task-due" type="date" value={d.due_date ?? ""} onChange={(e) => set({ due_date: e.target.value || null })} disabled={saving} />
+          <DateField id="task-due" clearable value={d.due_date ?? ""} min={d.start_date ?? undefined} onChange={(v) => set({ due_date: v || null })} disabled={saving} />
         </Field>
       </div>
       <div className="grid gap-4 md:grid-cols-2">

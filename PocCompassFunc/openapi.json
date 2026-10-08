@@ -368,6 +368,211 @@
     "title": "ChatSendResponse",
     "type": "object"
    },
+   "Compass": {
+    "properties": {
+     "attention_count": {
+      "title": "Attention Count",
+      "type": "integer"
+     },
+     "delta_vs_last_month": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Delta Vs Last Month"
+     },
+     "frames": {
+      "items": {
+       "$ref": "#/components/schemas/CompassFrame"
+      },
+      "title": "Frames",
+      "type": "array"
+     },
+     "health_score": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Health Score"
+     },
+     "sectors": {
+      "items": {
+       "$ref": "#/components/schemas/CompassSector"
+      },
+      "title": "Sectors",
+      "type": "array"
+     },
+     "tasks": {
+      "items": {
+       "$ref": "#/components/schemas/CompassTask"
+      },
+      "title": "Tasks",
+      "type": "array"
+     }
+    },
+    "required": [
+     "sectors",
+     "frames",
+     "tasks",
+     "attention_count",
+     "health_score",
+     "delta_vs_last_month"
+    ],
+    "title": "Compass",
+    "type": "object"
+   },
+   "CompassFrame": {
+    "properties": {
+     "date": {
+      "title": "Date",
+      "type": "string"
+     },
+     "health_score": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Health Score"
+     },
+     "is_current": {
+      "title": "Is Current",
+      "type": "boolean"
+     }
+    },
+    "required": [
+     "date",
+     "health_score",
+     "is_current"
+    ],
+    "title": "CompassFrame",
+    "type": "object"
+   },
+   "CompassPoint": {
+    "properties": {
+     "score": {
+      "title": "Score",
+      "type": "integer"
+     },
+     "verdict": {
+      "$ref": "#/components/schemas/Verdict"
+     }
+    },
+    "required": [
+     "score",
+     "verdict"
+    ],
+    "title": "CompassPoint",
+    "type": "object"
+   },
+   "CompassSector": {
+    "properties": {
+     "id": {
+      "title": "Id",
+      "type": "string"
+     },
+     "priority": {
+      "$ref": "#/components/schemas/Priority"
+     },
+     "text": {
+      "title": "Text",
+      "type": "string"
+     }
+    },
+    "required": [
+     "id",
+     "text",
+     "priority"
+    ],
+    "title": "CompassSector",
+    "type": "object"
+   },
+   "CompassTask": {
+    "properties": {
+     "feedback": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/FeedbackJudgement"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "needs_attention": {
+      "title": "Needs Attention",
+      "type": "boolean"
+     },
+     "points": {
+      "items": {
+       "anyOf": [
+        {
+         "$ref": "#/components/schemas/CompassPoint"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "title": "Points",
+      "type": "array"
+     },
+     "reason": {
+      "title": "Reason",
+      "type": "string"
+     },
+     "sector_id": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Sector Id"
+     },
+     "status": {
+      "$ref": "#/components/schemas/TaskStatus"
+     },
+     "suggested_action": {
+      "title": "Suggested Action",
+      "type": "string"
+     },
+     "task_id": {
+      "title": "Task Id",
+      "type": "string"
+     },
+     "title": {
+      "title": "Title",
+      "type": "string"
+     }
+    },
+    "required": [
+     "task_id",
+     "title",
+     "status",
+     "sector_id",
+     "points",
+     "needs_attention",
+     "feedback",
+     "reason",
+     "suggested_action"
+    ],
+    "title": "CompassTask",
+    "type": "object"
+   },
    "Criterion": {
     "properties": {
      "created_at": {
@@ -3428,6 +3633,48 @@
     "summary": "Discard",
     "tags": [
      "chat"
+    ]
+   }
+  },
+  "/api/projects/{project_id}/compass": {
+   "get": {
+    "operationId": "compass_api_projects__project_id__compass_get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "project_id",
+      "required": true,
+      "schema": {
+       "title": "Project Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Compass"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Compass",
+    "tags": [
+     "projects"
     ]
    }
   },

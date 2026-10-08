@@ -1,17 +1,18 @@
 "use client";
 
-import { AlertTriangle, CheckCircle2, Clock, Lightbulb, RefreshCw, ThumbsDown, ThumbsUp } from "lucide-react";
+import { AlertTriangle, ArrowUpRight, CheckCircle2, Clock, FlaskConical, Lightbulb, Maximize2, RefreshCw, Scissors, ThumbsDown, ThumbsUp } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { api, errorMessage, type Dashboard } from "@/lib/api/client";
-import { VERDICT_LABEL, scoreColor } from "@/lib/labels";
+import { PRIORITY, VERDICT_LABEL, labelOf, scoreColor } from "@/lib/labels";
 import { cn, formatDateTime } from "@/lib/utils";
 import Badge from "../../components/ui/Badge";
 import Button from "../../components/ui/Button";
 import Card from "../../components/ui/Card";
-import { EmptyState, ErrorState, LoadingState } from "../../components/ui/States";
+import { EmptyState, ErrorState } from "../../components/ui/States";
 import { useToast } from "../../components/ui/ToastProvider";
-import { BarRow, ScoreRing, TrendLine } from "./components/Charts";
+import Modal from "../../components/ui/Modal";
+import { BarRow, CountUp, GrowBar, ScoreRing, TrendLine, toneForScore } from "./components/Charts";
 import { useProject } from "./ProjectContext";
 
 const COMPONENT_LABELS: { key: "alignment" | "validation" | "schedule" | "waste"; label: string }[] = [
@@ -27,6 +28,7 @@ export default function DashboardPage() {
   const [dash, setDash] = useState<Dashboard | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [sending, setSending] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState<"weak" | "under" | "risk" | null>(null);
   const cl = mode.card_labels;
   const lb = mode.labels;
 
@@ -60,7 +62,7 @@ export default function DashboardPage() {
   };
 
   if (error) return <ErrorState message={error} onRetry={load} />;
-  if (!dash) return <LoadingState />;
+  if (!dash) return <DashboardSkeleton />;
 
   if (items.tasks.length === 0) {
     return (
@@ -79,11 +81,23 @@ export default function DashboardPage() {
   const pending = dash.unevaluated_task_ids.length + dash.stale_task_ids.length;
   const delta = dash.health.delta_vs_last_month;
   const cards = [
-    { label: cl.drift, hint: cl.drift_hint, value: dash.cards.drift, color: "text-rose-600", accent: "border-t-rose-500", href: "#alerts" },
-    { label: cl.unnecessary, hint: cl.unnecessary_hint, value: dash.cards.unnecessary, color: "text-orange-600", accent: "border-t-orange-500", href: "#alerts" },
-    { label: cl.deadline_risk, hint: cl.deadline_risk_hint, value: dash.cards.deadline_risk, color: "text-orange-600", accent: "border-t-orange-500", href: "#deadline-risks" },
-    { label: cl.untested, hint: cl.untested_hint, value: dash.cards.untested, color: "text-sky-700", accent: "border-t-sky-500", href: "#under-evidenced" },
+    { label: cl.drift, hint: cl.drift_hint, value: dash.cards.drift, color: "text-rose-600", tint: "bg-rose-50 text-rose-600", ring: "hover:border-rose-200", Icon: AlertTriangle, href: "#alerts" },
+    { label: cl.unnecessary, hint: cl.unnecessary_hint, value: dash.cards.unnecessary, color: "text-orange-600", tint: "bg-orange-50 text-orange-600", ring: "hover:border-orange-200", Icon: Scissors, href: "#alerts" },
+    { label: cl.deadline_risk, hint: cl.deadline_risk_hint, value: dash.cards.deadline_risk, color: "text-amber-600", tint: "bg-amber-50 text-amber-600", ring: "hover:border-amber-200", Icon: Clock, href: "#deadline-risks" },
+    { label: cl.untested, hint: cl.untested_hint, value: dash.cards.untested, color: "text-sky-600", tint: "bg-sky-50 text-sky-600", ring: "hover:border-sky-200", Icon: FlaskConical, href: "#under-evidenced" },
   ];
+
+  const expandButton = (k: "weak" | "under" | "risk") => (
+    <button
+      type="button"
+      onClick={() => setExpanded(k)}
+      aria-label="拡大して表示"
+      title="拡大して表示"
+      className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-primary focus:outline-none focus-visible:ring-4 focus-visible:ring-primary/25"
+    >
+      <Maximize2 className="h-4 w-4" aria-hidden="true" />
+    </button>
+  );
 
   return (
     <div className="space-y-4">
@@ -107,7 +121,7 @@ export default function DashboardPage() {
 
       <Card title={`${mode.name}健全度ダッシュボード`}>
         <div className="grid gap-4 lg:grid-cols-[200px_minmax(0,1fr)]">
-          <div className="flex flex-col items-center justify-center gap-1 rounded-xl border border-slate-200 p-3">
+          <div className="flex flex-col items-center justify-center gap-1 rounded-2xl border border-indigo-100 bg-gradient-to-br from-indigo-50 via-white to-white p-3">
             <p className="text-sm font-semibold text-slate-700">Health Score</p>
             <ScoreRing score={dash.health.score} size={104} />
             <p className={cn("text-sm font-bold", delta == null ? "text-slate-500" : delta >= 0 ? "text-emerald-600" : "text-rose-600")}>
@@ -118,31 +132,42 @@ export default function DashboardPage() {
             </p>
           </div>
           <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-            {cards.map((c) => (
+            {cards.map((c, i) => (
               <a
                 key={c.label}
                 href={c.href}
+                style={{ "--i": i } as React.CSSProperties}
                 className={cn(
-                  "flex flex-col items-center justify-center gap-0.5 rounded-xl border border-t-4 border-slate-200 p-2 text-center transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-ring",
-                  c.value > 0 ? c.accent : "border-t-slate-200",
+                  "stagger group relative flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3 transition duration-200 hover:-translate-y-0.5 hover:shadow-lg focus:outline-none focus-visible:ring-4 focus-visible:ring-primary/25 motion-reduce:transition-none motion-reduce:hover:translate-y-0",
+                  c.ring,
                 )}
               >
-                <p className="text-sm font-semibold text-slate-800">{c.label}</p>
-                <p className={cn("text-3xl font-bold tabular-nums", c.value > 0 ? c.color : "text-slate-400")}>
-                  {c.value}
-                  <span className="ml-0.5 text-sm font-medium">件</span>
-                </p>
-                <p className="text-xs text-slate-600">{c.hint}</p>
+                <span className={cn("flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-transform duration-200 group-hover:scale-110", c.value > 0 ? c.tint : "bg-slate-100 text-slate-400")}>
+                  <c.Icon className="h-5 w-5" aria-hidden="true" />
+                </span>
+                <span className="min-w-0">
+                  <span className="block truncate text-xs font-semibold text-slate-600">{c.label}</span>
+                  <span className={cn("flex items-baseline gap-0.5 text-3xl font-extrabold leading-tight tabular-nums", c.value > 0 ? c.color : "text-slate-400")}>
+                    <CountUp value={c.value} />
+                    <span className="text-sm font-medium">件</span>
+                  </span>
+                  <span className="block truncate text-[11px] text-slate-500" title={c.hint}>
+                    {c.hint}
+                  </span>
+                </span>
+                <ArrowUpRight className="absolute right-2.5 top-2.5 h-4 w-4 text-slate-300 opacity-0 transition group-hover:opacity-100" aria-hidden="true" />
               </a>
             ))}
-            <div className="col-span-2 rounded-xl border border-slate-200 px-3 py-2 xl:col-span-4">
+            <div className="stagger col-span-2 rounded-2xl border border-slate-200 bg-white px-3.5 py-2.5 xl:col-span-4" style={{ "--i": 4 } as React.CSSProperties}>
               <p className="mb-1 text-sm font-semibold text-slate-700">スコアの内訳（0〜100）</p>
               <div className="grid gap-x-6 sm:grid-cols-2">
-                {COMPONENT_LABELS.map(({ key, label }) => {
+                {COMPONENT_LABELS.map(({ key, label }, i) => {
                   const v = dash.health.components[key];
                   return (
                     <BarRow
                       key={key}
+                      index={i}
+                      tone={toneForScore(v)}
                       label={label}
                       value={v ?? 0}
                       valueLabel={v == null ? "対象なし" : String(Math.round(v))}
@@ -160,9 +185,9 @@ export default function DashboardPage() {
         </div>
       </Card>
 
-      <div className="grid gap-4 lg:h-[calc(100vh-34rem)] lg:min-h-[16rem] lg:grid-cols-3">
-      <Card className="flex min-h-0 flex-col" title={`AI からの指摘（${dash.alerts.length} 件）`} id="alerts">
-<div className="min-h-0 flex-1 overflow-y-auto">
+      <div className="grid gap-4 lg:h-[calc(100vh-35rem)] lg:min-h-[16rem] lg:grid-cols-3">
+      <Card className="stagger flash-target flex min-h-0 flex-col" title={`AI からの指摘（${dash.alerts.length} 件）`} id="alerts">
+<div className="thin-scroll min-h-0 flex-1 overflow-y-auto pr-1.5">
         {dash.alerts.length === 0 ? (
           <p className="flex items-center justify-center gap-2 py-6 text-sm text-emerald-700">
             <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
@@ -170,8 +195,8 @@ export default function DashboardPage() {
           </p>
         ) : (
           <ul className="divide-y divide-slate-100">
-            {dash.alerts.map((a) => (
-              <li key={a.task_id} className="flex flex-col gap-2 py-3">
+            {dash.alerts.map((a, i) => (
+              <li key={a.task_id} className="stagger flex flex-col gap-2 py-3" style={{ "--i": i + 3 } as React.CSSProperties}>
                 <div className="min-w-0 space-y-1.5">
                   <div className="flex flex-wrap items-center gap-2">
                     <Badge variant={VERDICT_LABEL[a.verdict].variant}>
@@ -206,34 +231,41 @@ export default function DashboardPage() {
       </Card>
 
         <div className="grid min-h-0 gap-4 lg:grid-rows-2">
-        <Card className="flex min-h-0 flex-col" title={cl.weak_tasks_title}>
-<div className="min-h-0 flex-1 overflow-y-auto">
+        <Card className="stagger flex min-h-0 flex-col" title={cl.weak_tasks_title} actions={expandButton("weak")}>
+<div className="thin-scroll min-h-0 flex-1 overflow-y-auto pr-1.5">
           {dash.weak_tasks.length === 0 ? (
             <p className="py-6 text-center text-sm text-slate-500">評価済みの{lb.task}がありません。</p>
           ) : (
             <div>
-              {dash.weak_tasks.map((w) => (
-                <BarRow key={w.task_id} tone="rose" label={w.title} value={w.gap} valueLabel={`ズレ ${w.gap}`} tooltip={`${w.title}\n整合スコア ${w.alignment_score}\n${w.reason}`} />
+              {dash.weak_tasks.map((w, i) => (
+                <BarRow
+                  key={w.task_id}
+                  index={i}
+                  tone="rose"
+                  label={w.title}
+                  value={w.gap}
+                  valueLabel={`ズレ ${w.gap}`}
+                />
               ))}
               <p className="mt-2 text-xs text-slate-600">バーが長いほど{lb.goal}との紐づきが弱い（100 − 整合スコア）</p>
             </div>
           )}
 </div>
         </Card>
-        <Card className="flex min-h-0 flex-col" title={cl.under_evidenced_title} id="under-evidenced">
-<div className="min-h-0 flex-1 overflow-y-auto">
+        <Card className="stagger flash-target flex min-h-0 flex-col" title={cl.under_evidenced_title} id="under-evidenced" actions={expandButton("under")}>
+<div className="thin-scroll min-h-0 flex-1 overflow-y-auto pr-1.5">
           {dash.under_evidenced.length === 0 ? (
             <p className="py-6 text-center text-sm text-slate-500">検証中・未検証の{lb.assumption}はありません。</p>
           ) : (
             <div>
-              {dash.under_evidenced.map((u) => (
+              {dash.under_evidenced.map((u, i) => (
                 <BarRow
                   key={u.assumption_id}
+                  index={i}
                   label={u.text}
                   value={u.shortage}
                   tone="slate"
                   valueLabel={`不足 ${u.shortage}`}
-                  tooltip={`${u.text}\n${lb.evidence} ${u.evidence_count} 件`}
                 />
               ))}
               <p className="mt-2 text-xs text-slate-600">優先度の高い順。{lb.evidence}を登録すると減ります。</p>
@@ -244,14 +276,14 @@ export default function DashboardPage() {
         </div>
 
         <div className="grid min-h-0 gap-4 lg:grid-rows-2">
-        <Card className="flex min-h-0 flex-col" title={`${cl.deadline_risk}（${dash.deadline_risks.length} 件）`} id="deadline-risks">
-<div className="min-h-0 flex-1 overflow-y-auto">
+        <Card className="stagger flash-target flex min-h-0 flex-col" title={`${cl.deadline_risk}（${dash.deadline_risks.length} 件）`} id="deadline-risks" actions={expandButton("risk")}>
+<div className="thin-scroll min-h-0 flex-1 overflow-y-auto pr-1.5">
           {dash.deadline_risks.length === 0 ? (
             <p className="py-6 text-center text-sm text-slate-500">期限リスクはありません。</p>
           ) : (
             <ul className="space-y-2">
-              {dash.deadline_risks.map((r) => (
-                <li key={`${r.kind}-${r.item_id}`} className="flex items-start gap-2 text-sm">
+              {dash.deadline_risks.map((r, i) => (
+                <li key={`${r.kind}-${r.item_id}`} className="stagger flex items-start gap-2 rounded-xl px-2 py-1.5 text-sm transition-colors hover:bg-amber-50/70" style={{ "--i": i } as React.CSSProperties}>
                   <Clock className="mt-0.5 h-4 w-4 shrink-0 text-orange-600" aria-hidden="true" />
                   <span>
                     <Badge variant="orange" className="mr-2">
@@ -265,14 +297,117 @@ export default function DashboardPage() {
           )}
 </div>
         </Card>
-        <Card className="flex min-h-0 flex-col" title="健全度の推移">
-<div className="min-h-0 flex-1 overflow-y-auto">
+        <Card className="stagger flex min-h-0 flex-col" title="健全度の推移">
+<div className="thin-scroll min-h-0 flex-1 overflow-y-auto pr-1.5">
           <TrendLine points={dash.trend} />
 </div>
         </Card>
         </div>
       </div>
 
+      <Modal open={expanded === "weak"} title={cl.weak_tasks_title} onClose={() => setExpanded(null)}>
+        {dash.weak_tasks.length === 0 ? (
+          <p className="py-8 text-center text-sm text-slate-500">評価済みの{lb.task}がありません。</p>
+        ) : (
+          <ol className="space-y-3">
+            {dash.weak_tasks.map((w, i) => (
+              <li key={w.task_id} className="stagger rounded-2xl border border-slate-200 p-4" style={{ "--i": i } as React.CSSProperties}>
+                <div className="flex items-start gap-3">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white">{i + 1}</span>
+                  <div className="min-w-0 flex-1 space-y-2">
+                    <p className="break-words text-base font-bold text-slate-900">{w.title}</p>
+                    <p className="flex flex-wrap items-center gap-2 text-sm">
+                      <Badge variant={VERDICT_LABEL[w.verdict].variant}>
+                        {w.verdict === "drift" ? cl.drift : w.verdict === "unnecessary_candidate" ? cl.unnecessary : VERDICT_LABEL[w.verdict].label}
+                      </Badge>
+                      <span className={cn("font-semibold tabular-nums", scoreColor(w.alignment_score))}>整合 {w.alignment_score}</span>
+                      <span className="font-semibold tabular-nums text-rose-600">ズレ {w.gap}</span>
+                    </p>
+                    <GrowBar value={w.gap} tone="rose" index={i} />
+                    {w.reason && <p className="text-sm leading-relaxed text-slate-700">{w.reason}</p>}
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ol>
+        )}
+        <p className="mt-4 text-xs text-slate-600">バーが長いほど{lb.goal}との紐づきが弱い（100 − 整合スコア）</p>
+      </Modal>
+
+      <Modal open={expanded === "under"} title={cl.under_evidenced_title} onClose={() => setExpanded(null)}>
+        {dash.under_evidenced.length === 0 ? (
+          <p className="py-8 text-center text-sm text-slate-500">検証中・未検証の{lb.assumption}はありません。</p>
+        ) : (
+          <ol className="space-y-3">
+            {dash.under_evidenced.map((u, i) => (
+              <li key={u.assumption_id} className="stagger rounded-2xl border border-slate-200 p-4" style={{ "--i": i } as React.CSSProperties}>
+                <div className="flex items-start gap-3">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white">{i + 1}</span>
+                  <div className="min-w-0 flex-1 space-y-2">
+                    <p className="break-words text-base font-bold text-slate-900">{u.text}</p>
+                    <p className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-600">
+                      <span>
+                        優先度 <b className="text-slate-900">{labelOf(PRIORITY, u.priority)}</b>
+                      </span>
+                      <span>
+                        {lb.evidence} <b className="tabular-nums text-slate-900">{u.evidence_count}</b> 件
+                      </span>
+                      <span>
+                        不足 <b className="tabular-nums text-slate-900">{u.shortage}</b> / 100
+                      </span>
+                    </p>
+                    <GrowBar value={u.shortage} tone="slate" index={i} />
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ol>
+        )}
+        <p className="mt-4 text-xs text-slate-600">優先度の高い順。{lb.evidence}を登録すると減ります。</p>
+      </Modal>
+
+      <Modal open={expanded === "risk"} title={`${cl.deadline_risk}（${dash.deadline_risks.length} 件）`} onClose={() => setExpanded(null)}>
+        {dash.deadline_risks.length === 0 ? (
+          <p className="py-8 text-center text-sm text-slate-500">期限リスクはありません。</p>
+        ) : (
+          <ul className="space-y-3">
+            {dash.deadline_risks.map((r, i) => (
+              <li key={`${r.kind}-${r.item_id}`} className="stagger flex items-start gap-3 rounded-2xl border border-amber-100 bg-amber-50/50 p-4" style={{ "--i": i } as React.CSSProperties}>
+                <Clock className="mt-0.5 h-5 w-5 shrink-0 text-orange-600" aria-hidden="true" />
+                <div className="min-w-0 space-y-1.5">
+                  <Badge variant="orange">{r.kind === "overdue_task" ? `期日超過の${lb.task}` : `未達成の${lb.criterion}`}</Badge>
+                  <p className="break-words text-base font-semibold text-slate-900">{r.text}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Modal>
+    </div>
+  );
+}
+
+/** Placeholder with the dashboard's silhouette while the first response is in flight. */
+function DashboardSkeleton() {
+  return (
+    <div className="space-y-4" role="status" aria-live="polite" aria-label="ダッシュボードを読み込み中">
+      <div className="rounded-2xl border border-slate-200 bg-white p-5">
+        <div className="grid gap-4 lg:grid-cols-[200px_minmax(0,1fr)]">
+          <div className="skeleton h-44 rounded-2xl" />
+          <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+            {[0, 1, 2, 3].map((i) => (
+              <div key={i} className="skeleton h-20 rounded-2xl" />
+            ))}
+            <div className="skeleton col-span-2 h-20 rounded-2xl xl:col-span-4" />
+          </div>
+        </div>
+      </div>
+      <div className="grid gap-4 lg:grid-cols-3">
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="skeleton h-56 rounded-2xl" />
+        ))}
+      </div>
+      <span className="sr-only">読み込み中です</span>
     </div>
   );
 }

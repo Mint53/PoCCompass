@@ -17,7 +17,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   ];
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur">
+      <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/80 backdrop-blur-xl">
         <div className="container-like flex h-14 items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2 font-bold text-primary">
             <Compass className="h-6 w-6" aria-hidden="true" />
@@ -29,8 +29,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 key={n.href}
                 href={n.href}
                 className={cn(
-                  "flex h-10 items-center gap-1.5 rounded-md px-3 text-sm font-medium",
-                  n.active ? "bg-accent text-accent-foreground" : "text-slate-700 hover:bg-slate-100",
+                  "flex h-10 items-center gap-1.5 rounded-xl px-3.5 text-sm font-semibold transition-colors",
+                  n.active ? "bg-slate-900 text-white shadow-sm" : "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
                 )}
               >
                 <n.icon className="h-4 w-4" aria-hidden="true" />

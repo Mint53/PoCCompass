@@ -45,10 +45,10 @@ export default function ConfirmDialog({
       <button
         type="button"
         aria-label="ダイアログを閉じる"
-        className="absolute inset-0 bg-slate-900/45"
+        className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
         onClick={() => !busy && onClose()}
       />
-      <div className="relative w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl">
+      <div className="relative w-full max-w-md rounded-3xl border border-slate-200 bg-white p-7 shadow-[0_32px_64px_-24px_rgb(15_23_42/0.35)]">
         <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
         <div className="mt-2 whitespace-pre-line text-sm leading-6 text-slate-600">{description}</div>
         <div className="mt-6 flex items-center justify-end gap-2">

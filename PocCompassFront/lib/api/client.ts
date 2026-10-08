@@ -21,6 +21,8 @@ export type DecisionItem = S["DecisionItem"];
 export type ItemPatch = S["ItemPatch"];
 export type TaskFields = S["TaskFields"];
 export type Dashboard = S["Dashboard"];
+export type Compass = S["Compass"];
+export type CompassTask = S["CompassTask"];
 export type Evaluation = S["Evaluation"];
 export type Report = S["Report"];
 export type ExtractedTask = S["ExtractedTask"];
@@ -105,6 +107,7 @@ export const api = {
     request<unknown>("POST", `${p(id)}/feedback`, { task_id: taskId, judgement }),
 
   dashboard: (id: string) => request<Dashboard>("GET", `${p(id)}/dashboard`),
+  compass: (id: string) => request<Compass>("GET", `${p(id)}/compass`),
   evaluate: (id: string) => request<Evaluation>("POST", `${p(id)}/evaluations`),
   latestEvaluation: (id: string) => request<Evaluation | null>("GET", `${p(id)}/evaluations/latest`),
 

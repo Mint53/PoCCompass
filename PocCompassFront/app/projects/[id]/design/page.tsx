@@ -7,6 +7,7 @@ import { ASSUMPTION_STATUS, CRITERION_STATUS, PRIORITY } from "@/lib/labels";
 import Button from "../../../components/ui/Button";
 import Card from "../../../components/ui/Card";
 import ConfirmDialog from "../../../components/ui/ConfirmDialog";
+import DateField from "../../../components/ui/DateField";
 import Field from "../../../components/ui/Field";
 import Input from "../../../components/ui/Input";
 import Select from "../../../components/ui/Select";
@@ -63,10 +64,10 @@ function BasicsCard() {
         </Field>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="開始日" htmlFor="d-start" required>
-            <Input id="d-start" type="date" value={start} onChange={(e) => setStart(e.target.value)} disabled={saving} />
+            <DateField id="d-start" value={start} onChange={setStart} disabled={saving} />
           </Field>
           <Field label={lb.deadline} htmlFor="d-deadline" required>
-            <Input id="d-deadline" type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} disabled={saving} />
+            <DateField id="d-deadline" value={deadline} min={start || undefined} onChange={setDeadline} disabled={saving} />
           </Field>
         </div>
       </div>
@@ -115,8 +116,8 @@ function ItemRow({ item, kind }: { item: RowItem; kind: "assumption" | "criterio
 
   return (
     <li className="flex flex-col gap-2 border-b border-slate-100 py-3 last:border-0 lg:flex-row lg:items-center">
-      <Input aria-label={`${label}の本文`} value={text} maxLength={1000} onChange={(e) => setText(e.target.value)} disabled={busy} />
-      <div className="flex flex-wrap items-center gap-2 lg:shrink-0">
+      <Input aria-label={`${label}の本文`} className="min-w-0 lg:flex-1" value={text} maxLength={1000} onChange={(e) => setText(e.target.value)} disabled={busy} />
+      <div className="flex flex-wrap items-center gap-2 lg:shrink-0 lg:flex-nowrap">
         {kind === "assumption" ? (
           <>
             <Select aria-label="優先度" className="w-28" value={extra} options={PRIORITY.map((p) => ({ value: p.value, label: `優先度 ${p.label}` }))} onChange={(e) => setExtra(e.target.value as Assumption["priority"])} disabled={busy} />

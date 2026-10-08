@@ -5,11 +5,12 @@ from fastapi import APIRouter, Depends, Query, Response
 from app.constants.enums import Mode
 from app.controllers.deps import get_current_user, get_llm_client, get_repos
 from app.models.common import UserContext
+from app.models.compass import Compass
 from app.models.dashboard import Dashboard
 from app.models.evaluation import Evaluation
 from app.models.project import Project, ProjectCreate, ProjectUpdate
 from app.models.report import ExtractRequest, ExtractResponse, Report
-from app.services import evaluation_service, project_service, report_service
+from app.services import compass_service, evaluation_service, project_service, report_service
 from app.services.context import Repos
 from app.services.llm_client import LlmClient
 
@@ -48,6 +49,11 @@ def delete_project(project_id: str, user: UserContext = Depends(get_current_user
 @router.get("/{project_id}/dashboard", response_model=Dashboard)
 def dashboard(project_id: str, user: UserContext = Depends(get_current_user), repos: Repos = Depends(get_repos)):
     return evaluation_service.get_dashboard(repos, project_id, user)
+
+
+@router.get("/{project_id}/compass", response_model=Compass)
+def compass(project_id: str, user: UserContext = Depends(get_current_user), repos: Repos = Depends(get_repos)):
+    return compass_service.get_compass(repos, project_id, user)
 
 
 @router.post("/{project_id}/evaluations", response_model=Evaluation, status_code=201)

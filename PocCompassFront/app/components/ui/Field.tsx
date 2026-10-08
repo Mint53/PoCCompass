@@ -18,7 +18,7 @@ export default function Field({
 }) {
   return (
     <div className="space-y-1.5">
-      <label htmlFor={htmlFor} className="block text-sm font-medium text-slate-800">
+      <label htmlFor={htmlFor} className="block text-[13px] font-semibold text-slate-700">
         {label}
         {required && (
           <span className="ml-1 text-rose-600" aria-hidden="true">
