@@ -37,8 +37,8 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
   const tabs = [
     { href: base, label: "ダッシュボード" },
     { href: `${base}/design`, label: "設計" },
-    { href: `${base}/tasks`, label: `${lb.task}（${items.tasks.length}）` },
-    { href: `${base}/evidence`, label: lb.evidence },
+    { href: `${base}/tasks`, label: lb.task, count: items.tasks.length },
+    { href: `${base}/evidence`, label: lb.evidence, count: items.evidence.length },
     { href: `${base}/report`, label: "判断レポート" },
     { href: `${base}/settings`, label: "設定" },
   ];
@@ -75,19 +75,25 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
           </div>
         </div>
 
-        <nav className="-mx-1 flex gap-1 overflow-x-auto border-b border-slate-200 px-1" aria-label="取り組みのメニュー">
+        <nav className="sticky top-14 z-30 -mx-1 flex gap-1 overflow-x-auto border-b border-slate-200 bg-background/95 px-1 backdrop-blur" aria-label="取り組みのメニュー">
           {tabs.map((t) => {
             const active = t.href === base ? pathname === base : pathname.startsWith(t.href);
             return (
               <Link
                 key={t.href}
                 href={t.href}
+                aria-current={active ? "page" : undefined}
                 className={cn(
-                  "-mb-px whitespace-nowrap border-b-2 px-3 py-2.5 text-sm font-medium",
-                  active ? "border-primary text-primary" : "border-transparent text-slate-600 hover:text-slate-900",
+                  "-mb-px inline-flex items-center gap-1.5 whitespace-nowrap border-b-2 px-3 py-3 text-sm font-medium",
+                  active ? "border-primary font-bold text-primary" : "border-transparent text-slate-600 hover:border-slate-300 hover:text-slate-900",
                 )}
               >
                 {t.label}
+                {t.count != null && (
+                  <span className={cn("rounded-full px-1.5 text-xs tabular-nums", active ? "bg-accent text-accent-foreground" : "bg-slate-100 text-slate-600")}>
+                    {t.count}
+                  </span>
+                )}
               </Link>
             );
           })}

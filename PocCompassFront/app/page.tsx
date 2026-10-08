@@ -7,7 +7,7 @@ import { api, errorMessage, type Mode, type Project } from "@/lib/api/client";
 import { PROJECT_STATUS, scoreColor } from "@/lib/labels";
 import { cn, formatDate, formatDateTime } from "@/lib/utils";
 import Badge from "./components/ui/Badge";
-import { EmptyState, ErrorState, LoadingState } from "./components/ui/States";
+import { EmptyState, ErrorState } from "./components/ui/States";
 import { useApp } from "./contexts/AppContext";
 
 const FILTER_KEY = "poc-compass.mode-filter";
@@ -91,7 +91,13 @@ export default function ProjectListPage() {
       </div>
 
       {error && <ErrorState message={error} onRetry={load} />}
-      {!error && projects === null && <LoadingState />}
+      {!error && projects === null && (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" role="status" aria-label="読み込み中">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="h-56 animate-pulse rounded-2xl border border-slate-200 bg-white" />
+          ))}
+        </div>
+      )}
       {projects && projects.length === 0 && (
         <EmptyState
           title="取り組みがまだありません"
@@ -113,7 +119,7 @@ export default function ProjectListPage() {
               <Link
                 key={p.id}
                 href={`/projects/${p.id}`}
-                className="group flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-ring"
+                className="group flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 card-shadow transition hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-ring"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 space-y-1.5">
@@ -127,7 +133,7 @@ export default function ProjectListPage() {
                     <p className={cn("text-3xl font-bold tabular-nums", scoreColor(s.health_score))}>
                       {s.health_score ?? "—"}
                     </p>
-                    <p className="text-xs text-slate-500">健全度</p>
+                    <p className="text-xs text-slate-600">健全度</p>
                   </div>
                 </div>
                 <p className="line-clamp-2 text-sm text-slate-600">{p.goal}</p>
@@ -139,7 +145,7 @@ export default function ProjectListPage() {
                     [mode.card_labels.untested, s.untested, "text-sky-700"],
                   ].map(([label, n, color]) => (
                     <div key={label as string} className="flex items-center justify-between rounded-md bg-slate-50 px-2 py-1.5">
-                      <dt className="truncate text-slate-600" title={label as string}>
+                      <dt className="truncate text-slate-700" title={label as string}>
                         {label}
                       </dt>
                       <dd className={cn("font-bold tabular-nums", (n as number) > 0 ? (color as string) : "text-slate-400")}>
@@ -148,7 +154,7 @@ export default function ProjectListPage() {
                     </div>
                   ))}
                 </dl>
-                <div className="mt-auto flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
+                <div className="mt-auto flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600">
                   <span className="inline-flex items-center gap-1">
                     <CalendarClock className="h-3.5 w-3.5" aria-hidden="true" />
                     {mode.labels.deadline} {formatDate(p.deadline)}

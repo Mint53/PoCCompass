@@ -14,7 +14,7 @@ export default function Button({ className, variant = "default", size = "default
     "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none";
   const variants = {
     default: "bg-primary text-primary-foreground hover:opacity-90",
-    outline: "border border-slate-300 bg-white text-slate-800 hover:bg-slate-50",
+    outline: "border border-slate-300 bg-white text-slate-800 hover:bg-slate-50 hover:border-slate-400",
     ghost: "text-slate-700 hover:bg-slate-100",
     danger: "bg-destructive text-destructive-foreground hover:opacity-90",
   } as const;

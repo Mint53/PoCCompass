@@ -79,10 +79,10 @@ export default function DashboardPage() {
   const pending = dash.unevaluated_task_ids.length + dash.stale_task_ids.length;
   const delta = dash.health.delta_vs_last_month;
   const cards = [
-    { label: cl.drift, hint: cl.drift_hint, value: dash.cards.drift, color: "text-rose-600" },
-    { label: cl.unnecessary, hint: cl.unnecessary_hint, value: dash.cards.unnecessary, color: "text-orange-600" },
-    { label: cl.deadline_risk, hint: cl.deadline_risk_hint, value: dash.cards.deadline_risk, color: "text-orange-600" },
-    { label: cl.untested, hint: cl.untested_hint, value: dash.cards.untested, color: "text-sky-700" },
+    { label: cl.drift, hint: cl.drift_hint, value: dash.cards.drift, color: "text-rose-600", accent: "border-t-rose-500", href: "#alerts" },
+    { label: cl.unnecessary, hint: cl.unnecessary_hint, value: dash.cards.unnecessary, color: "text-orange-600", accent: "border-t-orange-500", href: "#alerts" },
+    { label: cl.deadline_risk, hint: cl.deadline_risk_hint, value: dash.cards.deadline_risk, color: "text-orange-600", accent: "border-t-orange-500", href: "#deadline-risks" },
+    { label: cl.untested, hint: cl.untested_hint, value: dash.cards.untested, color: "text-sky-700", accent: "border-t-sky-500", href: "#under-evidenced" },
   ];
 
   return (
@@ -113,20 +113,27 @@ export default function DashboardPage() {
             <p className={cn("text-sm font-bold", delta == null ? "text-slate-500" : delta >= 0 ? "text-emerald-600" : "text-rose-600")}>
               {delta == null ? "先月比 比較データなし" : `先月比 ${delta >= 0 ? "+" : ""}${delta}`}
             </p>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-600">
               {dash.last_evaluated_at ? `評価 ${formatDateTime(dash.last_evaluated_at)}・毎朝 6 時に自動更新` : "未評価"}
             </p>
           </div>
           <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
             {cards.map((c) => (
-              <div key={c.label} className="flex flex-col items-center gap-1 rounded-xl border border-slate-200 p-4 text-center">
-                <p className="text-sm font-semibold text-slate-700">{c.label}</p>
-                <p className={cn("text-3xl font-bold tabular-nums", c.value > 0 ? c.color : "text-slate-400")}>
+              <a
+                key={c.label}
+                href={c.href}
+                className={cn(
+                  "flex flex-col items-center gap-1 rounded-xl border border-t-4 border-slate-200 p-4 text-center transition-shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-ring",
+                  c.value > 0 ? c.accent : "border-t-slate-200",
+                )}
+              >
+                <p className="text-sm font-semibold text-slate-800">{c.label}</p>
+                <p className={cn("text-4xl font-bold tabular-nums", c.value > 0 ? c.color : "text-slate-400")}>
                   {c.value}
                   <span className="ml-0.5 text-sm font-medium">件</span>
                 </p>
-                <p className="text-xs text-slate-500">{c.hint}</p>
-              </div>
+                <p className="text-xs text-slate-600">{c.hint}</p>
+              </a>
             ))}
             <div className="col-span-2 rounded-xl border border-slate-200 p-4 xl:col-span-4">
               <p className="mb-2 text-sm font-semibold text-slate-700">スコアの内訳（0〜100）</p>
@@ -144,7 +151,7 @@ export default function DashboardPage() {
                   );
                 })}
               </div>
-              <p className="mt-2 text-xs text-slate-500">
+              <p className="mt-2 text-xs text-slate-600">
                 期間の経過 {Math.round(dash.schedule.elapsed * 100)}% ／ 進捗 {Math.round(dash.schedule.progress * 100)}%（{lb.criterion}の達成と{lb.task}の完了から算出）
                 {dash.schedule.days_left >= 0 ? `・${lb.deadline}まで残り ${dash.schedule.days_left} 日` : `・${lb.deadline}を ${-dash.schedule.days_left} 日超過`}
               </p>
@@ -153,41 +160,7 @@ export default function DashboardPage() {
         </div>
       </Card>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card title={cl.weak_tasks_title}>
-          {dash.weak_tasks.length === 0 ? (
-            <p className="py-6 text-center text-sm text-slate-500">評価済みの{lb.task}がありません。</p>
-          ) : (
-            <div>
-              {dash.weak_tasks.map((w) => (
-                <BarRow key={w.task_id} label={w.title} value={w.gap} valueLabel={`ズレ ${w.gap}`} tooltip={`${w.title}\n整合スコア ${w.alignment_score}\n${w.reason}`} />
-              ))}
-              <p className="mt-2 text-xs text-slate-500">バーが長いほど{lb.goal}との紐づきが弱い（100 − 整合スコア）</p>
-            </div>
-          )}
-        </Card>
-        <Card title={cl.under_evidenced_title}>
-          {dash.under_evidenced.length === 0 ? (
-            <p className="py-6 text-center text-sm text-slate-500">検証中・未検証の{lb.assumption}はありません。</p>
-          ) : (
-            <div>
-              {dash.under_evidenced.map((u) => (
-                <BarRow
-                  key={u.assumption_id}
-                  label={u.text}
-                  value={u.shortage}
-                  tone="slate"
-                  valueLabel={`不足 ${u.shortage}`}
-                  tooltip={`${u.text}\n${lb.evidence} ${u.evidence_count} 件`}
-                />
-              ))}
-              <p className="mt-2 text-xs text-slate-500">優先度の高い順。{lb.evidence}を登録すると減ります。</p>
-            </div>
-          )}
-        </Card>
-      </div>
-
-      <Card title={`AI からの指摘（${dash.alerts.length} 件）`}>
+      <Card title={`AI からの指摘（${dash.alerts.length} 件）`} id="alerts">
         {dash.alerts.length === 0 ? (
           <p className="flex items-center justify-center gap-2 py-6 text-sm text-emerald-700">
             <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
@@ -230,7 +203,41 @@ export default function DashboardPage() {
       </Card>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card title={`${cl.deadline_risk}（${dash.deadline_risks.length} 件）`}>
+        <Card title={cl.weak_tasks_title}>
+          {dash.weak_tasks.length === 0 ? (
+            <p className="py-6 text-center text-sm text-slate-500">評価済みの{lb.task}がありません。</p>
+          ) : (
+            <div>
+              {dash.weak_tasks.map((w) => (
+                <BarRow key={w.task_id} tone="rose" label={w.title} value={w.gap} valueLabel={`ズレ ${w.gap}`} tooltip={`${w.title}\n整合スコア ${w.alignment_score}\n${w.reason}`} />
+              ))}
+              <p className="mt-2 text-xs text-slate-600">バーが長いほど{lb.goal}との紐づきが弱い（100 − 整合スコア）</p>
+            </div>
+          )}
+        </Card>
+        <Card title={cl.under_evidenced_title} id="under-evidenced">
+          {dash.under_evidenced.length === 0 ? (
+            <p className="py-6 text-center text-sm text-slate-500">検証中・未検証の{lb.assumption}はありません。</p>
+          ) : (
+            <div>
+              {dash.under_evidenced.map((u) => (
+                <BarRow
+                  key={u.assumption_id}
+                  label={u.text}
+                  value={u.shortage}
+                  tone="slate"
+                  valueLabel={`不足 ${u.shortage}`}
+                  tooltip={`${u.text}\n${lb.evidence} ${u.evidence_count} 件`}
+                />
+              ))}
+              <p className="mt-2 text-xs text-slate-600">優先度の高い順。{lb.evidence}を登録すると減ります。</p>
+            </div>
+          )}
+        </Card>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Card title={`${cl.deadline_risk}（${dash.deadline_risks.length} 件）`} id="deadline-risks">
           {dash.deadline_risks.length === 0 ? (
             <p className="py-6 text-center text-sm text-slate-500">期限リスクはありません。</p>
           ) : (
