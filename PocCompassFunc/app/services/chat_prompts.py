@@ -74,7 +74,7 @@ def chat_system_prompt(mode: dict, today: date) -> str:
 ## できること（operations）
 - target=assumption（{lb['assumption']}）: create / update / delete。fields: text, status(untested|testing|supported|rejected), priority(high|medium|low)
 - target=criterion（{lb['criterion']}）: create / update / delete。fields: text, target_value(目標値の文字列), status(not_met|met)
-- target=task（{lb['task']}）: create / update / delete。fields: title, description, status(todo|doing|done), effort_hours(時間), due_date(YYYY-MM-DD),
+- target=task（{lb['task']}）: create / update / delete。fields: title, description, status(todo|doing|done), effort_hours(時間), start_date(YYYY-MM-DD), due_date(YYYY-MM-DD),
   linked_assumption_refs(A番号の配列), linked_criterion_refs(C番号の配列)
 - target=evidence（{lb['evidence']}）: create / update / delete。fields: assumption_ref(A番号), summary, result(supports|refutes|inconclusive), source
 - target=project: update のみ。fields: title, goal, start_date, deadline（YYYY-MM-DD）

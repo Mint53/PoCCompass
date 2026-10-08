@@ -63,7 +63,7 @@
 |---|---|
 | `assumption` | text, status: `untested`/`testing`/`supported`/`rejected`, priority: `high`/`medium`/`low` |
 | `criterion` | text, target (任意: 目標値の文字列), status: `not_met`/`met` |
-| `task` | title, description, status: `todo`/`doing`/`done`, effort_hours (任意, >0), due_date (任意), linked_assumption_ids, linked_criterion_ids（人が付けたひも付け） |
+| `task` | title, description, status: `todo`/`doing`/`done`, effort_hours (任意, >0), start_date (任意。WBS の帯の開始。due_date 以前), due_date (任意), linked_assumption_ids, linked_criterion_ids（人が付けたひも付け） |
 | `evidence` | assumption_id, summary, result: `supports`/`refutes`/`inconclusive`, source (任意) |
 | `feedback` | task_id, content_hash, judgement: `agree`/`dismiss` |
 | `decision` | decision: `continue`/`pivot`/`stop`, note |
@@ -267,3 +267,27 @@ operation: `op: create|update|delete, target: assumption|criterion|task|evidence
 | POST | `/api/projects/{id}/chat/{messageId}/apply` | pending の提案を適用。`{operation_indexes?: number[]}` で一部だけ適用できる |
 | POST | `/api/projects/{id}/chat/{messageId}/discard` | 提案を破棄 |
 | DELETE | `/api/projects/{id}/chat` | 自分のスレッドを消去（物理削除。個人の会話ログのため） |
+
+## 12. 分析グラフと WBS（画面）
+
+### 12.1 分析タブ（`/projects/{id}/analysis`）
+
+ダッシュボード API（`GET /dashboard`）の値だけを描く。**画面側で件数・スコアを計算し直さない**（集計は `services/metrics.py`）。
+
+- `verdict_counts`: 最新評価（task の現在の content_hash と一致する結果のみ）の判定別件数。`dismissed`（フィードバックで除外済み）は別枠。`pending` = 結果が無い／内容変更で再評価待ちの task 数。`aligned + weak + drift + unnecessary + dismissed + pending` = task 総数。
+- `evidence_tally`: 仮説ごとの検証データ件数（`supports` / `refutes` / `inconclusive`）。登録順。
+- 画面の内容: 判定の内訳（積み上げ横棒）、健全度の構成要素（レーダー）、期間の経過と進捗、検証データの結果（仮説ごとの積み上げ棒）。色だけに頼らず、数値と凡例を必ず併記する。
+
+### 12.2 WBS タブ（`/projects/{id}/wbs`）
+
+- 表示するデータは task の `start_date` / `due_date` / `status` / ひも付け。AI は使わない。
+- 横軸 = 取り組みの `start_date`〜`deadline`（task の日付が範囲外ならその分だけ軸を広げる）。今日の線を引く。
+- 帯 = `start_date`〜`due_date`。`start_date` 無しは `due_date` のみの 1 日帯、両方無しは「日程未設定」として帯なしで下に並べる。
+- 遅延 = `due_date < today` かつ未完了（5.1 の期限リスクと同じ条件）。帯を赤枠にし、文言でも示す。
+- 並び = 仮説にひも付く task は仮説ごとにまとめ、どれにも付かない task は「ひも付けなし」にまとめる。複数の仮説に付く task は最初の仮説の下に表示する。
+
+### 12.3 画面の収まり
+
+分析・WBS 画面はブラウザ全画面（ズーム 100%）で縦スクロールなしに収める。ヘッダーとタブを除いた残りの高さを使い、内容が溢れる場合はその領域の中だけをスクロールする（ページ全体は動かない）。
+
+ダッシュボードなど既存の画面は対象外（縦に長い内容のため、別途レイアウトを見直す）。

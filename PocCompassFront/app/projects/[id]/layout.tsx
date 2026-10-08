@@ -36,6 +36,8 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
   const base = `/projects/${project.id}`;
   const tabs = [
     { href: base, label: "ダッシュボード" },
+    { href: `${base}/analysis`, label: "分析" },
+    { href: `${base}/wbs`, label: "WBS" },
     { href: `${base}/design`, label: "設計" },
     { href: `${base}/tasks`, label: `${lb.task}（${items.tasks.length}）` },
     { href: `${base}/evidence`, label: lb.evidence },
@@ -43,11 +45,13 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
     { href: `${base}/settings`, label: "設定" },
   ];
   const status = PROJECT_STATUS[project.status];
+  // SPEC §12.3: these screens fit the viewport at 100% zoom; their content scrolls inside, not the page.
+  const fit = pathname === `${base}/analysis` || pathname === `${base}/wbs`;
 
   return (
     <ProjectProvider value={value}>
-      <div className="space-y-5">
-        <div className="flex flex-wrap items-start justify-between gap-4">
+      <div className={cn(fit ? "flex h-[calc(100dvh-6.5rem-1px)] flex-col gap-3" : "space-y-5")}>
+        <div className="flex shrink-0 flex-wrap items-start justify-between gap-4">
           <div className="min-w-0 space-y-1.5">
             <Link href="/" className="inline-flex items-center gap-1 text-sm text-slate-600 hover:text-primary">
               <ArrowLeft className="h-4 w-4" aria-hidden="true" />
@@ -75,7 +79,7 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
           </div>
         </div>
 
-        <nav className="-mx-1 flex gap-1 overflow-x-auto border-b border-slate-200 px-1" aria-label="取り組みのメニュー">
+        <nav className="-mx-1 flex shrink-0 gap-1 overflow-x-auto border-b border-slate-200 px-1" aria-label="取り組みのメニュー">
           {tabs.map((t) => {
             const active = t.href === base ? pathname === base : pathname.startsWith(t.href);
             return (
@@ -93,7 +97,7 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
           })}
         </nav>
 
-        <div className="animate-fade-in-up pb-20">{children}</div>
+        <div className={cn("animate-fade-in-up", fit ? "min-h-0 flex-1" : "pb-20")}>{children}</div>
       </div>
       {!chatOpen && <ChatLauncher onOpen={() => setChatOpen(true)} />}
       <ChatPanel open={chatOpen} onClose={() => setChatOpen(false)} />

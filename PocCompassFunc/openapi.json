@@ -510,6 +510,13 @@
       "title": "Design Changed",
       "type": "boolean"
      },
+     "evidence_tally": {
+      "items": {
+       "$ref": "#/components/schemas/EvidenceTally"
+      },
+      "title": "Evidence Tally",
+      "type": "array"
+     },
      "health": {
       "$ref": "#/components/schemas/HealthView"
      },
@@ -555,6 +562,9 @@
       "title": "Unevaluated Task Ids",
       "type": "array"
      },
+     "verdict_counts": {
+      "$ref": "#/components/schemas/VerdictCounts"
+     },
      "weak_tasks": {
       "items": {
        "$ref": "#/components/schemas/WeakTask"
@@ -572,6 +582,8 @@
      "deadline_risks",
      "alerts",
      "trend",
+     "verdict_counts",
+     "evidence_tally",
      "stale_task_ids",
      "unevaluated_task_ids",
      "design_changed",
@@ -863,6 +875,39 @@
     ],
     "title": "EvidenceResult",
     "type": "string"
+   },
+   "EvidenceTally": {
+    "properties": {
+     "assumption_id": {
+      "title": "Assumption Id",
+      "type": "string"
+     },
+     "inconclusive": {
+      "title": "Inconclusive",
+      "type": "integer"
+     },
+     "refutes": {
+      "title": "Refutes",
+      "type": "integer"
+     },
+     "supports": {
+      "title": "Supports",
+      "type": "integer"
+     },
+     "text": {
+      "title": "Text",
+      "type": "string"
+     }
+    },
+    "required": [
+     "assumption_id",
+     "text",
+     "supports",
+     "refutes",
+     "inconclusive"
+    ],
+    "title": "EvidenceTally",
+    "type": "object"
    },
    "ExtractRequest": {
     "properties": {
@@ -1161,6 +1206,11 @@
       "title": "Clear Effort Hours",
       "type": "boolean"
      },
+     "clear_start_date": {
+      "default": false,
+      "title": "Clear Start Date",
+      "type": "boolean"
+     },
      "description": {
       "anyOf": [
        {
@@ -1264,6 +1314,18 @@
        }
       ],
       "title": "Source"
+     },
+     "start_date": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Start Date"
      },
      "status": {
       "anyOf": [
@@ -2247,6 +2309,18 @@
       "title": "Projectid",
       "type": "string"
      },
+     "start_date": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Start Date"
+     },
      "status": {
       "$ref": "#/components/schemas/TaskStatus",
       "default": "todo"
@@ -2274,6 +2348,7 @@
      "description",
      "status",
      "effort_hours",
+     "start_date",
      "due_date",
      "linked_assumption_ids",
      "linked_criterion_ids",
@@ -2332,6 +2407,18 @@
       },
       "title": "Linked Criterion Ids",
       "type": "array"
+     },
+     "start_date": {
+      "anyOf": [
+       {
+        "format": "date",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Start Date"
      },
      "status": {
       "$ref": "#/components/schemas/TaskStatus",
@@ -2558,6 +2645,44 @@
     ],
     "title": "Verdict",
     "type": "string"
+   },
+   "VerdictCounts": {
+    "properties": {
+     "aligned": {
+      "title": "Aligned",
+      "type": "integer"
+     },
+     "dismissed": {
+      "title": "Dismissed",
+      "type": "integer"
+     },
+     "drift": {
+      "title": "Drift",
+      "type": "integer"
+     },
+     "pending": {
+      "title": "Pending",
+      "type": "integer"
+     },
+     "unnecessary": {
+      "title": "Unnecessary",
+      "type": "integer"
+     },
+     "weak": {
+      "title": "Weak",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "aligned",
+     "weak",
+     "drift",
+     "unnecessary",
+     "dismissed",
+     "pending"
+    ],
+    "title": "VerdictCounts",
+    "type": "object"
    },
    "WeakTask": {
     "properties": {

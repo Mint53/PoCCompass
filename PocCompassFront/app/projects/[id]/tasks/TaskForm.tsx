@@ -12,7 +12,7 @@ import Textarea from "../../../components/ui/Textarea";
 export type TaskDraft = Required<Omit<TaskFields, "type">>;
 
 export function emptyDraft(): TaskDraft {
-  return { title: "", description: "", status: "todo", effort_hours: null, due_date: null, linked_assumption_ids: [], linked_criterion_ids: [] };
+  return { title: "", description: "", status: "todo", effort_hours: null, start_date: null, due_date: null, linked_assumption_ids: [], linked_criterion_ids: [] };
 }
 
 export function draftFromTask(t: Task): TaskDraft {
@@ -21,6 +21,7 @@ export function draftFromTask(t: Task): TaskDraft {
     description: t.description,
     status: t.status,
     effort_hours: t.effort_hours,
+    start_date: t.start_date ?? null,
     due_date: t.due_date,
     linked_assumption_ids: t.linked_assumption_ids,
     linked_criterion_ids: t.linked_criterion_ids,
@@ -95,6 +96,10 @@ export default function TaskForm({
       setError("工数は 0 より大きい数値で入力してください。");
       return;
     }
+    if (d.start_date && d.due_date && d.start_date > d.due_date) {
+      setError("開始日は期日以前の日付にしてください。");
+      return;
+    }
     setError(null);
     setSaving(true);
     const ok = await onSubmit({ ...d, title: d.title.trim(), description: d.description.trim() });
@@ -110,7 +115,7 @@ export default function TaskForm({
       <Field label="内容・ねらい" htmlFor="task-desc" hint="何を作る／調べるのか、なぜやるのかを書くと AI の判定が正確になります。">
         <Textarea id="task-desc" value={d.description} maxLength={1000} onChange={(e) => set({ description: e.target.value })} disabled={saving} />
       </Field>
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Field label="状態" htmlFor="task-status">
           <Select id="task-status" value={d.status} options={[...TASK_STATUS]} onChange={(e) => set({ status: e.target.value as TaskDraft["status"] })} disabled={saving} />
         </Field>
@@ -125,6 +130,9 @@ export default function TaskForm({
             onChange={(e) => set({ effort_hours: e.target.value === "" ? null : Number(e.target.value) })}
             disabled={saving}
           />
+        </Field>
+        <Field label="開始日（任意）" htmlFor="task-start" hint="WBS の帯の開始位置">
+          <Input id="task-start" type="date" value={d.start_date ?? ""} max={d.due_date ?? undefined} onChange={(e) => set({ start_date: e.target.value || null })} disabled={saving} />
         </Field>
         <Field label="期日（任意）" htmlFor="task-due">
           <Input id="task-due" type="date" value={d.due_date ?? ""} onChange={(e) => set({ due_date: e.target.value || null })} disabled={saving} />
