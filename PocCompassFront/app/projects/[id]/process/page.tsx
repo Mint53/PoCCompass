@@ -152,7 +152,7 @@ function QuickAdd({ variant, steps, assignees }: { variant: ProcessVariant; step
     if (e.key === "Enter" && !e.nativeEvent.isComposing) void add();
   };
   return (
-    <div className="mt-2 flex flex-col gap-2 rounded-xl border border-dashed border-slate-300 bg-slate-50/60 p-2.5 sm:flex-row sm:items-center">
+    <div className="mt-2 flex shrink-0 flex-col gap-2 rounded-xl border border-dashed border-slate-300 bg-slate-50/60 p-2.5 sm:flex-row sm:items-center">
       <Input aria-label="新しい業務No" className="sm:w-16" value={noValue} maxLength={20} onChange={(e) => setNo(e.target.value)} onKeyDown={onEnter} disabled={busy} />
       <Input aria-label="新しい業務の担当者" list="qa-assignees" className="sm:w-40" placeholder="担当者" value={assignee} maxLength={50} onChange={(e) => setAssignee(e.target.value)} onKeyDown={onEnter} disabled={busy} />
       <datalist id="qa-assignees">{assignees.map((a) => <option key={a} value={a} />)}</datalist>
@@ -178,16 +178,16 @@ function Legend() {
 function Delta({ label, a, b }: { label: string; a: number; b: number }) {
   const diff = b - a;
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4 card-shadow">
-      <p className="text-xs font-semibold text-slate-500">{label}</p>
-      <p className="mt-1 flex items-baseline gap-2 tabular-nums">
-        <span className="text-lg font-bold text-slate-500">{a}</span>
-        <ArrowRight className="h-4 w-4 self-center text-slate-400" aria-hidden="true" />
-        <span className="text-2xl font-extrabold text-slate-900">{b}</span>
-        <span className={cn("ml-auto rounded-full px-2 py-0.5 text-xs font-bold", diff === 0 ? "bg-slate-100 text-slate-500" : diff < 0 ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-800")}>
-          {diff === 0 ? "変化なし" : `${diff > 0 ? "+" : ""}${diff}`}
-        </span>
+    <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-3.5 py-2 card-shadow">
+      <p className="min-w-0 flex-1 truncate text-xs font-semibold text-slate-500">{label}</p>
+      <p className="flex items-baseline gap-1.5 tabular-nums">
+        <span className="text-sm font-bold text-slate-500">{a}</span>
+        <ArrowRight className="h-3.5 w-3.5 self-center text-slate-400" aria-hidden="true" />
+        <span className="text-lg font-extrabold text-slate-900">{b}</span>
       </p>
+      <span className={cn("rounded-full px-2 py-0.5 text-xs font-bold", diff === 0 ? "bg-slate-100 text-slate-500" : diff < 0 ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-800")}>
+        {diff === 0 ? "変化なし" : `${diff > 0 ? "+" : ""}${diff}`}
+      </span>
     </div>
   );
 }
@@ -254,15 +254,17 @@ export default function ProcessPage() {
       const a = stat("asis");
       const t = stat("tobe");
       return (
-        <div className="space-y-6">
-          <div className="grid gap-3 sm:grid-cols-3">
+        <div className="flex min-h-0 flex-1 flex-col gap-3">
+          <div className="grid shrink-0 gap-2 lg:grid-cols-3">
             <Delta label="業務の数" a={a.n} b={t.n} />
             <Delta label="関わる担当者" a={a.who} b={t.who} />
             <Delta label="前に戻る流れ（手戻り）" a={a.loops} b={t.loops} />
           </div>
           {(["asis", "tobe"] as const).map((v) => (
-            <Card key={v} title={`${variantLabel(v)} のフロー図`} actions={<span className="text-xs text-slate-500">{by[v].length} 件</span>}>
-              {by[v].length === 0 ? <EmptyState title={`${SHORT[v]} の業務がまだありません`} description="上のタブで切り替えて登録してください。" /> : <ProcessFlow steps={by[v]} label={variantLabel(v)} />}
+            <Card key={v} className="flex min-h-0 flex-1 flex-col !p-3" title={`${variantLabel(v)} のフロー図`} actions={<span className="text-xs text-slate-500">{by[v].length} 件</span>}>
+              <div className="min-h-0 flex-1">
+                {by[v].length === 0 ? <EmptyState title={`${SHORT[v]} の業務がまだありません`} description="上のタブで切り替えて登録してください。" /> : <ProcessFlow steps={by[v]} label={variantLabel(v)} />}
+              </div>
             </Card>
           ))}
         </div>
@@ -272,8 +274,8 @@ export default function ProcessPage() {
     const steps = by[v];
     const lanes = assigneesOf(steps);
     return (
-      <div className="space-y-6">
-        <Card title={`${variantLabel(v)} のフロー図`} actions={steps.length > 0 ? <Legend /> : undefined}>
+      <div className="flex min-h-0 flex-1 flex-col gap-3">
+        <Card className="flex min-h-[15rem] flex-[5] flex-col !p-4" title={`${variantLabel(v)} のフロー図`} actions={steps.length > 0 ? <Legend /> : undefined}>
           {steps.length === 0 ? (
             <EmptyState
               title={`${SHORT[v]} の業務がまだありません`}
@@ -286,19 +288,18 @@ export default function ProcessPage() {
               ) : undefined}
             />
           ) : (
-            <>
+            <div className="min-h-0 flex-1">
               <ProcessFlow steps={steps} label={variantLabel(v)} selectedId={selectedId} onSelect={select} />
-              <p className="mt-2 text-xs text-slate-500">業務をクリックすると、つながる矢印と下の一覧の行が強調されます。</p>
-            </>
+            </div>
           )}
         </Card>
-        <Card title="業務の一覧" actions={<Button size="sm" variant="outline" onClick={() => setModal({ step: null })}><Plus className="h-4 w-4" aria-hidden="true" />詳しく追加</Button>}>
+        <Card className="flex min-h-[12rem] flex-[4] flex-col !p-4" title="業務の一覧" actions={<Button size="sm" variant="outline" onClick={() => setModal({ step: null })}><Plus className="h-4 w-4" aria-hidden="true" />詳しく追加</Button>}>
           {steps.length > 0 && (
-            <div className="hidden gap-3 px-3 pb-1 text-xs font-semibold text-slate-500 sm:flex">
+            <div className="hidden shrink-0 gap-3 px-3 pb-1 text-xs font-semibold text-slate-500 sm:flex">
               <span className="w-12 text-center">No</span><span className="w-36">担当者</span><span className="flex-1">業務内容</span><span className="w-32">次の業務</span><span className="w-[4.5rem]" />
             </div>
           )}
-          <ul className="space-y-0.5">
+          <ul className="thin-scroll min-h-0 flex-1 space-y-0.5 overflow-y-auto">
             {steps.map((s) => (
               <StepRow key={`${s.id}-${s.updated_at}`} step={s} all={steps} lanes={lanes} selected={s.id === selectedId} onSelect={() => select(s.id === selectedId ? null : s.id)} onEdit={() => setModal({ step: s })} onDelete={() => setDeleting(s)} />
             ))}
@@ -310,10 +311,10 @@ export default function ProcessPage() {
   };
 
   return (
-    <div className="space-y-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <div className="flex h-full min-h-0 flex-col gap-3">
+      <div className="flex shrink-0 flex-wrap items-center justify-between gap-3">
         <Segmented kind="tabs" label="AsIs / ToBe の切り替え" options={options} value={view} onChange={setView} />
-        <p className="text-xs text-slate-500">現状（AsIs）とあるべき姿（ToBe）を、同じ形式で書き出して見比べます。</p>
+        <p className="text-xs text-slate-500">業務をクリックすると、つながる矢印と一覧の行が強調されます。</p>
       </div>
       {body()}
       {modal && view !== "compare" && (
