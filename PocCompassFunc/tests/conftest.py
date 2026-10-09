@@ -96,6 +96,13 @@ def client(repos: Repos, llm: FakeLlm, monkeypatch: pytest.MonkeyPatch) -> TestC
     get_settings.cache_clear()
 
 
+def register_users(client: TestClient, emails: list[str]) -> None:
+    """Newly added members must exist in the user master (SPEC section 9)."""
+    for e in emails:
+        r = client.post("/api/users", json={"email": e, "name": e.split("@")[0], "department": "テスト部"}, headers=ADMIN)
+        assert r.status_code in (201, 409), r.text
+
+
 def make_project(client: TestClient, mode: str = "poc", **overrides: Any) -> dict:
     body = {
         "mode": mode,
@@ -108,6 +115,7 @@ def make_project(client: TestClient, mode: str = "poc", **overrides: Any) -> dic
         "criteria": [{"text": "正解率 85% 以上", "target": "85%"}],
         **overrides,
     }
+    register_users(client, [*body["members"], *body.get("viewers", [])])
     r = client.post("/api/projects", json=body, headers=OWNER)
     assert r.status_code == 201, r.text
     return r.json()

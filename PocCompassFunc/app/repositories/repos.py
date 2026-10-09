@@ -18,8 +18,12 @@ class ProjectRepository:
         return self.s.upsert(Container.PROJECTS, doc)
 
     def list_for_member(self, email: str) -> list[dict]:
-        docs = self.s.find(Container.PROJECTS, equals={"deleted": False}, array_contains=("members", email))
-        return sorted(docs, key=lambda d: d["updated_at"], reverse=True)
+        # Editors (members) and read-only viewers; two simple queries instead of an OR so both stores behave the same.
+        docs: dict[str, dict] = {}
+        for field in ("members", "viewers"):
+            for d in self.s.find(Container.PROJECTS, equals={"deleted": False}, array_contains=(field, email)):
+                docs[d["id"]] = d
+        return sorted(docs.values(), key=lambda d: d["updated_at"], reverse=True)
 
     def list_all(self) -> list[dict]:
         docs = self.s.find(Container.PROJECTS, equals={"deleted": False})
@@ -97,6 +101,23 @@ class ModeRepository:
 
     def save(self, doc: dict) -> dict:
         return self.s.upsert(Container.MODES, doc)
+
+
+class UserRepository:
+    def __init__(self, store: DocumentStore):
+        self.s = store
+
+    def get(self, email: str) -> dict | None:
+        return self.s.get(Container.USERS, email, email)
+
+    def list(self) -> list[dict]:
+        return self.s.find(Container.USERS)
+
+    def save(self, doc: dict) -> dict:
+        return self.s.upsert(Container.USERS, doc)
+
+    def delete(self, email: str) -> None:
+        self.s.delete(Container.USERS, email, email)
 
 
 class ChatRepository:

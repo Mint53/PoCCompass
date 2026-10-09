@@ -19,7 +19,7 @@ from app.models.items import (
     ItemPatch,
     ProjectItems,
 )
-from app.services.access import load_project_for
+from app.services.access import load_project_for, load_project_for_edit
 from app.services.context import Repos
 
 _ITEM_ADAPTER: TypeAdapter = TypeAdapter(Item)
@@ -68,7 +68,7 @@ def _save_new(repos: Repos, project_id: str, fields: dict, user: UserContext) ->
 
 
 def create_item(repos: Repos, project_id: str, body: BaseModel, user: UserContext) -> dict:
-    project = load_project_for(repos, project_id, user)
+    project = load_project_for_edit(repos, project_id, user)
     fields = body.model_dump(mode="json")
     if ItemType(fields["type"]) not in _USER_CREATABLE:
         raise ValidationFailed("この種類の項目はこの方法では作成できません。")
@@ -83,7 +83,7 @@ def create_item(repos: Repos, project_id: str, body: BaseModel, user: UserContex
 
 
 def bulk_create_tasks(repos: Repos, project_id: str, body: BulkTaskCreate, user: UserContext) -> list[dict]:
-    load_project_for(repos, project_id, user)
+    load_project_for_edit(repos, project_id, user)
     # validate all first so a bad row does not leave a half-imported batch
     validated = [_validate_refs(repos, project_id, t.model_dump(mode="json")) for t in body.tasks]
     return [_save_new(repos, project_id, fields, user) for fields in validated]
@@ -130,12 +130,12 @@ def prepare_create(repos: Repos, project_id: str, fields: dict) -> dict:
 
 
 def update_item(repos: Repos, project_id: str, item_id: str, patch: ItemPatch, user: UserContext) -> dict:
-    load_project_for(repos, project_id, user)
+    load_project_for_edit(repos, project_id, user)
     return _to_response(repos.items.save(prepare_update(repos, project_id, item_id, patch)))
 
 
 def delete_item(repos: Repos, project_id: str, item_id: str, user: UserContext) -> None:
-    load_project_for(repos, project_id, user)
+    load_project_for_edit(repos, project_id, user)
     doc = repos.items.get(project_id, item_id)
     if not doc:
         raise NotFound("項目が見つかりません。画面を再読み込みしてください。")
@@ -163,7 +163,7 @@ def _unlink_tasks(repos: Repos, project_id: str, field: str, removed_id: str) ->
 
 
 def add_feedback(repos: Repos, project_id: str, body: FeedbackCreate, user: UserContext) -> dict:
-    load_project_for(repos, project_id, user)
+    load_project_for_edit(repos, project_id, user)
     task = repos.items.get(project_id, body.task_id)
     if not task or task["type"] != ItemType.TASK.value:
         raise NotFound("対象のタスクが見つかりません。画面を再読み込みしてください。")

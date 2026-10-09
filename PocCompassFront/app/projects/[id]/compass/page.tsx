@@ -17,7 +17,7 @@ const shortDate = (iso: string) => `${Number(iso.slice(5, 7))}/${Number(iso.slic
 
 /** SPEC §13: the screen only draws what GET /compass returns. */
 export default function CompassPage() {
-  const { project, mode, version, bump } = useProject();
+  const { project, mode, version, bump, canEdit } = useProject();
   const { toast } = useToast();
   const lb = mode.labels;
   const cl = mode.card_labels;
@@ -88,7 +88,7 @@ export default function CompassPage() {
     [project.id, toast, bump],
   );
 
-  const canAct = !!selected && isCurrent && selected.needs_attention && !selected.feedback;
+  const canAct = canEdit && !!selected && isCurrent && selected.needs_attention && !selected.feedback;
   useEffect(() => {
     if (!canAct || !selected) return;
     const onKey = (e: KeyboardEvent) => {

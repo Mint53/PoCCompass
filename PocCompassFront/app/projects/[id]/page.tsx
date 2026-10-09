@@ -23,7 +23,7 @@ const COMPONENT_LABELS: { key: "alignment" | "validation" | "schedule" | "waste"
 ];
 
 export default function DashboardPage() {
-  const { project, items, mode, version, evaluate, evaluating, bump } = useProject();
+  const { project, items, mode, version, evaluate, evaluating, bump, canEdit } = useProject();
   const { toast } = useToast();
   const [dash, setDash] = useState<Dashboard | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -100,9 +100,9 @@ export default function DashboardPage() {
   );
 
   return (
-    <div className="space-y-4">
-      {(pending > 0 || dash.design_changed || !dash.last_evaluated_at) && (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3" role="status">
+    <div className="thin-scroll flex h-full min-h-0 flex-col gap-3 overflow-y-auto">
+      {canEdit && (pending > 0 || dash.design_changed || !dash.last_evaluated_at) && (
+        <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3" role="status">
           <p className="flex items-start gap-2 text-sm text-amber-900">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
             {!dash.last_evaluated_at
@@ -119,11 +119,11 @@ export default function DashboardPage() {
         </div>
       )}
 
-      <Card title={`${mode.name}健全度ダッシュボード`}>
-        <div className="grid gap-4 lg:grid-cols-[200px_minmax(0,1fr)]">
+      <Card title={`${mode.name}健全度ダッシュボード`} className="shrink-0 !p-4 [&>div:first-child]:!mb-2">
+        <div className="grid gap-3 lg:grid-cols-[190px_minmax(0,1fr)]">
           <div className="flex flex-col items-center justify-center gap-1 rounded-2xl border border-indigo-100 bg-gradient-to-br from-indigo-50 via-white to-white p-3">
             <p className="text-sm font-semibold text-slate-700">Health Score</p>
-            <ScoreRing score={dash.health.score} size={104} />
+            <ScoreRing score={dash.health.score} size={92} />
             <p className={cn("text-sm font-bold", delta == null ? "text-slate-500" : delta >= 0 ? "text-emerald-600" : "text-rose-600")}>
               {delta == null ? "先月比 比較データなし" : `先月比 ${delta >= 0 ? "+" : ""}${delta}`}
             </p>
@@ -185,7 +185,7 @@ export default function DashboardPage() {
         </div>
       </Card>
 
-      <div className="grid gap-4 lg:h-[calc(100vh-35rem)] lg:min-h-[16rem] lg:grid-cols-3">
+      <div className="grid gap-4 lg:min-h-[13rem] lg:flex-1 lg:grid-cols-3 lg:grid-rows-[minmax(0,1fr)]">
       <Card className="stagger flash-target flex min-h-0 flex-col" title={`AI からの指摘（${dash.alerts.length} 件）`} id="alerts">
 <div className="thin-scroll min-h-0 flex-1 overflow-y-auto pr-1.5">
         {dash.alerts.length === 0 ? (
@@ -213,6 +213,7 @@ export default function DashboardPage() {
                     </p>
                   )}
                 </div>
+                {canEdit && (
                 <div className="flex shrink-0 flex-wrap gap-2">
                   <Button variant="outline" size="sm" disabled={sending === a.task_id} onClick={() => void feedback(a.task_id, "agree")} title="指摘のとおり。記録だけ残す">
                     <ThumbsUp className="h-4 w-4" aria-hidden="true" />
@@ -223,6 +224,7 @@ export default function DashboardPage() {
                     問題ない（除外）
                   </Button>
                 </div>
+                )}
               </li>
             ))}
           </ul>

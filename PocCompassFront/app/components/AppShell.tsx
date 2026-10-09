@@ -1,6 +1,6 @@
 "use client";
 
-import { Compass, LayoutGrid, Settings2 } from "lucide-react";
+import { BookOpen, Compass, LayoutGrid, Settings2, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useApp } from "../contexts/AppContext";
@@ -12,8 +12,12 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const nav = [
     { href: "/", label: "取り組み一覧", icon: LayoutGrid, active: pathname === "/" || pathname.startsWith("/projects") },
     ...(me.is_admin
-      ? [{ href: "/admin/modes", label: "モード設定", icon: Settings2, active: pathname.startsWith("/admin") }]
+      ? [
+          { href: "/admin/modes", label: "モード設定", icon: Settings2, active: pathname.startsWith("/admin/modes") },
+          { href: "/admin/users", label: "ユーザー管理", icon: Users, active: pathname.startsWith("/admin/users") },
+        ]
       : []),
+    { href: "/manual", label: "マニュアル", icon: BookOpen, active: pathname.startsWith("/manual") },
   ];
   return (
     <div className="min-h-screen">

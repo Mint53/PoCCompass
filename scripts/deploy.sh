@@ -52,7 +52,9 @@ with zipfile.ZipFile(r'../.harness/api.zip', 'w', zipfile.ZIP_DEFLATED) as z:
   az functionapp keys set -g "$RG" -n "$func" --key-type functionKeys --key-name frontend --key-value "$key" -o none
   az keyvault secret set --vault-name "$kv" --name backend-function-key --value "$key" -o none
   unset key
-  # Web App reads the key through a Key Vault reference; restart to pick up the new version.
+  # Web App reads the key through a Key Vault reference. A restart alone can keep serving the cached OLD secret
+  # (every browser call then fails with an empty 401), so re-save the setting to force the reference to be re-resolved.
+  az webapp config appsettings set -g "$RG" -n "$(out webAppName)" -o none     --settings "BACKEND_FUNCTION_KEY=@Microsoft.KeyVault(VaultName=${kv};SecretName=backend-function-key)"
   az webapp restart -g "$RG" -n "$(out webAppName)"
   echo "API deployed: $(out functionApiUrl)"
 }

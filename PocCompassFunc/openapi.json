@@ -1591,6 +1591,15 @@
     "title": "ItemPatch",
     "type": "object"
    },
+   "MemberRole": {
+    "enum": [
+     "owner",
+     "editor",
+     "viewer"
+    ],
+    "title": "MemberRole",
+    "type": "string"
+   },
    "Mode": {
     "enum": [
      "poc",
@@ -1966,6 +1975,13 @@
      "updated_at": {
       "title": "Updated At",
       "type": "string"
+     },
+     "viewers": {
+      "items": {
+       "type": "string"
+      },
+      "title": "Viewers",
+      "type": "array"
      }
     },
     "required": [
@@ -1978,6 +1994,7 @@
      "status",
      "owner_email",
      "members",
+     "viewers",
      "deleted",
      "created_at",
      "updated_at",
@@ -2040,6 +2057,13 @@
       "minLength": 1,
       "title": "Title",
       "type": "string"
+     },
+     "viewers": {
+      "items": {
+       "type": "string"
+      },
+      "title": "Viewers",
+      "type": "array"
      }
     },
     "required": [
@@ -2105,6 +2129,33 @@
      "feedback"
     ],
     "title": "ProjectItems",
+    "type": "object"
+   },
+   "ProjectMember": {
+    "properties": {
+     "department": {
+      "title": "Department",
+      "type": "string"
+     },
+     "email": {
+      "title": "Email",
+      "type": "string"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "role": {
+      "$ref": "#/components/schemas/MemberRole"
+     }
+    },
+    "required": [
+     "email",
+     "name",
+     "department",
+     "role"
+    ],
+    "title": "ProjectMember",
     "type": "object"
    },
    "ProjectStatus": {
@@ -2258,6 +2309,20 @@
        }
       ],
       "title": "Title"
+     },
+     "viewers": {
+      "anyOf": [
+       {
+        "items": {
+         "type": "string"
+        },
+        "type": "array"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Viewers"
      }
     },
     "title": "ProjectUpdate",
@@ -2777,6 +2842,27 @@
     "title": "UnderEvidenced",
     "type": "object"
    },
+   "UserBody": {
+    "properties": {
+     "department": {
+      "default": "",
+      "maxLength": 50,
+      "title": "Department",
+      "type": "string"
+     },
+     "name": {
+      "maxLength": 50,
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+     }
+    },
+    "required": [
+     "name"
+    ],
+    "title": "UserBody",
+    "type": "object"
+   },
    "UserContext": {
     "properties": {
      "email": {
@@ -2799,6 +2885,70 @@
      "is_admin"
     ],
     "title": "UserContext",
+    "type": "object"
+   },
+   "UserCreate": {
+    "properties": {
+     "department": {
+      "default": "",
+      "maxLength": 50,
+      "title": "Department",
+      "type": "string"
+     },
+     "email": {
+      "title": "Email",
+      "type": "string"
+     },
+     "name": {
+      "maxLength": 50,
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+     }
+    },
+    "required": [
+     "name",
+     "email"
+    ],
+    "title": "UserCreate",
+    "type": "object"
+   },
+   "UserRecord": {
+    "properties": {
+     "created_at": {
+      "title": "Created At",
+      "type": "string"
+     },
+     "department": {
+      "title": "Department",
+      "type": "string"
+     },
+     "email": {
+      "title": "Email",
+      "type": "string"
+     },
+     "is_admin": {
+      "title": "Is Admin",
+      "type": "boolean"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "updated_at": {
+      "title": "Updated At",
+      "type": "string"
+     }
+    },
+    "required": [
+     "email",
+     "name",
+     "department",
+     "is_admin",
+     "created_at",
+     "updated_at"
+    ],
+    "title": "UserRecord",
     "type": "object"
    },
    "ValidationError": {
@@ -4265,6 +4415,52 @@
     ]
    }
   },
+  "/api/projects/{project_id}/members": {
+   "get": {
+    "operationId": "list_members_api_projects__project_id__members_get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "project_id",
+      "required": true,
+      "schema": {
+       "title": "Project Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/ProjectMember"
+         },
+         "title": "Response List Members Api Projects  Project Id  Members Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "List Members",
+    "tags": [
+     "projects"
+    ]
+   }
+  },
   "/api/projects/{project_id}/reports": {
    "get": {
     "operationId": "list_reports_api_projects__project_id__reports_get",
@@ -4400,6 +4596,194 @@
     "summary": "Extract Tasks",
     "tags": [
      "projects"
+    ]
+   }
+  },
+  "/api/users": {
+   "get": {
+    "operationId": "search_users_api_users_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "q",
+      "required": false,
+      "schema": {
+       "default": "",
+       "title": "Q",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "limit",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "minimum": 1,
+         "type": "integer"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Limit"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/UserRecord"
+         },
+         "title": "Response Search Users Api Users Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Search Users",
+    "tags": [
+     "users"
+    ]
+   },
+   "post": {
+    "operationId": "create_user_api_users_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/UserCreate"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/UserRecord"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Create User",
+    "tags": [
+     "users"
+    ]
+   }
+  },
+  "/api/users/{email}": {
+   "delete": {
+    "operationId": "delete_user_api_users__email__delete",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "email",
+      "required": true,
+      "schema": {
+       "title": "Email",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Delete User",
+    "tags": [
+     "users"
+    ]
+   },
+   "put": {
+    "operationId": "update_user_api_users__email__put",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "email",
+      "required": true,
+      "schema": {
+       "title": "Email",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/UserBody"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/UserRecord"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Update User",
+    "tags": [
+     "users"
     ]
    }
   }

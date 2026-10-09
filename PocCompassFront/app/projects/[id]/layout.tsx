@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, CalendarClock, CircleHelp, Loader2, Sparkles } from "lucide-react";
+import { ArrowLeft, CalendarClock, CircleHelp, Eye, Loader2, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import { useState } from "react";
@@ -33,7 +33,7 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
   }
   if (!value) return <LoadingState />;
 
-  const { project, mode, evaluating, evaluate, items } = value;
+  const { project, mode, evaluating, evaluate, items, canEdit } = value;
   const lb = mode.labels;
   const base = `/projects/${project.id}`;
   const tabs = [
@@ -48,8 +48,10 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
     { href: `${base}/settings`, label: "設定" },
   ];
   const status = PROJECT_STATUS[project.status];
+  // Viewers cannot edit: these screens are made of inputs and buttons, so lock them wholesale (the API also answers 403).
+  const readOnlyPage = !canEdit && [`${base}/tasks`, `${base}/evidence`, `${base}/design`].includes(pathname);
   // SPEC §12.3: these screens fit the viewport at 100% zoom; their content scrolls inside, not the page.
-  const fit = pathname === `${base}/analysis` || pathname === `${base}/wbs` || pathname === `${base}/compass`;
+  const fit = [base, `${base}/analysis`, `${base}/wbs`, `${base}/compass`, `${base}/report`].includes(pathname);
 
   return (
     <ProjectProvider value={value}>
@@ -63,6 +65,12 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
               </Link>
               <Badge variant="brand">{mode.name}</Badge>
               {status && <Badge variant={status.variant}>{status.label}</Badge>}
+              {!canEdit && (
+                <Badge variant="yellow" title="この取り組みは閲覧のみです。編集が必要なときは作成者に編集者への変更を依頼してください。">
+                  <Eye className="mr-1 h-3.5 w-3.5" aria-hidden="true" />
+                  閲覧のみ
+                </Badge>
+              )}
               <span className="inline-flex items-center gap-1 text-xs text-slate-600">
                 <CalendarClock className="h-3.5 w-3.5" aria-hidden="true" />
                 {formatDate(project.start_date)} 〜 {lb.deadline} {formatDate(project.deadline)}
@@ -70,12 +78,14 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
             </div>
             <h1 className="break-words text-xl font-bold text-slate-900">{project.title}</h1>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <Button onClick={() => void evaluate()} disabled={evaluating} aria-busy={evaluating}>
-              {evaluating ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Sparkles className="h-4 w-4" aria-hidden="true" />}
-              {evaluating ? "AI が評価中（数十秒かかります）" : "AI で評価"}
-            </Button>
-          </div>
+          {canEdit && (
+            <div className="flex flex-wrap gap-2">
+              <Button onClick={() => void evaluate()} disabled={evaluating} aria-busy={evaluating}>
+                {evaluating ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Sparkles className="h-4 w-4" aria-hidden="true" />}
+                {evaluating ? "AI が評価中（数十秒かかります）" : "AI で評価"}
+              </Button>
+            </div>
+          )}
         </div>
 
         <nav className="sticky top-14 z-30 flex shrink-0 gap-1 overflow-x-auto rounded-2xl bg-slate-100/95 p-1 ring-1 ring-slate-200/70 backdrop-blur" aria-label="取り組みのメニュー">
@@ -110,11 +120,20 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
           </button>
         </nav>
 
-        <div className={cn("animate-fade-in-up", fit ? "min-h-0 flex-1" : "pb-1")}>{children}</div>
+        <div className={cn("animate-fade-in-up", fit ? "min-h-0 flex-1" : "pb-1")}>
+          {readOnlyPage ? (
+            // Native fieldset[disabled] turns every button / input / select inside into a read-only control.
+            <fieldset disabled className="m-0 min-w-0 border-0 p-0">
+              {children}
+            </fieldset>
+          ) : (
+            children
+          )}
+        </div>
       </div>
       <GuideDialog open={guideOpen} onClose={() => setGuideOpen(false)} labels={lb} />
-      {!chatOpen && <ChatLauncher onOpen={() => setChatOpen(true)} />}
-      <ChatPanel open={chatOpen} onClose={() => setChatOpen(false)} />
+      {canEdit && !chatOpen && <ChatLauncher onOpen={() => setChatOpen(true)} />}
+      {canEdit && <ChatPanel open={chatOpen} onClose={() => setChatOpen(false)} />}
     </ProjectProvider>
   );
 }

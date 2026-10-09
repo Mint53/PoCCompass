@@ -85,6 +85,7 @@ class Container(StrEnum):
     REPORTS = "reports"
     MODES = "mode_definitions"
     CHAT = "chat_messages"
+    USERS = "users"
 
 
 # Partition key path per container (must match infra/modules/resources.bicep).
@@ -96,7 +97,14 @@ PARTITION_KEYS: dict[Container, str] = {
     Container.REPORTS: "projectId",
     Container.MODES: "id",
     Container.CHAT: "projectId",
+    Container.USERS: "id",
 }
+
+
+class MemberRole(StrEnum):
+    OWNER = "owner"
+    EDITOR = "editor"
+    VIEWER = "viewer"
 
 
 class ChatRole(StrEnum):

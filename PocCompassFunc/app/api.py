@@ -8,7 +8,7 @@ from fastapi import APIRouter, FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
-from app.controllers import chat, common, items, modes, projects
+from app.controllers import chat, common, items, modes, projects, users
 from app.core.errors import AppError
 
 logger = logging.getLogger(__name__)
@@ -40,7 +40,7 @@ def create_app() -> FastAPI:
                       "サーバーでエラーが発生しました。時間をおいて再実行し、解決しない場合は管理者に連絡してください。")
 
     api = APIRouter(prefix="/api")
-    for r in (common.router, modes.router, projects.router, items.router, chat.router):
+    for r in (common.router, modes.router, projects.router, items.router, chat.router, users.router):
         api.include_router(r)
     app.include_router(api)
     return app

@@ -318,6 +318,23 @@ export interface paths {
         patch: operations["update_item_api_projects__project_id__items__item_id__patch"];
         trace?: never;
     };
+    "/api/projects/{project_id}/members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Members */
+        get: operations["list_members_api_projects__project_id__members_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/projects/{project_id}/reports": {
         parameters: {
             query?: never;
@@ -348,6 +365,42 @@ export interface paths {
         /** Extract Tasks */
         post: operations["extract_tasks_api_projects__project_id__tasks_extract_post"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Search Users */
+        get: operations["search_users_api_users_get"];
+        put?: never;
+        /** Create User */
+        post: operations["create_user_api_users_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/users/{email}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update User */
+        put: operations["update_user_api_users__email__put"];
+        post?: never;
+        /** Delete User */
+        delete: operations["delete_user_api_users__email__delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -927,6 +980,11 @@ export interface components {
             title?: string | null;
         };
         /**
+         * MemberRole
+         * @enum {string}
+         */
+        MemberRole: "owner" | "editor" | "viewer";
+        /**
          * Mode
          * @enum {string}
          */
@@ -1067,6 +1125,8 @@ export interface components {
             title: string;
             /** Updated At */
             updated_at: string;
+            /** Viewers */
+            viewers: string[];
         };
         /** ProjectCreate */
         ProjectCreate: {
@@ -1088,6 +1148,8 @@ export interface components {
             start_date?: string | null;
             /** Title */
             title: string;
+            /** Viewers */
+            viewers?: string[];
         };
         /** ProjectItems */
         ProjectItems: {
@@ -1103,6 +1165,16 @@ export interface components {
             feedback: components["schemas"]["Feedback"][];
             /** Tasks */
             tasks: components["schemas"]["Task"][];
+        };
+        /** ProjectMember */
+        ProjectMember: {
+            /** Department */
+            department: string;
+            /** Email */
+            email: string;
+            /** Name */
+            name: string;
+            role: components["schemas"]["MemberRole"];
         };
         /**
          * ProjectStatus
@@ -1153,6 +1225,8 @@ export interface components {
             status?: components["schemas"]["ProjectStatus"] | null;
             /** Title */
             title?: string | null;
+            /** Viewers */
+            viewers?: string[] | null;
         };
         /** Proposal */
         Proposal: {
@@ -1332,6 +1406,16 @@ export interface components {
             /** Text */
             text: string;
         };
+        /** UserBody */
+        UserBody: {
+            /**
+             * Department
+             * @default
+             */
+            department?: string;
+            /** Name */
+            name: string;
+        };
         /** UserContext */
         UserContext: {
             /** Email */
@@ -1343,6 +1427,33 @@ export interface components {
             is_admin: boolean;
             /** Name */
             name: string;
+        };
+        /** UserCreate */
+        UserCreate: {
+            /**
+             * Department
+             * @default
+             */
+            department?: string;
+            /** Email */
+            email: string;
+            /** Name */
+            name: string;
+        };
+        /** UserRecord */
+        UserRecord: {
+            /** Created At */
+            created_at: string;
+            /** Department */
+            department: string;
+            /** Email */
+            email: string;
+            /** Is Admin */
+            is_admin: boolean;
+            /** Name */
+            name: string;
+            /** Updated At */
+            updated_at: string;
         };
         /** ValidationError */
         ValidationError: {
@@ -2216,6 +2327,37 @@ export interface operations {
             };
         };
     };
+    list_members_api_projects__project_id__members_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectMember"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_reports_api_projects__project_id__reports_get: {
         parameters: {
             query?: never;
@@ -2301,6 +2443,135 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ExtractResponse"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    search_users_api_users_get: {
+        parameters: {
+            query?: {
+                q?: string;
+                limit?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserRecord"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_user_api_users_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UserCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserRecord"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_user_api_users__email__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                email: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UserBody"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserRecord"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_user_api_users__email__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                email: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

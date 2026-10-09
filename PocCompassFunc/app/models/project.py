@@ -39,10 +39,11 @@ class ProjectCreate(ApiModel):
     start_date: date | None = None
     deadline: date
     members: list[str] = Field(default_factory=list)
+    viewers: list[str] = Field(default_factory=list)
     assumptions: list[AssumptionSeed] = Field(default_factory=list)
     criteria: list[CriterionSeed] = Field(default_factory=list)
 
-    @field_validator("members")
+    @field_validator("members", "viewers")
     @classmethod
     def _members(cls, v: list[str]) -> list[str]:
         return _normalize_emails(v)
@@ -70,8 +71,9 @@ class ProjectUpdate(ApiModel):
     deadline: date | None = None
     status: ProjectStatus | None = None
     members: list[str] | None = None
+    viewers: list[str] | None = None
 
-    @field_validator("members")
+    @field_validator("members", "viewers")
     @classmethod
     def _members(cls, v: list[str] | None) -> list[str] | None:
         return None if v is None else _normalize_emails(v)
@@ -98,6 +100,7 @@ class Project(StoredModel):
     status: ProjectStatus = ProjectStatus.ACTIVE
     owner_email: str
     members: list[str]
+    viewers: list[str] = Field(default_factory=list)
     deleted: bool = False
     created_at: str
     updated_at: str

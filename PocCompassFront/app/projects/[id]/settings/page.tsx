@@ -1,39 +1,56 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { api, errorMessage, type Mode } from "@/lib/api/client";
 import { cn } from "@/lib/utils";
 import Button from "../../../components/ui/Button";
 import Card from "../../../components/ui/Card";
 import ConfirmDialog from "../../../components/ui/ConfirmDialog";
-import Field from "../../../components/ui/Field";
-import Textarea from "../../../components/ui/Textarea";
+import MemberPicker, { type PickerMember } from "../../../components/MemberPicker";
 import { useToast } from "../../../components/ui/ToastProvider";
 import { useApp } from "../../../contexts/AppContext";
 import { useProject } from "../ProjectContext";
 
 export default function SettingsPage() {
-  const { modes } = useApp();
+  const { modes, me } = useApp();
   const { project, mode, isOwner, reloadProject, bump } = useProject();
   const { toast } = useToast();
   const router = useRouter();
-  const [members, setMembers] = useState(project.members.join("\n"));
+  const [list, setList] = useState<PickerMember[] | null>(null);
+  const [saved, setSaved] = useState<PickerMember[]>([]);
+  const [membersError, setMembersError] = useState<string | null>(null);
   const [savingMembers, setSavingMembers] = useState(false);
   const [nextMode, setNextMode] = useState<Mode | null>(null);
   const [busy, setBusy] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
+  useEffect(() => {
+    let alive = true;
+    api
+      .listMembers(project.id)
+      .then((rows) => {
+        if (!alive) return;
+        setList(rows);
+        setSaved(rows);
+      })
+      .catch((e) => alive && setMembersError(errorMessage(e)));
+    return () => {
+      alive = false;
+    };
+  }, [project.id, project.members, project.viewers]);
+
+  const signature = (rows: PickerMember[]) => rows.map((m) => `${m.email}:${m.role}`).sort().join("|");
+  const dirty = useMemo(() => list !== null && signature(list) !== signature(saved), [list, saved]);
+
   const saveMembers = async () => {
-    const list = members.split(/[\s,、]+/).map((s) => s.trim()).filter(Boolean);
-    const bad = list.filter((m) => !/^[^@\s]+@[^@\s]+$/.test(m));
-    if (bad.length) {
-      toast({ tone: "error", message: `メールアドレスの形式が正しくありません: ${bad.join(", ")}` });
-      return;
-    }
+    if (!list) return;
     setSavingMembers(true);
     try {
-      await api.updateProject(project.id, { members: list });
+      await api.updateProject(project.id, {
+        members: list.filter((m) => m.role !== "viewer").map((m) => m.email),
+        viewers: list.filter((m) => m.role === "viewer").map((m) => m.email),
+      });
       await reloadProject();
       toast({ tone: "success", message: "メンバーを保存しました。" });
     } catch (e) {
@@ -75,10 +92,14 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-6">
-      <Card title="メンバー" actions={<Button size="sm" onClick={() => void saveMembers()} disabled={!isOwner || savingMembers}>{savingMembers ? "保存中..." : "保存"}</Button>}>
-        <Field label="閲覧・編集できるメンバー（メールアドレス、1 行に 1 人）" htmlFor="members" hint="作成者は常に含まれます。">
-          <Textarea id="members" rows={5} value={members} onChange={(e) => setMembers(e.target.value)} disabled={!isOwner || savingMembers} />
-        </Field>
+      <Card title="メンバー" actions={<Button size="sm" onClick={() => void saveMembers()} disabled={!isOwner || savingMembers || !dirty}>{savingMembers ? "保存中..." : "保存"}</Button>}>
+        {membersError ? (
+          <p className="text-sm text-rose-700" role="alert">{membersError}</p>
+        ) : list === null ? (
+          <p className="text-sm text-slate-500">読み込み中...</p>
+        ) : (
+          <MemberPicker members={list} onChange={setList} disabled={!isOwner || savingMembers} isAdmin={me.is_admin} />
+        )}
         {ownerNote}
       </Card>
 
