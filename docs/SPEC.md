@@ -67,8 +67,12 @@
 | `evidence` | assumption_id, summary, result: `supports`/`refutes`/`inconclusive`, source (任意) |
 | `feedback` | task_id, content_hash, judgement: `agree`/`dismiss` |
 | `decision` | decision: `continue`/`pivot`/`stop`, note |
+| `request` | kind: `request`(要望)/`issue`(課題), title, description, requester (任意: 誰からの声か), priority: `high`/`medium`/`low`, action: `undecided`/`needed`/`not_needed`（対応の要否。人が判断する）, action_reason（判断の理由。任意） |
+| `process_step` | variant: `asis`/`tobe`, no（業務 No。同じ variant 内で一意）, assignee（担当者）, content（業務内容）, next_nos（次の業務 No の一覧。任意） |
 
 - assumption / criterion を削除したら、task の linked_*_ids と evidence から参照を外す（evidence は削除）。
+- `request` の対応の要否（action）は人が決める。AI は判断しない。健全度・件数・AI 評価には影響しない（§14）。
+- `process_step` を削除したら、同じ variant の他の step の next_nos からその No を外す。No を変更したら next_nos の参照も追従させる。
 
 ### 3.3 evaluations（コンテナ `evaluations`, PK `/projectId`）
 
@@ -316,3 +320,21 @@ operation: `op: create|update|delete, target: assumption|criterion|task|evidence
 - 下部の時間軸で `frames` を切り替えられ、再生すると点が動く。過去の時点では判断操作を出さない。
 - 右カードは「次に見ること」（`needs_attention` かつ `feedback=null` の最もスコアが低い task）。点をクリックすると、その task の理由・提案・操作を出す。操作は既存の 4.6 と同じ（**AI は直接データを書き換えない**）: 「指摘のとおり」（`agree`・記録のみ）／「当たらない」（`dismiss`・件数から除外）。
 - 名前（task 名）は点に触れた・選んだときだけ出す。
+
+## 14. 要望・課題と業務整理（画面）
+
+どちらも `project_items` の item（§3.2）として保存する。モードによって構造を変えない。健全度・AI 評価・チャットの対象にしない。
+
+### 14.1 要望・課題タブ（`/projects/{id}/requests`）
+
+- 要望（`request`）と課題（`issue`）を登録し、それぞれに「対応要／対応不要／未判断」を人が付ける。理由は任意で書ける。
+- 一覧は対応の要否で絞り込める（すべて／未判断／対応要／対応不要）。件数は画面側の単純な数え上げのみ。
+- 並び = 登録順。
+
+### 14.2 業務整理タブ（`/projects/{id}/process`）
+
+- AsIs（現状）と ToBe（あるべき姿）を切り替えて、業務を表で登録・編集・削除する。入力は 業務No・担当者・業務内容・次の業務No（任意）。
+- 業務No は同じ variant 内で一意（最大 20 字）。重複は 400。並びは業務No の自然順（数字は数値として比較。`2` < `10`）。
+- フロー図 = 担当者ごとの横レーン（スイムレーン）に業務を並べた図。業務No の順に左から右へ置く。
+- 矢印 = `next_nos` があればその宛先、無ければ並びの次の業務。最後の業務は矢印なし。前の業務（左）へ戻る矢印は点線で描く。存在しない No を指す `next_nos` は描かない。
+- 図は画面側で `process_step` から描くだけで、AI は使わない。

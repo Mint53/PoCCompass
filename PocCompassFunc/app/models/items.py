@@ -14,9 +14,12 @@ from app.constants.enums import (
     EvidenceResult,
     FeedbackJudgement,
     Priority,
+    ProcessVariant,
+    RequestAction,
+    RequestKind,
     TaskStatus,
 )
-from app.constants.limits import TEXT_MAX, TITLE_MAX
+from app.constants.limits import ASSIGNEE_MAX, NEXT_NOS_MAX, PROCESS_NO_MAX, TEXT_MAX, TITLE_MAX
 from app.models.common import ApiModel, StoredModel
 
 
@@ -96,6 +99,49 @@ class DecisionFields(ApiModel):
     note: str = Field(default="", max_length=TEXT_MAX)
 
 
+class RequestFields(ApiModel):
+    type: Literal["request"] = "request"
+    kind: RequestKind = RequestKind.REQUEST
+    title: str = Field(min_length=1, max_length=TITLE_MAX)
+    description: str = Field(default="", max_length=TEXT_MAX)
+    requester: str = Field(default="", max_length=ASSIGNEE_MAX)
+    priority: Priority = Priority.MEDIUM
+    action: RequestAction = RequestAction.UNDECIDED
+    action_reason: str = Field(default="", max_length=TEXT_MAX)
+
+    @field_validator("title")
+    @classmethod
+    def _strip_title(cls, v: str) -> str:
+        return _strip_required(v)
+
+
+class ProcessStepFields(ApiModel):
+    type: Literal["process_step"] = "process_step"
+    variant: ProcessVariant
+    no: str = Field(min_length=1, max_length=PROCESS_NO_MAX)
+    assignee: str = Field(default="", max_length=ASSIGNEE_MAX)
+    content: str = Field(min_length=1, max_length=TEXT_MAX)
+    next_nos: list[str] = Field(default_factory=list, max_length=NEXT_NOS_MAX)
+
+    @field_validator("no", "content")
+    @classmethod
+    def _strip_required_text(cls, v: str) -> str:
+        return _strip_required(v)
+
+    @field_validator("assignee")
+    @classmethod
+    def _strip_assignee(cls, v: str) -> str:
+        return v.strip()
+
+    @field_validator("next_nos")
+    @classmethod
+    def _clean_next_nos(cls, v: list[str]) -> list[str]:
+        cleaned = list(dict.fromkeys(x.strip() for x in v if x.strip()))
+        if any(len(x) > PROCESS_NO_MAX for x in cleaned):
+            raise ValueError(f"次の業務Noは {PROCESS_NO_MAX} 字以内にしてください")
+        return cleaned
+
+
 class FeedbackFields(ApiModel):
     type: Literal["feedback"] = "feedback"
     task_id: str
@@ -104,7 +150,8 @@ class FeedbackFields(ApiModel):
 
 
 ItemCreate = Annotated[
-    AssumptionFields | CriterionFields | TaskFields | EvidenceFields | DecisionFields,
+    AssumptionFields | CriterionFields | TaskFields | EvidenceFields | DecisionFields | RequestFields
+    | ProcessStepFields,
     Field(discriminator="type"),
 ]
 
@@ -114,6 +161,8 @@ CREATE_MODELS: dict[str, type[ApiModel]] = {
     "task": TaskFields,
     "evidence": EvidenceFields,
     "decision": DecisionFields,
+    "request": RequestFields,
+    "process_step": ProcessStepFields,
     "feedback": FeedbackFields,
 }
 
@@ -136,6 +185,14 @@ class ItemPatch(ApiModel):
     result: EvidenceResult | None = None
     source: str | None = None
     note: str | None = None
+    kind: RequestKind | None = None
+    action: RequestAction | None = None
+    action_reason: str | None = None
+    requester: str | None = None
+    no: str | None = None
+    assignee: str | None = None
+    content: str | None = None
+    next_nos: list[str] | None = None
     clear_effort_hours: bool = False
     clear_due_date: bool = False
     clear_start_date: bool = False
@@ -181,12 +238,20 @@ class DecisionItem(ItemMeta, DecisionFields):
     pass
 
 
+class Request(ItemMeta, RequestFields):
+    pass
+
+
+class ProcessStep(ItemMeta, ProcessStepFields):
+    pass
+
+
 class Feedback(ItemMeta, FeedbackFields):
     pass
 
 
 Item = Annotated[
-    Assumption | Criterion | Task | Evidence | DecisionItem | Feedback,
+    Assumption | Criterion | Task | Evidence | DecisionItem | Request | ProcessStep | Feedback,
     Field(discriminator="type"),
 ]
 
@@ -197,4 +262,6 @@ class ProjectItems(ApiModel):
     tasks: list[Task]
     evidence: list[Evidence]
     decisions: list[DecisionItem]
+    requests: list[Request]
+    process_steps: list[ProcessStep]
     feedback: list[Feedback]

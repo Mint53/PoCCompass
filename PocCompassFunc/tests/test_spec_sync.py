@@ -9,7 +9,7 @@ import re
 from pathlib import Path
 
 from app.constants import limits
-from app.constants.enums import Container, Mode, Verdict
+from app.constants.enums import Container, ItemType, Mode, ProcessVariant, RequestAction, RequestKind, Verdict
 from app.modes.defaults import DEFAULT_MODES
 
 SPEC = (Path(__file__).resolve().parents[2] / "docs" / "SPEC.md").read_text(encoding="utf-8")
@@ -60,3 +60,14 @@ def test_cosmos_containers_match_bicep():
     text = BICEP.read_text(encoding="utf-8")
     for c in Container:
         assert f"'{c.value}'" in text, f"container {c.value} missing in bicep"
+
+
+def test_item_types_and_new_enums_documented():
+    for t in ItemType:
+        assert f"| `{t.value}` |" in SPEC, f"item type {t.value} missing in SPEC §3.2"
+    for e in (*RequestKind, *RequestAction, *ProcessVariant):
+        assert f"`{e.value}`" in SPEC
+
+
+def test_process_no_limit_matches_spec():
+    assert f"最大 {limits.PROCESS_NO_MAX} 字" in SPEC

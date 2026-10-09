@@ -22,6 +22,8 @@ class ItemType(StrEnum):
     EVIDENCE = "evidence"
     FEEDBACK = "feedback"
     DECISION = "decision"
+    REQUEST = "request"
+    PROCESS_STEP = "process_step"
 
 
 class AssumptionStatus(StrEnum):
@@ -63,6 +65,22 @@ class Decision(StrEnum):
     CONTINUE = "continue"
     PIVOT = "pivot"
     STOP = "stop"
+
+
+class RequestKind(StrEnum):
+    REQUEST = "request"
+    ISSUE = "issue"
+
+
+class RequestAction(StrEnum):
+    UNDECIDED = "undecided"
+    NEEDED = "needed"
+    NOT_NEEDED = "not_needed"
+
+
+class ProcessVariant(StrEnum):
+    ASIS = "asis"
+    TOBE = "tobe"
 
 
 class Verdict(StrEnum):

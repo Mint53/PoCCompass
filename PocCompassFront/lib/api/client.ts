@@ -18,6 +18,9 @@ export type Criterion = S["Criterion"];
 export type Task = S["Task"];
 export type Evidence = S["Evidence"];
 export type DecisionItem = S["DecisionItem"];
+export type Request = S["Request"];
+export type ProcessStep = S["ProcessStep"];
+export type ProcessVariant = S["ProcessVariant"];
 export type ItemPatch = S["ItemPatch"];
 export type TaskFields = S["TaskFields"];
 export type Dashboard = S["Dashboard"];
@@ -35,7 +38,9 @@ export type ItemCreate =
   | S["CriterionFields"]
   | S["TaskFields"]
   | S["EvidenceFields"]
-  | S["DecisionFields"];
+  | S["DecisionFields"]
+  | S["RequestFields"]
+  | S["ProcessStepFields"];
 
 export class ApiError extends Error {
   constructor(
@@ -97,7 +102,7 @@ export const api = {
   deleteProject: (id: string) => request<void>("DELETE", p(id)),
 
   listItems: (id: string) => request<ProjectItems>("GET", `${p(id)}/items`),
-  createItem: (id: string, body: ItemCreate) => request<S["Assumption"] | Task | Criterion | Evidence | DecisionItem>(
+  createItem: (id: string, body: ItemCreate) => request<S["Assumption"] | Task | Criterion | Evidence | DecisionItem | Request | ProcessStep>(
     "POST", `${p(id)}/items`, body),
   bulkCreateTasks: (id: string, tasks: TaskFields[]) => request<Task[]>("POST", `${p(id)}/items/bulk`, { tasks }),
   updateItem: (id: string, itemId: string, body: ItemPatch) =>

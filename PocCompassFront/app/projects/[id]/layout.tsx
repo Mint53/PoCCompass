@@ -42,6 +42,8 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
     { href: `${base}/analysis`, label: "分析" },
     { href: `${base}/wbs`, label: "WBS" },
     { href: `${base}/design`, label: "設計" },
+    { href: `${base}/requests`, label: "要望・課題", count: items.requests.length },
+    { href: `${base}/process`, label: "業務整理" },
     { href: `${base}/tasks`, label: lb.task, count: items.tasks.length },
     { href: `${base}/evidence`, label: lb.evidence, count: items.evidence.length },
     { href: `${base}/report`, label: "判断レポート" },

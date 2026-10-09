@@ -23,7 +23,8 @@ from app.services.access import load_project_for
 from app.services.context import Repos
 
 _ITEM_ADAPTER: TypeAdapter = TypeAdapter(Item)
-_USER_CREATABLE = {ItemType.ASSUMPTION, ItemType.CRITERION, ItemType.TASK, ItemType.EVIDENCE, ItemType.DECISION}
+_USER_CREATABLE = {ItemType.ASSUMPTION, ItemType.CRITERION, ItemType.TASK, ItemType.EVIDENCE, ItemType.DECISION,
+                   ItemType.REQUEST, ItemType.PROCESS_STEP}
 _META_KEYS = ("id", "projectId", "type", "created_at", "updated_at", "created_by")
 
 
@@ -41,10 +42,11 @@ def list_items(repos: Repos, project_id: str, user: UserContext) -> dict:
     return ProjectItems(
         assumptions=of(ItemType.ASSUMPTION), criteria=of(ItemType.CRITERION), tasks=of(ItemType.TASK),
         evidence=of(ItemType.EVIDENCE), decisions=of(ItemType.DECISION), feedback=of(ItemType.FEEDBACK),
+        requests=of(ItemType.REQUEST), process_steps=of(ItemType.PROCESS_STEP),
     ).model_dump(mode="json")
 
 
-def _validate_refs(repos: Repos, project_id: str, fields: dict) -> dict:
+def _validate_refs(repos: Repos, project_id: str, fields: dict, self_id: str | None = None) -> dict:
     """Drop/verify references to assumptions & criteria of this project."""
     if fields.get("type") == ItemType.TASK.value:
         a_ids = {d["id"] for d in repos.items.list(project_id, ItemType.ASSUMPTION)}
@@ -57,6 +59,11 @@ def _validate_refs(repos: Repos, project_id: str, fields: dict) -> dict:
         a = repos.items.get(project_id, fields["assumption_id"])
         if not a or a.get("type") != ItemType.ASSUMPTION.value:
             raise ValidationFailed("対象の仮説が見つかりません。画面を再読み込みしてください。")
+    if fields.get("type") == ItemType.PROCESS_STEP.value:
+        same_no = [d for d in repos.items.list(project_id, ItemType.PROCESS_STEP)
+                   if d["variant"] == fields["variant"] and d["no"] == fields["no"] and d["id"] != self_id]
+        if same_no:
+            raise ValidationFailed(f"業務No「{fields['no']}」は既に使われています。別の番号にしてください。")
     return fields
 
 
@@ -113,7 +120,7 @@ def prepare_update(repos: Repos, project_id: str, item_id: str, patch: ItemPatch
         fields = model.model_validate(merged).model_dump(mode="json")
     except ValidationError as e:
         raise ValidationFailed("入力内容が正しくありません: " + "; ".join(err["msg"] for err in e.errors())) from e
-    _validate_refs(repos, project_id, fields)
+    _validate_refs(repos, project_id, fields, self_id=item_id)
     return {**{k: doc[k] for k in _META_KEYS}, **fields, "updated_at": utc_now_iso()}
 
 
@@ -131,7 +138,11 @@ def prepare_create(repos: Repos, project_id: str, fields: dict) -> dict:
 
 def update_item(repos: Repos, project_id: str, item_id: str, patch: ItemPatch, user: UserContext) -> dict:
     load_project_for(repos, project_id, user)
-    return _to_response(repos.items.save(prepare_update(repos, project_id, item_id, patch)))
+    old = repos.items.get(project_id, item_id)
+    saved = repos.items.save(prepare_update(repos, project_id, item_id, patch))
+    if old and old["type"] == ItemType.PROCESS_STEP.value and old["no"] != saved["no"]:
+        _rewrite_next_nos(repos, project_id, old, saved["no"])
+    return _to_response(saved)
 
 
 def delete_item(repos: Repos, project_id: str, item_id: str, user: UserContext) -> None:
@@ -148,6 +159,8 @@ def delete_item(repos: Repos, project_id: str, item_id: str, user: UserContext) 
         _unlink_tasks(repos, project_id, "linked_assumption_ids", item_id)
     elif doc["type"] == ItemType.CRITERION.value:
         _unlink_tasks(repos, project_id, "linked_criterion_ids", item_id)
+    elif doc["type"] == ItemType.PROCESS_STEP.value:
+        _rewrite_next_nos(repos, project_id, doc, None)
     elif doc["type"] == ItemType.TASK.value:
         for f in repos.items.list(project_id, ItemType.FEEDBACK):
             if f["task_id"] == item_id:
@@ -160,6 +173,18 @@ def _unlink_tasks(repos: Repos, project_id: str, field: str, removed_id: str) ->
             t[field] = [i for i in t[field] if i != removed_id]
             t["updated_at"] = utc_now_iso()
             repos.items.save(t)
+
+
+def _rewrite_next_nos(repos: Repos, project_id: str, step: dict, new_no: str | None) -> None:
+    """Keep next_nos of the same variant pointing at `step`: follow a renamed No, drop a deleted one."""
+    for other in repos.items.list(project_id, ItemType.PROCESS_STEP):
+        if other["variant"] != step["variant"] or step["no"] not in other.get("next_nos", []):
+            continue
+        renamed = [new_no if n == step["no"] else n for n in other["next_nos"]] if new_no else \
+            [n for n in other["next_nos"] if n != step["no"]]
+        other["next_nos"] = list(dict.fromkeys(renamed))
+        other["updated_at"] = utc_now_iso()
+        repos.items.save(other)
 
 
 def add_feedback(repos: Repos, project_id: str, body: FeedbackCreate, user: UserContext) -> dict:

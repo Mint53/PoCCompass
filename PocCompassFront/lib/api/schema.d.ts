@@ -882,6 +882,11 @@ export interface components {
          * @description Partial update. The service merges it into the stored item and re-validates with the type's model.
          */
         ItemPatch: {
+            action?: components["schemas"]["RequestAction"] | null;
+            /** Action Reason */
+            action_reason?: string | null;
+            /** Assignee */
+            assignee?: string | null;
             /**
              * Clear Due Date
              * @default false
@@ -897,19 +902,28 @@ export interface components {
              * @default false
              */
             clear_start_date?: boolean;
+            /** Content */
+            content?: string | null;
             /** Description */
             description?: string | null;
             /** Due Date */
             due_date?: string | null;
             /** Effort Hours */
             effort_hours?: number | null;
+            kind?: components["schemas"]["RequestKind"] | null;
             /** Linked Assumption Ids */
             linked_assumption_ids?: string[] | null;
             /** Linked Criterion Ids */
             linked_criterion_ids?: string[] | null;
+            /** Next Nos */
+            next_nos?: string[] | null;
+            /** No */
+            no?: string | null;
             /** Note */
             note?: string | null;
             priority?: components["schemas"]["Priority"] | null;
+            /** Requester */
+            requester?: string | null;
             result?: components["schemas"]["EvidenceResult"] | null;
             /** Source */
             source?: string | null;
@@ -1032,6 +1046,61 @@ export interface components {
          * @enum {string}
          */
         Priority: "high" | "medium" | "low";
+        /** ProcessStep */
+        ProcessStep: {
+            /**
+             * Assignee
+             * @default
+             */
+            assignee: string;
+            /** Content */
+            content: string;
+            /** Created At */
+            created_at: string;
+            /** Created By */
+            created_by: string;
+            /** Id */
+            id: string;
+            /** Next Nos */
+            next_nos: string[];
+            /** No */
+            no: string;
+            /** Projectid */
+            projectId: string;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "process_step";
+            /** Updated At */
+            updated_at: string;
+            variant: components["schemas"]["ProcessVariant"];
+        };
+        /** ProcessStepFields */
+        ProcessStepFields: {
+            /**
+             * Assignee
+             * @default
+             */
+            assignee?: string;
+            /** Content */
+            content: string;
+            /** Next Nos */
+            next_nos?: string[];
+            /** No */
+            no: string;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "process_step";
+            variant: components["schemas"]["ProcessVariant"];
+        };
+        /**
+         * ProcessVariant
+         * @enum {string}
+         */
+        ProcessVariant: "asis" | "tobe";
         /** Project */
         Project: {
             /** Created At */
@@ -1101,6 +1170,10 @@ export interface components {
             evidence: components["schemas"]["Evidence"][];
             /** Feedback */
             feedback: components["schemas"]["Feedback"][];
+            /** Process Steps */
+            process_steps: components["schemas"]["ProcessStep"][];
+            /** Requests */
+            requests: components["schemas"]["Request"][];
             /** Tasks */
             tasks: components["schemas"]["Task"][];
         };
@@ -1204,6 +1277,88 @@ export interface components {
             /** Supporting */
             supporting: string[];
         };
+        /** Request */
+        Request: {
+            /** @default undecided */
+            action: components["schemas"]["RequestAction"];
+            /**
+             * Action Reason
+             * @default
+             */
+            action_reason: string;
+            /** Created At */
+            created_at: string;
+            /** Created By */
+            created_by: string;
+            /**
+             * Description
+             * @default
+             */
+            description: string;
+            /** Id */
+            id: string;
+            /** @default request */
+            kind: components["schemas"]["RequestKind"];
+            /** @default medium */
+            priority: components["schemas"]["Priority"];
+            /** Projectid */
+            projectId: string;
+            /**
+             * Requester
+             * @default
+             */
+            requester: string;
+            /** Title */
+            title: string;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "request";
+            /** Updated At */
+            updated_at: string;
+        };
+        /**
+         * RequestAction
+         * @enum {string}
+         */
+        RequestAction: "undecided" | "needed" | "not_needed";
+        /** RequestFields */
+        RequestFields: {
+            /** @default undecided */
+            action?: components["schemas"]["RequestAction"];
+            /**
+             * Action Reason
+             * @default
+             */
+            action_reason?: string;
+            /**
+             * Description
+             * @default
+             */
+            description?: string;
+            /** @default request */
+            kind?: components["schemas"]["RequestKind"];
+            /** @default medium */
+            priority?: components["schemas"]["Priority"];
+            /**
+             * Requester
+             * @default
+             */
+            requester?: string;
+            /** Title */
+            title: string;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "request";
+        };
+        /**
+         * RequestKind
+         * @enum {string}
+         */
+        RequestKind: "request" | "issue";
         /** ScheduleView */
         ScheduleView: {
             /** Days Left */
@@ -2035,7 +2190,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Assumption"] | components["schemas"]["Criterion"] | components["schemas"]["Task"] | components["schemas"]["Evidence"] | components["schemas"]["DecisionItem"] | components["schemas"]["Feedback"];
+                    "application/json": components["schemas"]["Assumption"] | components["schemas"]["Criterion"] | components["schemas"]["Task"] | components["schemas"]["Evidence"] | components["schemas"]["DecisionItem"] | components["schemas"]["Request"] | components["schemas"]["ProcessStep"] | components["schemas"]["Feedback"];
                 };
             };
             /** @description Validation Error */
@@ -2091,7 +2246,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["AssumptionFields"] | components["schemas"]["CriterionFields"] | components["schemas"]["TaskFields"] | components["schemas"]["EvidenceFields"] | components["schemas"]["DecisionFields"];
+                "application/json": components["schemas"]["AssumptionFields"] | components["schemas"]["CriterionFields"] | components["schemas"]["TaskFields"] | components["schemas"]["EvidenceFields"] | components["schemas"]["DecisionFields"] | components["schemas"]["RequestFields"] | components["schemas"]["ProcessStepFields"];
             };
         };
         responses: {
@@ -2101,7 +2256,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Assumption"] | components["schemas"]["Criterion"] | components["schemas"]["Task"] | components["schemas"]["Evidence"] | components["schemas"]["DecisionItem"] | components["schemas"]["Feedback"];
+                    "application/json": components["schemas"]["Assumption"] | components["schemas"]["Criterion"] | components["schemas"]["Task"] | components["schemas"]["Evidence"] | components["schemas"]["DecisionItem"] | components["schemas"]["Request"] | components["schemas"]["ProcessStep"] | components["schemas"]["Feedback"];
                 };
             };
             /** @description Validation Error */
@@ -2136,7 +2291,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": (components["schemas"]["Assumption"] | components["schemas"]["Criterion"] | components["schemas"]["Task"] | components["schemas"]["Evidence"] | components["schemas"]["DecisionItem"] | components["schemas"]["Feedback"])[];
+                    "application/json": (components["schemas"]["Assumption"] | components["schemas"]["Criterion"] | components["schemas"]["Task"] | components["schemas"]["Evidence"] | components["schemas"]["DecisionItem"] | components["schemas"]["Request"] | components["schemas"]["ProcessStep"] | components["schemas"]["Feedback"])[];
                 };
             };
             /** @description Validation Error */
@@ -2202,7 +2357,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Assumption"] | components["schemas"]["Criterion"] | components["schemas"]["Task"] | components["schemas"]["Evidence"] | components["schemas"]["DecisionItem"] | components["schemas"]["Feedback"];
+                    "application/json": components["schemas"]["Assumption"] | components["schemas"]["Criterion"] | components["schemas"]["Task"] | components["schemas"]["Evidence"] | components["schemas"]["DecisionItem"] | components["schemas"]["Request"] | components["schemas"]["ProcessStep"] | components["schemas"]["Feedback"];
                 };
             };
             /** @description Validation Error */
