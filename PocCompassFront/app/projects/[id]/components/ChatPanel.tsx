@@ -1,6 +1,6 @@
 "use client";
 
-import { Bot, CheckCircle2, Loader2, MessageSquare, Send, Trash2, X, XCircle } from "lucide-react";
+import { Bot, CheckCircle2, Loader2, MessageSquare, Send, Sparkles, Trash2, X, XCircle } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api, errorMessage, type ChatMessage } from "@/lib/api/client";
 import { cn, formatDateTime } from "@/lib/utils";
@@ -328,24 +328,36 @@ export default function ChatPanel({ open, onClose }: { open: boolean; onClose: (
 }
 
 const LAUNCHER_KEY = "poc-compass.chat-launcher-collapsed";
+const HINT_KEY = "poc-compass.chat-launcher-hint-seen";
 
 /**
- * Small floating entry to the AI chat. It stays out of the way: icon-only and faded until hovered,
- * and can be tucked into a thin edge tab (remembered per browser).
+ * Floating entry to the AI chat. The label is always shown so people notice it; a one-time hint bubble
+ * (dismissal remembered per browser) and a short ring pulse draw the eye on the first visit only.
+ * It can still be tucked into a thin edge tab (remembered per browser).
  */
 export function ChatLauncher({ onOpen }: { onOpen: () => void }) {
   const [collapsed, setCollapsed] = useState(false);
+  const [hintSeen, setHintSeen] = useState(true);
   useEffect(() => {
     try {
       setCollapsed(window.localStorage.getItem(LAUNCHER_KEY) === "1");
+      setHintSeen(window.localStorage.getItem(HINT_KEY) === "1");
     } catch {
-      // storage unavailable: keep default
+      // storage unavailable: keep default (no hint)
     }
   }, []);
   const setAndStore = (v: boolean) => {
     setCollapsed(v);
     try {
       window.localStorage.setItem(LAUNCHER_KEY, v ? "1" : "0");
+    } catch {
+      // ignore
+    }
+  };
+  const dismissHint = () => {
+    setHintSeen(true);
+    try {
+      window.localStorage.setItem(HINT_KEY, "1");
     } catch {
       // ignore
     }
@@ -365,26 +377,53 @@ export function ChatLauncher({ onOpen }: { onOpen: () => void }) {
     );
   }
   return (
-    <div className="group fixed bottom-4 right-4 z-40 flex items-center gap-1 opacity-70 transition-opacity focus-within:opacity-100 hover:opacity-100">
-      <button
-        type="button"
-        onClick={() => setAndStore(true)}
-        className="hidden h-6 w-6 items-center justify-center rounded-full bg-white/90 text-slate-500 shadow hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-ring group-hover:flex group-focus-within:flex"
-        aria-label="ボタンを端にしまう"
-        title="端にしまう"
-      >
-        <X className="h-3.5 w-3.5" aria-hidden="true" />
-      </button>
-      <button
-        type="button"
-        onClick={onOpen}
-        className="flex h-11 items-center gap-2 rounded-full bg-primary px-3 text-sm font-semibold text-primary-foreground shadow-md hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-        aria-label="AI に相談・編集を開く"
-        title="AI に相談・編集"
-      >
-        <MessageSquare className="h-5 w-5" aria-hidden="true" />
-        <span className="hidden group-hover:inline group-focus-within:inline">AI に相談・編集</span>
-      </button>
+    <div className="group fixed bottom-4 right-4 z-40 flex flex-col items-end gap-2">
+      {!hintSeen && (
+        <div
+          role="status"
+          className="animate-fade-in-up flex max-w-[16rem] items-start gap-2 rounded-lg border border-primary/30 bg-white px-3 py-2 text-xs text-slate-700 shadow-lg"
+        >
+          <p>
+            <b className="text-primary">AI に相談できます。</b>
+            この取り組みの内容を踏まえて、質問への回答や追加・修正の提案をします。
+          </p>
+          <button
+            type="button"
+            onClick={dismissHint}
+            className="shrink-0 rounded text-slate-400 hover:text-slate-700 focus:outline-none focus:ring-2 focus:ring-ring"
+            aria-label="ヒントを閉じる"
+          >
+            <X className="h-3.5 w-3.5" aria-hidden="true" />
+          </button>
+        </div>
+      )}
+      <div className="flex items-center gap-1">
+        <button
+          type="button"
+          onClick={() => setAndStore(true)}
+          className="hidden h-6 w-6 items-center justify-center rounded-full bg-white/90 text-slate-500 shadow hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-ring group-hover:flex group-focus-within:flex"
+          aria-label="ボタンを端にしまう"
+          title="端にしまう"
+        >
+          <X className="h-3.5 w-3.5" aria-hidden="true" />
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            dismissHint();
+            onOpen();
+          }}
+          className={cn(
+            "flex h-11 items-center gap-2 rounded-full bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-lg ring-2 ring-white hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+            !hintSeen && "launcher-attention",
+          )}
+          aria-label="AI に相談・編集を開く"
+          title="AI に相談・編集"
+        >
+          <Sparkles className="h-5 w-5" aria-hidden="true" />
+          <span>AI に相談</span>
+        </button>
+      </div>
     </div>
   );
 }
