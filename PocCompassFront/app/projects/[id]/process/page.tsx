@@ -10,6 +10,7 @@ import Button from "../../../components/ui/Button";
 import Card from "../../../components/ui/Card";
 import ConfirmDialog from "../../../components/ui/ConfirmDialog";
 import Field from "../../../components/ui/Field";
+import Combobox from "@/app/components/ui/Combobox";
 import Input from "../../../components/ui/Input";
 import Modal from "../../../components/ui/Modal";
 import Segmented from "../../../components/ui/Segmented";
@@ -70,8 +71,7 @@ function StepModal({ step, variant, steps, assignees, onClose }: { step: Process
             <Input id="ps-no" value={d.no} maxLength={20} onChange={(e) => setD({ ...d, no: e.target.value })} disabled={busy} />
           </Field>
           <Field label="担当者" htmlFor="ps-assignee" hint="既に使われている担当者は候補から選べます。">
-            <Input id="ps-assignee" list="ps-assignees" value={d.assignee} maxLength={50} placeholder="例: 営業" onChange={(e) => setD({ ...d, assignee: e.target.value })} disabled={busy} />
-            <datalist id="ps-assignees">{assignees.map((a) => <option key={a} value={a} />)}</datalist>
+            <Combobox id="ps-assignee" options={assignees} value={d.assignee} maxLength={50} placeholder="例: 営業" onChange={(v) => setD({ ...d, assignee: v })} disabled={busy} />
           </Field>
         </div>
         <Field label="業務内容" htmlFor="ps-content" required>
@@ -154,8 +154,7 @@ function QuickAdd({ variant, steps, assignees }: { variant: ProcessVariant; step
   return (
     <div className="mt-2 flex shrink-0 flex-col gap-2 rounded-xl border border-dashed border-slate-300 bg-slate-50/60 p-2.5 sm:flex-row sm:items-center">
       <Input aria-label="新しい業務No" className="sm:w-16" value={noValue} maxLength={20} onChange={(e) => setNo(e.target.value)} onKeyDown={onEnter} disabled={busy} />
-      <Input aria-label="新しい業務の担当者" list="qa-assignees" className="sm:w-40" placeholder="担当者" value={assignee} maxLength={50} onChange={(e) => setAssignee(e.target.value)} onKeyDown={onEnter} disabled={busy} />
-      <datalist id="qa-assignees">{assignees.map((a) => <option key={a} value={a} />)}</datalist>
+      <div className="sm:w-40"><Combobox aria-label="新しい業務の担当者" placeholder="担当者" options={assignees} value={assignee} maxLength={50} onChange={setAssignee} onKeyDown={onEnter} disabled={busy} /></div>
       <Input ref={contentRef} aria-label="新しい業務の内容" className="min-w-0 sm:flex-1" placeholder="業務内容を入力して Enter（例: 見積書を作成して上長に提出）" value={content} maxLength={1000} onChange={(e) => setContent(e.target.value)} onKeyDown={onEnter} disabled={busy} />
       <Button onClick={() => void add()} disabled={busy || !noValue.trim() || !content.trim()}>
         <Plus className="h-4 w-4" aria-hidden="true" />
