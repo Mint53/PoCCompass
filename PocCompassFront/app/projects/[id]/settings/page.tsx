@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import Button from "../../../components/ui/Button";
 import Card from "../../../components/ui/Card";
 import ConfirmDialog from "../../../components/ui/ConfirmDialog";
+import DepartmentShare from "../../../components/DepartmentShare";
 import MemberPicker, { type PickerMember } from "../../../components/MemberPicker";
 import { useToast } from "../../../components/ui/ToastProvider";
 import { useApp } from "../../../contexts/AppContext";
@@ -24,6 +25,8 @@ export default function SettingsPage() {
   const [nextMode, setNextMode] = useState<Mode | null>(null);
   const [busy, setBusy] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [sharing, setSharing] = useState(false);
+  const ownerDepartment = list?.find((m) => m.role === "owner")?.department ?? "";
 
   useEffect(() => {
     let alive = true;
@@ -57,6 +60,19 @@ export default function SettingsPage() {
       toast({ tone: "error", message: errorMessage(e) });
     } finally {
       setSavingMembers(false);
+    }
+  };
+
+  const changeShare = async (v: boolean) => {
+    setSharing(true);
+    try {
+      await api.updateProject(project.id, { share_with_department: v });
+      await reloadProject();
+      toast({ tone: "success", message: v ? "同じ部署に公開しました（閲覧のみ）。" : "部署への公開をやめました。" });
+    } catch (e) {
+      toast({ tone: "error", message: errorMessage(e) });
+    } finally {
+      setSharing(false);
     }
   };
 
@@ -100,6 +116,11 @@ export default function SettingsPage() {
         ) : (
           <MemberPicker members={list} onChange={setList} disabled={!isOwner || savingMembers} isAdmin={me.is_admin} />
         )}
+        {ownerNote}
+      </Card>
+
+      <Card title="部署への公開">
+        <DepartmentShare checked={project.shared_department !== ""} onChange={(v) => void changeShare(v)} department={project.shared_department || ownerDepartment} disabled={!isOwner || sharing} />
         {ownerNote}
       </Card>
 

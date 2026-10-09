@@ -2173,6 +2173,11 @@
       "title": "Owner Email",
       "type": "string"
      },
+     "shared_department": {
+      "default": "",
+      "title": "Shared Department",
+      "type": "string"
+     },
      "start_date": {
       "format": "date",
       "title": "Start Date",
@@ -2212,6 +2217,7 @@
      "owner_email",
      "members",
      "viewers",
+     "shared_department",
      "deleted",
      "created_at",
      "updated_at",
@@ -2256,6 +2262,11 @@
      },
      "mode": {
       "$ref": "#/components/schemas/Mode"
+     },
+     "share_with_department": {
+      "default": false,
+      "title": "Share With Department",
+      "type": "boolean"
      },
      "start_date": {
       "anyOf": [
@@ -2507,6 +2518,17 @@
         "type": "null"
        }
       ]
+     },
+     "share_with_department": {
+      "anyOf": [
+       {
+        "type": "boolean"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Share With Department"
      },
      "start_date": {
       "anyOf": [
@@ -3239,6 +3261,16 @@
       "minLength": 1,
       "title": "Name",
       "type": "string"
+     },
+     "role": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/UserRole"
+       },
+       {
+        "type": "null"
+       }
+      ]
      }
     },
     "required": [
@@ -3249,6 +3281,11 @@
    },
    "UserContext": {
     "properties": {
+     "department": {
+      "default": "",
+      "title": "Department",
+      "type": "string"
+     },
      "email": {
       "title": "Email",
       "type": "string"
@@ -3261,11 +3298,17 @@
      "name": {
       "title": "Name",
       "type": "string"
+     },
+     "role": {
+      "$ref": "#/components/schemas/UserRole",
+      "default": "general"
      }
     },
     "required": [
      "email",
      "name",
+     "department",
+     "role",
      "is_admin"
     ],
     "title": "UserContext",
@@ -3288,6 +3331,16 @@
       "minLength": 1,
       "title": "Name",
       "type": "string"
+     },
+     "role": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/UserRole"
+       },
+       {
+        "type": "null"
+       }
+      ]
      }
     },
     "required": [
@@ -3319,6 +3372,13 @@
       "title": "Name",
       "type": "string"
      },
+     "role": {
+      "$ref": "#/components/schemas/UserRole"
+     },
+     "role_locked": {
+      "title": "Role Locked",
+      "type": "boolean"
+     },
      "updated_at": {
       "title": "Updated At",
       "type": "string"
@@ -3328,12 +3388,24 @@
      "email",
      "name",
      "department",
+     "role",
+     "role_locked",
      "is_admin",
      "created_at",
      "updated_at"
     ],
     "title": "UserRecord",
     "type": "object"
+   },
+   "UserRole": {
+    "description": "Global role stored on the user master (SPEC §3.7, §9).",
+    "enum": [
+     "admin",
+     "global_viewer",
+     "general"
+    ],
+    "title": "UserRole",
+    "type": "string"
    },
    "ValidationError": {
     "properties": {

@@ -8,7 +8,7 @@ from tests.conftest import ADMIN, MEMBER, OWNER, STRANGER, add_task, make_projec
 def test_health_and_me(client):
     assert client.get("/api/health").json()["status"] == "ok"
     me = client.get("/api/me", headers=OWNER).json()
-    assert me == {"email": "owner@example.com", "name": "オーナー", "is_admin": False}
+    assert me == {"email": "owner@example.com", "name": "オーナー", "department": "", "role": "general", "is_admin": False}
     assert client.get("/api/me", headers=ADMIN).json()["is_admin"] is True
 
 

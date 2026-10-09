@@ -25,6 +25,9 @@ class ProjectRepository:
                 docs[d["id"]] = d
         return sorted(docs.values(), key=lambda d: d["updated_at"], reverse=True)
 
+    def list_for_department(self, department: str) -> list[dict]:
+        return self.s.find(Container.PROJECTS, equals={"deleted": False, "shared_department": department})
+
     def list_all(self) -> list[dict]:
         docs = self.s.find(Container.PROJECTS, equals={"deleted": False})
         return sorted(docs, key=lambda d: d["updated_at"], reverse=True)

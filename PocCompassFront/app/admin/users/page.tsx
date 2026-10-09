@@ -3,6 +3,7 @@
 import { Pencil, Search, Trash2, UserPlus } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { api, errorMessage, type UserRecord } from "@/lib/api/client";
+import { USER_ROLE, labelOf } from "@/lib/labels";
 import { formatDateTime } from "@/lib/utils";
 import Badge from "../../components/ui/Badge";
 import Button from "../../components/ui/Button";
@@ -11,6 +12,7 @@ import ConfirmDialog from "../../components/ui/ConfirmDialog";
 import Field from "../../components/ui/Field";
 import Input from "../../components/ui/Input";
 import Modal from "../../components/ui/Modal";
+import Select from "../../components/ui/Select";
 import { EmptyState, ErrorState, LoadingState } from "../../components/ui/States";
 import { useToast } from "../../components/ui/ToastProvider";
 import { useApp } from "../../contexts/AppContext";
@@ -19,16 +21,19 @@ const LIST_LIMIT = 500;
 const DEBOUNCE_MS = 250;
 const EMAIL_RE = /^[^@\s]+@[^@\s]+$/;
 
-type Form = { email: string; name: string; department: string };
+type Role = UserRecord["role"];
+type Form = { email: string; name: string; department: string; role: Role };
 type Editing = { kind: "new" } | { kind: "edit"; user: UserRecord };
 
 function UserDialog({ editing, onClose, onSaved }: { editing: Editing; onClose: () => void; onSaved: () => void }) {
   const { toast } = useToast();
+  const { me } = useApp();
   const isEdit = editing.kind === "edit";
+  const lockReason = editing.kind !== "edit" ? null : editing.user.role_locked ? "環境設定（ADMIN_EMAILS）で管理者に固定されているため変更できません。" : editing.user.email === me.email ? "自分自身の役割は変更できません。他の管理者に依頼してください。" : null;
   const [form, setForm] = useState<Form>(
     editing.kind === "edit"
-      ? { email: editing.user.email, name: editing.user.name, department: editing.user.department }
-      : { email: "", name: "", department: "" },
+      ? { email: editing.user.email, name: editing.user.name, department: editing.user.department, role: editing.user.role }
+      : { email: "", name: "", department: "", role: "general" },
   );
   const [errors, setErrors] = useState<Partial<Record<keyof Form, string>>>({});
   const [busy, setBusy] = useState(false);
@@ -41,7 +46,7 @@ function UserDialog({ editing, onClose, onSaved }: { editing: Editing; onClose: 
     if (Object.keys(e).length) return;
     setBusy(true);
     try {
-      const body = { name: form.name.trim(), department: form.department.trim() };
+      const body = { name: form.name.trim(), department: form.department.trim(), ...(lockReason ? {} : { role: form.role }) };
       if (editing.kind === "edit") await api.updateUser(editing.user.email, body);
       else await api.createUser({ email: form.email.trim(), ...body });
       toast({ tone: "success", message: isEdit ? "ユーザーを更新しました。" : "ユーザーを追加しました。" });
@@ -67,8 +72,11 @@ function UserDialog({ editing, onClose, onSaved }: { editing: Editing; onClose: 
         <Field label="氏名" htmlFor="u-name" required error={errors.name}>
           <Input id="u-name" value={form.name} maxLength={50} disabled={busy} autoFocus={isEdit} onChange={(e) => setForm({ ...form, name: e.target.value })} />
         </Field>
-        <Field label="部署" htmlFor="u-dept" hint="任意。検索で絞り込むときに使います。">
+        <Field label="部署" htmlFor="u-dept" hint="任意。検索の絞り込みと、取り組みの「同じ部署に公開」の判定に使います（表記は完全に同じにしてください）。">
           <Input id="u-dept" value={form.department} maxLength={50} disabled={busy} onChange={(e) => setForm({ ...form, department: e.target.value })} />
+        </Field>
+        <Field label="役割" htmlFor="u-role" hint={lockReason ?? USER_ROLE.find((r) => r.value === form.role)?.hint}>
+          <Select id="u-role" value={form.role} options={USER_ROLE.map((r) => ({ value: r.value, label: r.label }))} disabled={busy || lockReason !== null} onChange={(e) => setForm({ ...form, role: e.target.value as Role })} />
         </Field>
         <div className="flex justify-end gap-2 pt-2">
           <Button variant="outline" onClick={onClose} disabled={busy}>
@@ -115,7 +123,7 @@ export default function UsersAdminPage() {
   }, [q, load, me.is_admin]);
 
   if (!me.is_admin) {
-    return <EmptyState title="管理者のみ利用できます" description="ユーザーマスタの管理は管理者（ADMIN_EMAILS に登録されたユーザー）のみ行えます。" />;
+    return <EmptyState title="管理者のみ利用できます" description="ユーザーマスタの管理は管理者のみ行えます。" />;
   }
 
   const remove = async () => {
@@ -139,7 +147,7 @@ export default function UsersAdminPage() {
         <div className="space-y-1">
           <h1 className="text-xl font-bold text-slate-900">ユーザー管理</h1>
           <p className="max-w-3xl text-sm text-slate-600">
-            取り組みのメンバー（編集者・閲覧者）は、ここに登録したユーザーから検索して選びます。サインインできるかどうかは変わりません。
+            取り組みのメンバーは、ここに登録したユーザーから検索して選びます。全体の役割（管理者／全体閲覧者／一般）と部署もここで決めます。サインインできるかどうかは変わりません。
           </p>
         </div>
         <Button onClick={() => setEditing({ kind: "new" })}>
@@ -188,13 +196,14 @@ export default function UsersAdminPage() {
           )
         ) : (
           <div className="thin-scroll -mx-1 overflow-x-auto px-1">
-            <table className="w-full min-w-[40rem] text-left text-sm">
+            <table className="w-full min-w-[44rem] text-left text-sm">
               <caption className="sr-only">ユーザーマスタ</caption>
               <thead>
                 <tr className="border-b border-slate-200 text-xs font-semibold text-slate-600">
                   <th scope="col" className="py-2 pr-3">氏名</th>
                   <th scope="col" className="py-2 pr-3">メールアドレス</th>
                   <th scope="col" className="py-2 pr-3">部署</th>
+                  <th scope="col" className="py-2 pr-3">役割</th>
                   <th scope="col" className="py-2 pr-3">更新日時</th>
                   <th scope="col" className="py-2 text-right">操作</th>
                 </tr>
@@ -204,10 +213,14 @@ export default function UsersAdminPage() {
                   <tr key={u.email} className="transition-colors hover:bg-slate-50/70">
                     <td className="py-2.5 pr-3 font-semibold text-slate-900">
                       <span className="break-words">{u.name}</span>
-                      {u.is_admin && <Badge variant="brand" className="ml-2" title="ADMIN_EMAILS に登録された管理者">管理者</Badge>}
                     </td>
                     <td className="break-all py-2.5 pr-3 text-slate-700">{u.email}</td>
                     <td className="py-2.5 pr-3 text-slate-700">{u.department || <span className="text-slate-400">—</span>}</td>
+                    <td className="py-2.5 pr-3">
+                      <Badge variant={u.role === "admin" ? "brand" : u.role === "global_viewer" ? "yellow" : "slate"} title={u.role_locked ? "ADMIN_EMAILS に登録された管理者（画面から変更不可）" : undefined}>
+                        {labelOf(USER_ROLE, u.role)}
+                      </Badge>
+                    </td>
                     <td className="whitespace-nowrap py-2.5 pr-3 text-xs text-slate-500">{formatDateTime(u.updated_at)}</td>
                     <td className="whitespace-nowrap py-2.5 text-right">
                       <Button variant="ghost" size="icon" aria-label={`${u.name} を編集`} title="編集" onClick={() => setEditing({ kind: "edit", user: u })}>

@@ -9,6 +9,14 @@ class Mode(StrEnum):
     IMPROVEMENT = "improvement"
 
 
+class UserRole(StrEnum):
+    """Global role stored on the user master (SPEC §3.7, §9)."""
+
+    ADMIN = "admin"
+    GLOBAL_VIEWER = "global_viewer"
+    GENERAL = "general"
+
+
 class ProjectStatus(StrEnum):
     ACTIVE = "active"
     STOPPED = "stopped"
