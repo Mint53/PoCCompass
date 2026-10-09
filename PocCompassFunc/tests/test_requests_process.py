@@ -105,3 +105,20 @@ def test_viewer_can_read_but_not_write(client):
     assert _post(client, pid, {"type": "request", "title": "x"}, viewer).status_code == 403
     assert client.patch(f"/api/projects/{pid}/items/{req['id']}", json={"action": "needed"}, headers=viewer).status_code == 403
     assert len(client.get(f"/api/projects/{pid}/items", headers=viewer).json()["requests"]) == 1
+
+
+def test_samples_create_one_filled_project_per_mode(client):
+    r = client.post("/api/projects/samples", headers=OWNER)
+    assert r.status_code == 201
+    projects = r.json()
+    assert [p["mode"] for p in projects] == ["poc", "planning", "improvement"]
+    for p in projects:
+        assert p["title"].startswith("【サンプル】") and p["owner_email"] == "owner@example.com"
+        items = _items(client, p["id"])
+        assert len(items["assumptions"]) == 3 and len(items["criteria"]) == 2
+        assert len(items["tasks"]) >= 5 and len(items["evidence"]) == 2 and len(items["requests"]) == 3
+        assert {s["variant"] for s in items["process_steps"]} == {"asis", "tobe"}
+        assert any(t["linked_assumption_ids"] for t in items["tasks"])
+        assert {r["action"] for r in items["requests"]} >= {"needed", "not_needed"}
+        assert client.get(f"/api/projects/{p['id']}/dashboard", headers=OWNER).status_code == 200
+    assert client.post("/api/projects/samples").status_code == 401

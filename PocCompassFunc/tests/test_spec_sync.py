@@ -77,3 +77,10 @@ def test_item_types_and_new_enums_documented():
 
 def test_process_no_limit_matches_spec():
     assert f"最大 {limits.PROCESS_NO_MAX} 字" in SPEC
+
+
+def test_samples_documented_and_cover_every_mode():
+    from app.services.sample_data import SAMPLE_TITLE_PREFIX, SAMPLES
+
+    assert set(SAMPLES) == set(Mode)
+    assert f"`{SAMPLE_TITLE_PREFIX}`" in SPEC

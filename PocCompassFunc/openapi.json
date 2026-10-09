@@ -3797,6 +3797,31 @@
     ]
    }
   },
+  "/api/projects/samples": {
+   "post": {
+    "operationId": "create_samples_api_projects_samples_post",
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/Project"
+         },
+         "title": "Response Create Samples Api Projects Samples Post",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Create Samples",
+    "tags": [
+     "projects"
+    ]
+   }
+  },
   "/api/projects/{project_id}": {
    "delete": {
     "operationId": "delete_project_api_projects__project_id__delete",

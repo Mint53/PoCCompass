@@ -102,6 +102,7 @@ export const api = {
 
   listProjects: (mode?: Mode) => request<Project[]>("GET", `/projects${mode ? `?mode=${mode}` : ""}`),
   createProject: (body: ProjectCreate) => request<Project>("POST", "/projects", body),
+  createSamples: () => request<Project[]>("POST", "/projects/samples"),
   getProject: (id: string) => request<Project>("GET", p(id)),
   updateProject: (id: string, body: ProjectUpdate) => request<Project>("PATCH", p(id), body),
   deleteProject: (id: string) => request<void>("DELETE", p(id)),
