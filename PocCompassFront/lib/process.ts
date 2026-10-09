@@ -31,6 +31,30 @@ export function buildEdges(sorted: ProcessStep[]): FlowEdge[] {
   return edges;
 }
 
+/** The arrows leaving `step` as drawn (explicit next_nos, or the implicit next step), as target Nos. */
+export function outgoingNos(step: ProcessStep, sorted: ProcessStep[]): string[] {
+  const byId = new Map(sorted.map((s) => [s.id, s]));
+  return buildEdges(sorted).filter((e) => e.from === step.id).map((e) => byId.get(e.to)!.no);
+}
+
+/**
+ * A free 業務No that sorts at position `index` among `others` (the steps in No order, without the one being moved).
+ * Prefers a plain integer, then `<previous No>.<k>`. Null when no such No exists (the user edits it by hand).
+ */
+export function noForInsert(others: ProcessStep[], index: number): string | null {
+  const used = new Set(others.map((s) => s.no));
+  const prev = index > 0 ? others[index - 1].no : null;
+  const next = index < others.length ? others[index].no : null;
+  const fits = (c: string) => !used.has(c) && (prev === null || compareNo(prev, c) < 0) && (next === null || compareNo(c, next) < 0);
+  const candidates: string[] = [];
+  const lo = prev !== null && /^\d+$/.test(prev) ? Number(prev) : 0;
+  const hi = next !== null && /^\d+$/.test(next) ? Number(next) : lo + 50;
+  if (prev === null) candidates.push("0");
+  for (let n = lo + 1; n < hi && candidates.length < 60; n++) candidates.push(String(n));
+  for (let k = 1; k <= 20; k++) candidates.push(`${prev ?? "0"}.${k}`);
+  return candidates.find(fits) ?? null;
+}
+
 /** next_nos entries that point at no step of this variant (shown as a warning in the table). */
 export function danglingNos(step: ProcessStep, all: ProcessStep[]): string[] {
   const known = new Set(all.map((s) => s.no));

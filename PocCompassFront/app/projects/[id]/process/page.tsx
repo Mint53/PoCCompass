@@ -17,7 +17,7 @@ import Segmented from "../../../components/ui/Segmented";
 import { EmptyState } from "../../../components/ui/States";
 import Textarea from "../../../components/ui/Textarea";
 import { useToast } from "../../../components/ui/ToastProvider";
-import ProcessFlow from "../components/ProcessFlow";
+import ProcessFlow, { type FlowEdit } from "../components/ProcessFlow";
 import { useProject } from "../ProjectContext";
 
 type View = ProcessVariant | "compare";
@@ -44,10 +44,10 @@ function AssigneeChip({ name, lanes }: { name: string; lanes: string[] }) {
   );
 }
 
-function StepModal({ step, variant, steps, assignees, onClose }: { step: ProcessStep | null; variant: ProcessVariant; steps: ProcessStep[]; assignees: string[]; onClose: () => void }) {
+function StepModal({ step, variant, steps, assignees, initialAssignee = "", onClose }: { step: ProcessStep | null; variant: ProcessVariant; steps: ProcessStep[]; assignees: string[]; initialAssignee?: string; onClose: () => void }) {
   const { project, reloadItems } = useProject();
   const { toast } = useToast();
-  const [d, setD] = useState<Draft>({ no: step?.no ?? suggestNo(steps), assignee: step?.assignee ?? "", content: step?.content ?? "", next: step?.next_nos.join(", ") ?? "" });
+  const [d, setD] = useState<Draft>({ no: step?.no ?? suggestNo(steps), assignee: step?.assignee ?? initialAssignee, content: step?.content ?? "", next: step?.next_nos.join(", ") ?? "" });
   const [busy, setBusy] = useState(false);
   const save = async () => {
     setBusy(true);
@@ -192,11 +192,11 @@ function Delta({ label, a, b }: { label: string; a: number; b: number }) {
 }
 
 export default function ProcessPage() {
-  const { project, items, reloadItems } = useProject();
+  const { project, items, reloadItems, canEdit } = useProject();
   const { toast } = useToast();
   const [view, setView] = useState<View>("asis");
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [modal, setModal] = useState<{ step: ProcessStep | null } | null>(null);
+  const [modal, setModal] = useState<{ step: ProcessStep | null; assignee?: string } | null>(null);
   const [deleting, setDeleting] = useState<ProcessStep | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -227,6 +227,31 @@ export default function ProcessPage() {
       setBusy(false);
     }
   };
+
+  /** GUI edits from the diagram (editors only). Each one is a plain PATCH of the step; the server keeps 次の業務No in sync with a renamed No. */
+  const patchStep = async (step: ProcessStep, body: Parameters<typeof api.updateItem>[2], done: string) => {
+    setBusy(true);
+    try {
+      await api.updateItem(project.id, step.id, body);
+      await reloadItems();
+      toast({ tone: "success", message: done });
+    } catch (e) {
+      toast({ tone: "error", message: errorMessage(e) });
+    } finally {
+      setBusy(false);
+    }
+  };
+  const flowEdit: FlowEdit | undefined = canEdit
+    ? {
+        busy,
+        onMove: (step, change) => void patchStep(step, change, change.no ? `業務${step.no}を移動しました${change.no !== step.no ? `（業務No ${change.no}）` : ""}。` : `業務${step.no}の担当者を変えました。`),
+        onLink: (step, nextNos) => void patchStep(step, { next_nos: nextNos }, `業務${step.no}の矢印を更新しました。`),
+        onEditStep: (step) => setModal({ step }),
+        onDeleteStep: (step) => setDeleting(step),
+        onAddStep: (assignee) => setModal({ step: null, assignee }),
+        onNotice: (message) => toast({ tone: "error", message }),
+      }
+    : undefined;
 
   const copyAsIs = async () => {
     setBusy(true);
@@ -288,7 +313,7 @@ export default function ProcessPage() {
             />
           ) : (
             <div className="min-h-0 flex-1">
-              <ProcessFlow steps={steps} label={variantLabel(v)} selectedId={selectedId} onSelect={select} />
+              <ProcessFlow steps={steps} label={variantLabel(v)} selectedId={selectedId} onSelect={select} edit={flowEdit} />
             </div>
           )}
         </Card>
@@ -313,11 +338,11 @@ export default function ProcessPage() {
     <div className="flex h-full min-h-0 flex-col gap-3">
       <div className="flex shrink-0 flex-wrap items-center justify-between gap-3">
         <Segmented kind="tabs" label="AsIs / ToBe の切り替え" options={options} value={view} onChange={setView} />
-        <p className="text-xs text-slate-500">業務をクリックすると、つながる矢印と一覧の行が強調されます。</p>
+        <p className="text-xs text-slate-500">業務をクリックすると、つながる矢印と一覧の行が強調されます。{canEdit && "図の上では、業務をドラッグして並べ替え、右端の ● から矢印を引き、ダブルクリックで編集・追加できます。"}</p>
       </div>
       {body()}
       {modal && view !== "compare" && (
-        <StepModal key={modal.step?.id ?? "new"} step={modal.step} variant={view} steps={by[view]} assignees={allAssignees} onClose={() => setModal(null)} />
+        <StepModal key={modal.step?.id ?? `new-${modal.assignee ?? ""}`} step={modal.step} variant={view} steps={by[view]} assignees={allAssignees} initialAssignee={modal.assignee} onClose={() => setModal(null)} />
       )}
       <ConfirmDialog
         open={!!deleting}

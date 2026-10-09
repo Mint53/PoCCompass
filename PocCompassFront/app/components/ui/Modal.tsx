@@ -5,6 +5,9 @@ import { type ReactNode, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 
+/** Open modals, oldest first: Esc closes only the top one (a dialog opened from inside another must not close both). */
+const stack: symbol[] = [];
+
 /**
  * Large content dialog (for "expand this card"). Esc / backdrop click / ✕ close it, the page behind does not scroll,
  * and focus returns to whatever opened it. For yes/no questions use ConfirmDialog instead.
@@ -24,6 +27,16 @@ export default function Modal({
 }) {
   const closeRef = useRef<HTMLButtonElement>(null);
 
+  const me = useRef(Symbol("modal")).current;
+  // Own effect keyed on `open` only: onClose is usually an inline lambda, and re-registering would move this modal to the top.
+  useEffect(() => {
+    if (!open) return;
+    stack.push(me);
+    return () => {
+      stack.splice(stack.indexOf(me), 1);
+    };
+  }, [open, me]);
+
   useEffect(() => {
     if (!open) return;
     const opener = document.activeElement as HTMLElement | null;
@@ -31,7 +44,7 @@ export default function Modal({
     document.body.style.overflow = "hidden";
     closeRef.current?.focus();
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape" && stack[stack.length - 1] === me) onClose();
     };
     window.addEventListener("keydown", onKey);
     return () => {
@@ -39,7 +52,7 @@ export default function Modal({
       window.removeEventListener("keydown", onKey);
       opener?.focus?.();
     };
-  }, [open, onClose]);
+  }, [open, onClose, me]);
 
   if (!open || typeof document === "undefined") return null;
   return createPortal(
