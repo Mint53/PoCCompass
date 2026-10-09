@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from app.constants.enums import UserRole
 from app.core.errors import Forbidden, NotFound
 from app.models.common import UserContext
 from app.services.context import Repos
@@ -13,9 +14,17 @@ VIEW_ONLY_MESSAGE = "この取り組みは閲覧のみ可能です。編集が�
 def load_project_for(repos: Repos, project_id: str, user: UserContext) -> dict:
     """Return the project if the user may see it; 404 otherwise (do not reveal existence)."""
     project = repos.projects.get(project_id)
-    if not project or not (user.is_admin or user.email in project["members"] or user.email in project.get("viewers", [])):
+    if not project or not can_view(project, user):
         raise NotFound(NOT_FOUND_MESSAGE)
     return project
+
+
+def can_view(project: dict, user: UserContext) -> bool:
+    shared = project.get("shared_department") or ""
+    return bool(
+        user.is_admin or user.role == UserRole.GLOBAL_VIEWER
+        or user.email in project["members"] or user.email in project.get("viewers", [])
+        or (shared and user.department == shared))
 
 
 def load_project_for_edit(repos: Repos, project_id: str, user: UserContext) -> dict:

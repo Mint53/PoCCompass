@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pydantic import Field, field_validator
 
-from app.constants.enums import MemberRole
+from app.constants.enums import MemberRole, UserRole
 from app.constants.limits import DEPARTMENT_MAX, USER_NAME_MAX
 from app.models.common import ApiModel, StoredModel
 
@@ -17,6 +17,7 @@ def normalize_email(value: str) -> str:
 class UserBody(ApiModel):
     name: str = Field(min_length=1, max_length=USER_NAME_MAX)
     department: str = Field(default="", max_length=DEPARTMENT_MAX)
+    role: UserRole | None = None  # None = keep the current role (general for a new user)
 
     @field_validator("name", "department")
     @classmethod
@@ -47,6 +48,7 @@ class UserDoc(StoredModel):
     email: str
     name: str
     department: str = ""
+    role: UserRole = UserRole.GENERAL
     created_at: str
     updated_at: str
 
@@ -55,6 +57,8 @@ class UserRecord(ApiModel):
     email: str
     name: str
     department: str
+    role: UserRole
+    role_locked: bool
     is_admin: bool
     created_at: str
     updated_at: str

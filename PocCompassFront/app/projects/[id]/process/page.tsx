@@ -89,7 +89,7 @@ function StepModal({ step, variant, steps, assignees, initialAssignee = "", onCl
   );
 }
 
-function StepRow({ step, all, lanes, selected, onSelect, onEdit, onDelete }: { step: ProcessStep; all: ProcessStep[]; lanes: string[]; selected: boolean; onSelect: () => void; onEdit: () => void; onDelete: () => void }) {
+function StepRow({ step, all, lanes, selected, canEdit, onSelect, onEdit, onDelete }: { step: ProcessStep; all: ProcessStep[]; lanes: string[]; selected: boolean; canEdit: boolean; onSelect: () => void; onEdit: () => void; onDelete: () => void }) {
   const dangling = danglingNos(step, all);
   return (
     <li
@@ -112,14 +112,14 @@ function StepRow({ step, all, lanes, selected, onSelect, onEdit, onDelete }: { s
           <span className="text-xs text-slate-400">番号順</span>
         )}
       </div>
-      <div className="flex shrink-0 items-center gap-0.5 sm:opacity-0 sm:transition sm:group-focus-within:opacity-100 sm:group-hover:opacity-100">
+      {canEdit && <div className="flex shrink-0 items-center gap-0.5 sm:opacity-0 sm:transition sm:group-focus-within:opacity-100 sm:group-hover:opacity-100">
         <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={`業務${step.no}を編集`} title="編集" onClick={(e) => { e.stopPropagation(); onEdit(); }}>
           <Pencil className="h-4 w-4" />
         </Button>
         <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={`業務${step.no}を削除`} title="削除" onClick={(e) => { e.stopPropagation(); onDelete(); }}>
           <Trash2 className="h-4 w-4" />
         </Button>
-      </div>
+      </div>}
     </li>
   );
 }
@@ -287,7 +287,7 @@ export default function ProcessPage() {
           {(["asis", "tobe"] as const).map((v) => (
             <Card key={v} className="flex min-h-0 flex-1 flex-col !p-3" title={`${variantLabel(v)} のフロー図`} actions={<span className="text-xs text-slate-500">{by[v].length} 件</span>}>
               <div className="min-h-0 flex-1">
-                {by[v].length === 0 ? <EmptyState title={`${SHORT[v]} の業務がまだありません`} description="上のタブで切り替えて登録してください。" /> : <ProcessFlow steps={by[v]} label={variantLabel(v)} />}
+                {by[v].length === 0 ? <EmptyState title={`${SHORT[v]} の業務がまだありません`} description={canEdit ? "上のタブで切り替えて登録してください。" : "編集者が登録すると、ここに出ます。"} /> : <ProcessFlow steps={by[v]} label={variantLabel(v)} />}
               </div>
             </Card>
           ))}
@@ -303,8 +303,8 @@ export default function ProcessPage() {
           {steps.length === 0 ? (
             <EmptyState
               title={`${SHORT[v]} の業務がまだありません`}
-              description="下の入力欄に、業務No・担当者・業務内容を入れて Enter で追加すると、担当者ごとのレーンにフロー図ができあがります。"
-              action={v === "tobe" && by.asis.length > 0 ? (
+              description={canEdit ? "下の入力欄に、業務No・担当者・業務内容を入れて Enter で追加すると、担当者ごとのレーンにフロー図ができあがります。" : "編集者が業務を登録すると、ここにフロー図が出ます。"}
+              action={canEdit && v === "tobe" && by.asis.length > 0 ? (
                 <Button variant="outline" onClick={() => void copyAsIs()} disabled={busy}>
                   <Copy className="h-4 w-4" aria-hidden="true" />
                   AsIs をコピーして始める
@@ -317,7 +317,7 @@ export default function ProcessPage() {
             </div>
           )}
         </Card>
-        <Card className="flex min-h-[12rem] flex-[4] flex-col !p-4" title="業務の一覧" actions={<Button size="sm" variant="outline" onClick={() => setModal({ step: null })}><Plus className="h-4 w-4" aria-hidden="true" />詳しく追加</Button>}>
+        <Card className="flex min-h-[12rem] flex-[4] flex-col !p-4" title="業務の一覧" actions={canEdit ? <Button size="sm" variant="outline" onClick={() => setModal({ step: null })}><Plus className="h-4 w-4" aria-hidden="true" />詳しく追加</Button> : undefined}>
           {steps.length > 0 && (
             <div className="hidden shrink-0 gap-3 px-3 pb-1 text-xs font-semibold text-slate-500 sm:flex">
               <span className="w-12 text-center">No</span><span className="w-36">担当者</span><span className="flex-1">業務内容</span><span className="w-32">次の業務</span><span className="w-[4.5rem]" />
@@ -325,10 +325,10 @@ export default function ProcessPage() {
           )}
           <ul className="thin-scroll min-h-0 flex-1 space-y-0.5 overflow-y-auto">
             {steps.map((s) => (
-              <StepRow key={`${s.id}-${s.updated_at}`} step={s} all={steps} lanes={lanes} selected={s.id === selectedId} onSelect={() => select(s.id === selectedId ? null : s.id)} onEdit={() => setModal({ step: s })} onDelete={() => setDeleting(s)} />
+              <StepRow key={`${s.id}-${s.updated_at}`} step={s} all={steps} lanes={lanes} selected={s.id === selectedId} canEdit={canEdit} onSelect={() => select(s.id === selectedId ? null : s.id)} onEdit={() => setModal({ step: s })} onDelete={() => setDeleting(s)} />
             ))}
           </ul>
-          <QuickAdd key={v} variant={v} steps={steps} assignees={allAssignees} />
+          {canEdit && <QuickAdd key={v} variant={v} steps={steps} assignees={allAssignees} />}
         </Card>
       </div>
     );

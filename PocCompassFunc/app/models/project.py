@@ -40,6 +40,7 @@ class ProjectCreate(ApiModel):
     deadline: date
     members: list[str] = Field(default_factory=list)
     viewers: list[str] = Field(default_factory=list)
+    share_with_department: bool = False
     assumptions: list[AssumptionSeed] = Field(default_factory=list)
     criteria: list[CriterionSeed] = Field(default_factory=list)
 
@@ -72,6 +73,7 @@ class ProjectUpdate(ApiModel):
     status: ProjectStatus | None = None
     members: list[str] | None = None
     viewers: list[str] | None = None
+    share_with_department: bool | None = None
 
     @field_validator("members", "viewers")
     @classmethod
@@ -101,6 +103,7 @@ class Project(StoredModel):
     owner_email: str
     members: list[str]
     viewers: list[str] = Field(default_factory=list)
+    shared_department: str = ""
     deleted: bool = False
     created_at: str
     updated_at: str

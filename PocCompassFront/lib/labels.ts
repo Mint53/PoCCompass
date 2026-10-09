@@ -64,6 +64,12 @@ export const PROJECT_STATUS: Record<string, { label: string; variant: BadgeVaria
   completed: { label: "完了", variant: "green" },
 };
 
+export const USER_ROLE = [
+  { value: "admin", label: "管理者", hint: "全ての取り組みを閲覧・編集。ユーザー管理・モード設定ができる" },
+  { value: "global_viewer", label: "全体閲覧者", hint: "全ての取り組みを閲覧のみ" },
+  { value: "general", label: "一般", hint: "メンバーに入った取り組みと、自分の部署に公開された取り組み" },
+] as const;
+
 export function labelOf<T extends { value: string; label: string }>(list: readonly T[], value: string): string {
   return list.find((x) => x.value === value)?.label ?? value;
 }

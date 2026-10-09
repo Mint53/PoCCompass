@@ -7,6 +7,7 @@ import { api, errorMessage, type Mode } from "@/lib/api/client";
 import { PRIORITY } from "@/lib/labels";
 import { cn, todayIso } from "@/lib/utils";
 import ListEditor, { type ListRow } from "../../components/ListEditor";
+import DepartmentShare from "../../components/DepartmentShare";
 import MemberPicker, { type PickerMember } from "../../components/MemberPicker";
 import Button from "../../components/ui/Button";
 import Card from "../../components/ui/Card";
@@ -35,6 +36,7 @@ function NewProjectForm() {
   const [assumptions, setAssumptions] = useState<ListRow[]>([{ text: "", extra: "high" }]);
   const [criteria, setCriteria] = useState<ListRow[]>([{ text: "", extra: "" }]);
   const [picked, setPicked] = useState<PickerMember[]>([]);
+  const [shareDept, setShareDept] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
   const [saving, setSaving] = useState(false);
 
@@ -97,6 +99,7 @@ function NewProjectForm() {
         deadline,
         members: picked.filter((m) => m.role === "editor").map((m) => m.email),
         viewers: picked.filter((m) => m.role === "viewer").map((m) => m.email),
+        share_with_department: shareDept,
         assumptions: assumptions
           .filter((a) => a.text.trim())
           .map((a) => ({ text: a.text.trim(), priority: a.extra as "high" | "medium" | "low" })),
@@ -174,7 +177,10 @@ function NewProjectForm() {
           disabled={saving}
           isAdmin={me.is_admin}
         />
-        <p className="mt-3 text-xs text-slate-500">あなた（作成者）は自動で編集者として含まれます。メンバーに入っていない人は、この取り組みを見ることができません。</p>
+        <p className="mt-3 text-xs text-slate-500">あなた（作成者）は自動で編集者として含まれます。メンバーに入っていない人は、下で部署に公開しない限り、この取り組みを見ることができません（管理者・全体閲覧者を除く）。</p>
+        <div className="mt-4 border-t border-slate-100 pt-4">
+          <DepartmentShare checked={shareDept} onChange={setShareDept} department={me.department} disabled={saving} />
+        </div>
       </Card>
 
       <div className="flex justify-end gap-2">

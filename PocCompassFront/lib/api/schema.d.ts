@@ -1200,6 +1200,11 @@ export interface components {
             /** Owner Email */
             owner_email: string;
             /**
+             * Shared Department
+             * @default
+             */
+            shared_department: string;
+            /**
              * Start Date
              * Format: date
              */
@@ -1230,6 +1235,11 @@ export interface components {
             /** Members */
             members?: string[];
             mode: components["schemas"]["Mode"];
+            /**
+             * Share With Department
+             * @default false
+             */
+            share_with_department?: boolean;
             /** Start Date */
             start_date?: string | null;
             /** Title */
@@ -1310,6 +1320,8 @@ export interface components {
             /** Members */
             members?: string[] | null;
             mode?: components["schemas"]["Mode"] | null;
+            /** Share With Department */
+            share_with_department?: boolean | null;
             /** Start Date */
             start_date?: string | null;
             status?: components["schemas"]["ProjectStatus"] | null;
@@ -1587,9 +1599,15 @@ export interface components {
             department?: string;
             /** Name */
             name: string;
+            role?: components["schemas"]["UserRole"] | null;
         };
         /** UserContext */
         UserContext: {
+            /**
+             * Department
+             * @default
+             */
+            department: string;
             /** Email */
             email: string;
             /**
@@ -1599,6 +1617,8 @@ export interface components {
             is_admin: boolean;
             /** Name */
             name: string;
+            /** @default general */
+            role: components["schemas"]["UserRole"];
         };
         /** UserCreate */
         UserCreate: {
@@ -1611,6 +1631,7 @@ export interface components {
             email: string;
             /** Name */
             name: string;
+            role?: components["schemas"]["UserRole"] | null;
         };
         /** UserRecord */
         UserRecord: {
@@ -1624,9 +1645,18 @@ export interface components {
             is_admin: boolean;
             /** Name */
             name: string;
+            role: components["schemas"]["UserRole"];
+            /** Role Locked */
+            role_locked: boolean;
             /** Updated At */
             updated_at: string;
         };
+        /**
+         * UserRole
+         * @description Global role stored on the user master (SPEC §3.7, §9).
+         * @enum {string}
+         */
+        UserRole: "admin" | "global_viewer" | "general";
         /** ValidationError */
         ValidationError: {
             /** Context */

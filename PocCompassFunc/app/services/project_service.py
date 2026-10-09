@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import uuid
 
-from app.constants.enums import AssumptionStatus, CriterionStatus, ItemType, MemberRole, ProjectStatus
+from app.constants.enums import AssumptionStatus, CriterionStatus, ItemType, MemberRole, ProjectStatus, UserRole
 from app.core.clock import today_jst, utc_now_iso
 from app.core.errors import ValidationFailed
 from app.models.common import UserContext
@@ -27,6 +27,18 @@ def _ensure_registered(repos: Repos, emails: list[str]) -> None:
             f"ユーザーマスタに登録されていないユーザーです: {', '.join(unknown)}。管理者にユーザー登録を依頼してください。")
 
 
+def _shared_department(repos: Repos, owner_email: str, share: bool) -> str:
+    """Department a project is shared with: the owner's department in the user master, or "" when not shared (SPEC §9)."""
+    if not share:
+        return ""
+    doc = repos.users.get(owner_email)
+    dept = (doc or {}).get("department", "").strip()
+    if not dept:
+        raise ValidationFailed(
+            "作成者の部署がユーザーマスタに登録されていないため、部署に公開できません。管理者に部署の登録を依頼してください。")
+    return dept
+
+
 def _new_item(project_id: str, item_type: ItemType, user: UserContext, fields: dict) -> dict:
     now = utc_now_iso()
     return {"id": str(uuid.uuid4()), "projectId": project_id, "type": item_type.value, "created_at": now,
@@ -43,7 +55,7 @@ def create_project(repos: Repos, body: ProjectCreate, user: UserContext) -> dict
     project = Project(
         id=str(uuid.uuid4()), mode=body.mode, title=body.title, goal=body.goal, start_date=start,
         deadline=body.deadline, status=ProjectStatus.ACTIVE, owner_email=user.email, members=members, viewers=viewers,
-        deleted=False, created_at=now, updated_at=now,
+        shared_department=_shared_department(repos, user.email, body.share_with_department), deleted=False, created_at=now, updated_at=now,
     ).model_dump(mode="json")
     repos.projects.save(project)
     for a in body.assumptions:
@@ -56,7 +68,13 @@ def create_project(repos: Repos, body: ProjectCreate, user: UserContext) -> dict
 
 
 def list_projects(repos: Repos, user: UserContext, mode: str | None = None) -> list[dict]:
-    docs = repos.projects.list_all() if user.is_admin else repos.projects.list_for_member(user.email)
+    if user.is_admin or user.role == UserRole.GLOBAL_VIEWER:
+        docs = repos.projects.list_all()
+    else:
+        found = {d["id"]: d for d in repos.projects.list_for_member(user.email)}
+        if user.department:
+            found.update({d["id"]: d for d in repos.projects.list_for_department(user.department)})
+        docs = sorted(found.values(), key=lambda d: d["updated_at"], reverse=True)
     if mode:
         docs = [d for d in docs if d["mode"] == mode]
     return [Project.model_validate(d).model_dump(mode="json") for d in docs]
@@ -69,8 +87,11 @@ def get_project(repos: Repos, project_id: str, user: UserContext) -> dict:
 def update_project(repos: Repos, project_id: str, body: ProjectUpdate, user: UserContext) -> dict:
     project = load_project_for_edit(repos, project_id, user)
     patch = body.model_dump(mode="json", exclude_unset=True)
-    if any(k in patch for k in ("members", "viewers", "mode")):
+    if any(k in patch for k in ("members", "viewers", "mode", "share_with_department")):
         ensure_owner(project, user)
+    share = patch.pop("share_with_department", None)
+    if share is not None:
+        patch["shared_department"] = _shared_department(repos, project["owner_email"], share)
     if patch.get("members") is not None or patch.get("viewers") is not None:
         current_viewers = project.get("viewers", [])
         members, viewers = _split_roles(
@@ -80,7 +101,7 @@ def update_project(repos: Repos, project_id: str, body: ProjectUpdate, user: Use
         before = {*project["members"], *current_viewers}
         _ensure_registered(repos, [e for e in [*members, *viewers] if e not in before])
         patch["members"], patch["viewers"] = members, viewers
-    merged = {**project, **{k: v for k, v in patch.items() if v is not None}}
+    merged = {**project, **{k: v for k, v in patch.items() if v is not None or k == "shared_department"}}
     if merged["deadline"] < merged["start_date"]:
         raise ValidationFailed("期限は開始日以降の日付にしてください。")
     merged["updated_at"] = utc_now_iso()
