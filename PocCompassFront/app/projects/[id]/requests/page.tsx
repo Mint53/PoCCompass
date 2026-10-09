@@ -109,7 +109,7 @@ function QuickCapture({ onDetail }: { onDetail: (d: Draft) => void }) {
     }
   };
   return (
-    <div className="flex flex-col gap-2 rounded-2xl border border-slate-200 bg-white p-3 card-shadow sm:flex-row sm:items-center">
+    <div className="flex shrink-0 flex-col gap-2 rounded-2xl border border-slate-200 bg-white p-2.5 card-shadow sm:flex-row sm:items-center">
       <Segmented label="種類" size="sm" options={REQUEST_KIND} value={kind} onChange={setKind} />
       <Input
         ref={ref}
@@ -159,43 +159,42 @@ function RequestCard({ item, onEdit, onDelete }: { item: Request; onEdit: () => 
   return (
     <li className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white card-shadow transition hover:border-slate-300">
       <span className={cn("absolute inset-y-0 left-0 w-1.5", st.stripe)} aria-hidden="true" />
-      <div className="space-y-3 py-4 pl-6 pr-4">
-        <div className="flex items-start gap-3">
+      <div className="flex flex-col gap-2 py-2.5 pl-5 pr-3 lg:flex-row lg:items-center lg:gap-4">
+        <div className="flex min-w-0 flex-1 items-start gap-3">
           <span className={cn("mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-xl", k.tone)} title={labelOf(REQUEST_KIND, item.kind)}>
             <k.Icon className="h-4 w-4" aria-hidden="true" />
           </span>
           <div className="min-w-0 flex-1">
-            <h3 className="break-words text-[15px] font-bold leading-snug text-slate-900">{item.title}</h3>
-            <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
+            <h3 className="break-words text-sm font-bold leading-snug text-slate-900">{item.title}</h3>
+            <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-slate-500">
               <span className="font-semibold text-slate-600">{labelOf(REQUEST_KIND, item.kind)}</span>
               <span className="inline-flex items-center gap-1.5"><span className={cn("h-2 w-2 rounded-full", PRIORITY_DOT[item.priority])} aria-hidden="true" />優先度 {labelOf(PRIORITY, item.priority)}</span>
               {item.requester && <span>{item.requester}</span>}
               <span>{formatDate(item.created_at)} 登録</span>
             </div>
-          </div>
-          <span className={cn("inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold ring-1", st.pill)}>
-            <st.Icon className="h-3.5 w-3.5" aria-hidden="true" />
-            {labelOf(REQUEST_ACTION, item.action)}
-          </span>
-          <div className="flex shrink-0 items-center sm:opacity-0 sm:transition sm:group-focus-within:opacity-100 sm:group-hover:opacity-100">
-            <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={`${item.title}を編集`} title="編集" onClick={onEdit} disabled={busy}><Pencil className="h-4 w-4" /></Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={`${item.title}を削除`} title="削除" onClick={onDelete} disabled={busy}><Trash2 className="h-4 w-4" /></Button>
+            {item.description && <p className="mt-1 line-clamp-2 whitespace-pre-wrap break-words text-xs leading-relaxed text-slate-600" title={item.description}>{item.description}</p>}
           </div>
         </div>
-        {item.description && <p className="whitespace-pre-wrap break-words pl-11 text-sm leading-relaxed text-slate-700">{item.description}</p>}
 
-        <div className="pl-11">
+        <div className="flex shrink-0 flex-wrap items-center gap-2 pl-11 lg:pl-0">
           {item.action === "undecided" ? (
-            <div className="flex flex-wrap items-center gap-2 rounded-xl bg-amber-50/60 p-2.5 ring-1 ring-amber-100">
-              <span className="mr-1 text-xs font-semibold text-amber-800">対応しますか？</span>
+            <>
+              <span className={cn("inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold ring-1", st.pill)}>
+                <st.Icon className="h-3.5 w-3.5" aria-hidden="true" />
+                {labelOf(REQUEST_ACTION, item.action)}
+              </span>
               <Button size="sm" onClick={() => decide("needed")} disabled={busy} aria-label="対応要にする"><Check className="h-4 w-4" aria-hidden="true" />対応要</Button>
               <Button size="sm" variant="outline" onClick={() => decide("not_needed")} disabled={busy} aria-label="対応不要にする"><Minus className="h-4 w-4" aria-hidden="true" />対応不要</Button>
-            </div>
+            </>
           ) : (
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <>
+              <span className={cn("inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold ring-1", st.pill)}>
+                <st.Icon className="h-3.5 w-3.5" aria-hidden="true" />
+                {labelOf(REQUEST_ACTION, item.action)}
+              </span>
               <Input
                 aria-label="判断の理由"
-                className="min-w-0 sm:flex-1"
+                className="h-8 w-48 xl:w-60"
                 placeholder="判断の理由（任意）"
                 value={reason}
                 maxLength={1000}
@@ -206,16 +205,18 @@ function RequestCard({ item, onEdit, onDelete }: { item: Request; onEdit: () => 
                 }}
                 disabled={busy}
               />
-              <div className="flex shrink-0 gap-1.5">
-                {item.action === "needed" ? (
-                  <Button size="sm" variant="outline" onClick={() => decide("not_needed")} disabled={busy}>対応不要に変更</Button>
-                ) : (
-                  <Button size="sm" variant="outline" onClick={() => decide("needed")} disabled={busy}>対応要に変更</Button>
-                )}
-                <Button size="sm" variant="ghost" onClick={() => decide("undecided")} disabled={busy} title="未判断に戻す"><Undo2 className="h-4 w-4" aria-hidden="true" />戻す</Button>
-              </div>
-            </div>
+              {item.action === "needed" ? (
+                <Button size="sm" variant="outline" onClick={() => decide("not_needed")} disabled={busy}>対応不要に変更</Button>
+              ) : (
+                <Button size="sm" variant="outline" onClick={() => decide("needed")} disabled={busy}>対応要に変更</Button>
+              )}
+              <Button size="sm" variant="ghost" onClick={() => decide("undecided")} disabled={busy} title="未判断に戻す"><Undo2 className="h-4 w-4" aria-hidden="true" />戻す</Button>
+            </>
           )}
+          <div className="flex shrink-0 items-center sm:opacity-0 sm:transition sm:group-focus-within:opacity-100 sm:group-hover:opacity-100">
+            <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={`${item.title}を編集`} title="編集" onClick={onEdit} disabled={busy}><Pencil className="h-4 w-4" /></Button>
+            <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={`${item.title}を削除`} title="削除" onClick={onDelete} disabled={busy}><Trash2 className="h-4 w-4" /></Button>
+          </div>
         </div>
       </div>
     </li>
@@ -230,8 +231,8 @@ function SummaryTiles({ requests, filter, onFilter }: { requests: Request[]; fil
     ...REQUEST_ACTION.map((a) => ({ value: a.value as Filter, label: a.label, count: n(a.value), accent: ACTION_STYLE[a.value].tile })),
   ];
   return (
-    <div className="space-y-3">
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+    <div className="shrink-0 space-y-2">
+      <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
         {tiles.map((t) => (
           <button
             key={t.value}
@@ -239,17 +240,17 @@ function SummaryTiles({ requests, filter, onFilter }: { requests: Request[]; fil
             aria-pressed={filter === t.value}
             onClick={() => onFilter(t.value)}
             className={cn(
-              "rounded-2xl border bg-white p-4 text-left card-shadow transition focus:outline-none focus-visible:ring-4 focus-visible:ring-primary/25",
+              "flex items-center justify-between rounded-xl border bg-white px-4 py-2 text-left card-shadow transition focus:outline-none focus-visible:ring-4 focus-visible:ring-primary/25",
               filter === t.value ? "border-primary ring-2 ring-primary/20" : "border-slate-200 hover:border-slate-300",
             )}
           >
-            <p className="text-xs font-semibold text-slate-500">{t.label}</p>
-            <p className={cn("mt-1 text-3xl font-extrabold tabular-nums", t.accent)}>{t.count}</p>
+            <span className="text-xs font-semibold text-slate-500">{t.label}</span>
+            <span className={cn("text-2xl font-extrabold tabular-nums leading-none", t.accent)}>{t.count}</span>
           </button>
         ))}
       </div>
       {total > 0 && (
-        <div className="flex h-2 overflow-hidden rounded-full bg-slate-100" role="img" aria-label={`判断済み ${total - n("undecided")} / ${total} 件`}>
+        <div className="flex h-1.5 overflow-hidden rounded-full bg-slate-100" role="img" aria-label={`判断済み ${total - n("undecided")} / ${total} 件`}>
           {REQUEST_ACTION.map((a) => <div key={a.value} className={cn("h-full transition-all duration-500", ACTION_STYLE[a.value].bar)} style={{ width: `${(n(a.value) / total) * 100}%` }} />)}
         </div>
       )}
@@ -294,11 +295,12 @@ export default function RequestsPage() {
   const undecided = items.requests.filter((r) => r.action === "undecided").length;
 
   return (
-    <div className="space-y-5">
+    <div className="flex h-full min-h-0 flex-col gap-3">
       <QuickCapture onDetail={(initial) => setModal({ item: null, initial })} />
       <SummaryTiles requests={items.requests} filter={filter} onFilter={setFilter} />
 
       <Card
+        className="flex min-h-0 flex-1 flex-col !p-4"
         title={undecided > 0 ? `要望・課題の一覧（判断待ち ${undecided} 件）` : "要望・課題の一覧"}
         actions={
           <>
@@ -311,14 +313,16 @@ export default function RequestsPage() {
           </>
         }
       >
+        <div className="-mr-2 min-h-0 flex-1 overflow-y-auto pr-2">
         {shown.length === 0 ? (
           <EmptyState
             title={items.requests.length === 0 ? "要望・課題はまだありません" : "該当するものはありません"}
             description={items.requests.length === 0 ? "上の入力欄に一言入れて Enter で登録できます。登録したら、対応するかどうかをここで判断します。" : "絞り込みや検索の条件を変えてみてください。"}
           />
         ) : (
-          <ul className="space-y-3">{shown.map((r) => <RequestCard key={`${r.id}-${r.updated_at}`} item={r} onEdit={() => setModal({ item: r })} onDelete={() => setDeleting(r)} />)}</ul>
+          <ul className="space-y-2">{shown.map((r) => <RequestCard key={`${r.id}-${r.updated_at}`} item={r} onEdit={() => setModal({ item: r })} onDelete={() => setDeleting(r)} />)}</ul>
         )}
+        </div>
       </Card>
 
       {modal && <RequestModal key={modal.item?.id ?? "new"} item={modal.item} initial={modal.initial} onClose={() => setModal(null)} />}
