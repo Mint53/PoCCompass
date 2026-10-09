@@ -52,7 +52,7 @@ export default function Modal({
       window.removeEventListener("keydown", onKey);
       opener?.focus?.();
     };
-  }, [open, onClose]);
+  }, [open, onClose, me]);
 
   if (!open || typeof document === "undefined") return null;
   return createPortal(
