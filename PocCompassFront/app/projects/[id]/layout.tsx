@@ -51,7 +51,7 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
   ];
   const status = PROJECT_STATUS[project.status];
   // Viewers cannot edit: these screens are made of inputs and buttons, so lock them wholesale (the API also answers 403).
-  const readOnlyPage = !canEdit && [`${base}/tasks`, `${base}/evidence`, `${base}/design`, `${base}/requests`, `${base}/process`, `${base}/requests`].includes(pathname);
+  const readOnlyPage = !canEdit && [`${base}/tasks`, `${base}/evidence`, `${base}/design`].includes(pathname);
   // SPEC §12.3: these screens fit the viewport at 100% zoom; their content scrolls inside, not the page.
   const fit = [base, `${base}/analysis`, `${base}/wbs`, `${base}/compass`, `${base}/report`, `${base}/process`, `${base}/requests`].includes(pathname);
 

@@ -136,7 +136,7 @@ function QuickCapture({ onDetail }: { onDetail: (d: Draft) => void }) {
 }
 
 function RequestCard({ item, onEdit, onDelete }: { item: Request; onEdit: () => void; onDelete: () => void }) {
-  const { project, reloadItems } = useProject();
+  const { project, reloadItems, canEdit } = useProject();
   const { toast } = useToast();
   const [reason, setReason] = useState(item.action_reason);
   const [busy, setBusy] = useState(false);
@@ -177,7 +177,15 @@ function RequestCard({ item, onEdit, onDelete }: { item: Request; onEdit: () => 
         </div>
 
         <div className="flex shrink-0 flex-wrap items-center gap-2 pl-11 lg:pl-0">
-          {item.action === "undecided" ? (
+          {!canEdit ? (
+            <>
+              <span className={cn("inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold ring-1", st.pill)}>
+                <st.Icon className="h-3.5 w-3.5" aria-hidden="true" />
+                {labelOf(REQUEST_ACTION, item.action)}
+              </span>
+              {item.action_reason && <span className="max-w-60 truncate text-xs text-slate-600" title={item.action_reason}>{item.action_reason}</span>}
+            </>
+          ) : item.action === "undecided" ? (
             <>
               <span className={cn("inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold ring-1", st.pill)}>
                 <st.Icon className="h-3.5 w-3.5" aria-hidden="true" />
@@ -213,10 +221,10 @@ function RequestCard({ item, onEdit, onDelete }: { item: Request; onEdit: () => 
               <Button size="sm" variant="ghost" onClick={() => decide("undecided")} disabled={busy} title="未判断に戻す"><Undo2 className="h-4 w-4" aria-hidden="true" />戻す</Button>
             </>
           )}
-          <div className="flex shrink-0 items-center sm:opacity-0 sm:transition sm:group-focus-within:opacity-100 sm:group-hover:opacity-100">
+          {canEdit && <div className="flex shrink-0 items-center sm:opacity-0 sm:transition sm:group-focus-within:opacity-100 sm:group-hover:opacity-100">
             <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={`${item.title}を編集`} title="編集" onClick={onEdit} disabled={busy}><Pencil className="h-4 w-4" /></Button>
             <Button variant="ghost" size="icon" className="h-8 w-8" aria-label={`${item.title}を削除`} title="削除" onClick={onDelete} disabled={busy}><Trash2 className="h-4 w-4" /></Button>
-          </div>
+          </div>}
         </div>
       </div>
     </li>
@@ -259,7 +267,7 @@ function SummaryTiles({ requests, filter, onFilter }: { requests: Request[]; fil
 }
 
 export default function RequestsPage() {
-  const { project, items, reloadItems } = useProject();
+  const { project, items, reloadItems, canEdit } = useProject();
   const { toast } = useToast();
   const [filter, setFilter] = useState<Filter>("all");
   const [kind, setKind] = useState<"all" | Kind>("all");
@@ -296,7 +304,7 @@ export default function RequestsPage() {
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-3">
-      <QuickCapture onDetail={(initial) => setModal({ item: null, initial })} />
+      {canEdit && <QuickCapture onDetail={(initial) => setModal({ item: null, initial })} />}
       <SummaryTiles requests={items.requests} filter={filter} onFilter={setFilter} />
 
       <Card
@@ -317,7 +325,7 @@ export default function RequestsPage() {
         {shown.length === 0 ? (
           <EmptyState
             title={items.requests.length === 0 ? "要望・課題はまだありません" : "該当するものはありません"}
-            description={items.requests.length === 0 ? "上の入力欄に一言入れて Enter で登録できます。登録したら、対応するかどうかをここで判断します。" : "絞り込みや検索の条件を変えてみてください。"}
+            description={items.requests.length === 0 ? (canEdit ? "上の入力欄に一言入れて Enter で登録できます。登録したら、対応するかどうかをここで判断します。" : "編集者が登録すると、ここに出ます。") : "絞り込みや検索の条件を変えてみてください。"}
           />
         ) : (
           <ul className="space-y-2">{shown.map((r) => <RequestCard key={`${r.id}-${r.updated_at}`} item={r} onEdit={() => setModal({ item: r })} onDelete={() => setDeleting(r)} />)}</ul>
