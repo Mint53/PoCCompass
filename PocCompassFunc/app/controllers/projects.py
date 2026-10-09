@@ -11,7 +11,7 @@ from app.models.evaluation import Evaluation
 from app.models.project import Project, ProjectCreate, ProjectUpdate
 from app.models.report import ExtractRequest, ExtractResponse, Report
 from app.models.user import ProjectMember
-from app.services import compass_service, evaluation_service, project_service, report_service
+from app.services import compass_service, evaluation_service, project_service, report_service, sample_service
 from app.services.context import Repos
 from app.services.llm_client import LlmClient
 
@@ -28,6 +28,11 @@ def list_projects(mode: Mode | None = Query(default=None), user: UserContext = D
 def create_project(body: ProjectCreate, user: UserContext = Depends(get_current_user),
                    repos: Repos = Depends(get_repos)):
     return project_service.create_project(repos, body, user)
+
+
+@router.post("/samples", response_model=list[Project], status_code=201)
+def create_samples(user: UserContext = Depends(get_current_user), repos: Repos = Depends(get_repos)):
+    return sample_service.create_samples(repos, user)
 
 
 @router.get("/{project_id}", response_model=Project)

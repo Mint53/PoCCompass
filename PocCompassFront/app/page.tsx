@@ -1,13 +1,16 @@
 "use client";
 
-import { CalendarClock, Plus } from "lucide-react";
+import { CalendarClock, FlaskConical, Plus } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { api, errorMessage, type Mode, type Project } from "@/lib/api/client";
 import { PROJECT_STATUS, scoreColor } from "@/lib/labels";
 import { cn, formatDate, formatDateTime } from "@/lib/utils";
 import Badge from "./components/ui/Badge";
+import Button from "./components/ui/Button";
+import ConfirmDialog from "./components/ui/ConfirmDialog";
 import { EmptyState, ErrorState } from "./components/ui/States";
+import { useToast } from "./components/ui/ToastProvider";
 import { useApp } from "./contexts/AppContext";
 
 const FILTER_KEY = "poc-compass.mode-filter";
@@ -17,6 +20,9 @@ export default function ProjectListPage() {
   const [filter, setFilter] = useState<Mode | "all">("all");
   const [projects, setProjects] = useState<Project[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
+  const [sampleOpen, setSampleOpen] = useState(false);
+  const [sampleBusy, setSampleBusy] = useState(false);
 
   useEffect(() => {
     try {
@@ -50,6 +56,20 @@ export default function ProjectListPage() {
     }
   };
 
+  const createSamples = async () => {
+    setSampleBusy(true);
+    try {
+      await api.createSamples();
+      setSampleOpen(false);
+      toast({ tone: "success", message: "サンプルの取り組みを 3 件作成しました。" });
+      await load();
+    } catch (e) {
+      toast({ tone: "error", message: errorMessage(e) });
+    } finally {
+      setSampleBusy(false);
+    }
+  };
+
   const newHref = `/projects/new${filter === "all" ? "" : `?mode=${filter}`}`;
 
   return (
@@ -61,6 +81,11 @@ export default function ProjectListPage() {
             目的・仮説・成功条件からのズレを AI が見張ります。モードを選んで絞り込めます。
           </p>
         </div>
+        <div className="flex flex-wrap items-center gap-2">
+        <Button variant="outline" className="h-10" onClick={() => setSampleOpen(true)}>
+          <FlaskConical className="h-4 w-4" aria-hidden="true" />
+          サンプルを作成
+        </Button>
         <Link
           href={newHref}
           className="inline-flex h-10 items-center gap-2 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-ring"
@@ -68,6 +93,7 @@ export default function ProjectListPage() {
           <Plus className="h-4 w-4" aria-hidden="true" />
           新しい取り組み
         </Link>
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-2" role="tablist" aria-label="モードで絞り込み">
@@ -166,6 +192,15 @@ export default function ProjectListPage() {
           })}
         </div>
       )}
+      <ConfirmDialog
+        open={sampleOpen}
+        title="サンプルの取り組みを作成しますか？"
+        description="PoC・企画・業務改善の 3 モード分、設計・タスク・検証データ・要望課題・業務整理まで記入済みの取り組みを作ります。作成後は設定画面から削除できます。"
+        confirmLabel="作成する"
+        busy={sampleBusy}
+        onConfirm={createSamples}
+        onClose={() => setSampleOpen(false)}
+      />
     </div>
   );
 }

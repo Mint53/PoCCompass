@@ -190,6 +190,27 @@ function SceneDecide() {
   );
 }
 
+function SceneNotes() {
+  return (
+    <Stage>
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center gap-1.5">
+          <Chip tone="slate" style={{ "--i": 0 } as CSSProperties}>要望・課題</Chip>
+          <Chip tone="emerald" style={{ "--i": 1 } as CSSProperties}>対応要</Chip>
+          <Chip tone="slate" style={{ "--i": 2 } as CSSProperties}>対応不要</Chip>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <Chip tone="slate" style={{ "--i": 3 } as CSSProperties}>AsIs</Chip>
+          <svg width="22" height="12" viewBox="0 0 22 12" className="stagger text-slate-400" style={{ "--i": 4 } as CSSProperties}>
+            <path d="M1 6h18m-5-5 5 5-5 5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          <Chip tone="brand" style={{ "--i": 5 } as CSSProperties}>ToBe フロー図</Chip>
+        </div>
+      </div>
+    </Stage>
+  );
+}
+
 /* ---- dialog ---- */
 
 export default function GuideDialog({ open, onClose, labels: l }: { open: boolean; onClose: () => void; labels: Labels }) {
@@ -255,6 +276,16 @@ export default function GuideDialog({ open, onClose, labels: l }: { open: boolea
         </p>
       ),
       scene: <SceneDecide />,
+    },
+    {
+      title: "6. 要望・課題と業務を整理する",
+      tab: "整理",
+      body: (
+        <p>
+          「要望・課題」タブでは、出てきた声を登録して<b>対応要・対応不要を人が判断</b>し、理由を残せます。「業務整理」タブでは、AsIs（現状）と ToBe（あるべき姿）の業務を 業務No・担当者・業務内容で入力すると、担当者ごとのフロー図になります。どちらも健全度や AI 評価には影響しません。
+        </p>
+      ),
+      scene: <SceneNotes />,
     },
   ];
 

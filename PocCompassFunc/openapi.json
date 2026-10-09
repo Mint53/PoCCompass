@@ -1401,6 +1401,38 @@
    "ItemPatch": {
     "description": "Partial update. The service merges it into the stored item and re-validates with the type's model.",
     "properties": {
+     "action": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/RequestAction"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "action_reason": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Action Reason"
+     },
+     "assignee": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Assignee"
+     },
      "clear_due_date": {
       "default": false,
       "title": "Clear Due Date",
@@ -1415,6 +1447,17 @@
       "default": false,
       "title": "Clear Start Date",
       "type": "boolean"
+     },
+     "content": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Content"
      },
      "description": {
       "anyOf": [
@@ -1450,6 +1493,16 @@
       ],
       "title": "Effort Hours"
      },
+     "kind": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/RequestKind"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
      "linked_assumption_ids": {
       "anyOf": [
        {
@@ -1478,6 +1531,31 @@
       ],
       "title": "Linked Criterion Ids"
      },
+     "next_nos": {
+      "anyOf": [
+       {
+        "items": {
+         "type": "string"
+        },
+        "type": "array"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Next Nos"
+     },
+     "no": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "No"
+     },
      "note": {
       "anyOf": [
        {
@@ -1498,6 +1576,17 @@
         "type": "null"
        }
       ]
+     },
+     "requester": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Requester"
      },
      "result": {
       "anyOf": [
@@ -1918,6 +2007,134 @@
     "title": "Priority",
     "type": "string"
    },
+   "ProcessStep": {
+    "properties": {
+     "assignee": {
+      "default": "",
+      "maxLength": 50,
+      "title": "Assignee",
+      "type": "string"
+     },
+     "content": {
+      "maxLength": 1000,
+      "minLength": 1,
+      "title": "Content",
+      "type": "string"
+     },
+     "created_at": {
+      "title": "Created At",
+      "type": "string"
+     },
+     "created_by": {
+      "title": "Created By",
+      "type": "string"
+     },
+     "id": {
+      "title": "Id",
+      "type": "string"
+     },
+     "next_nos": {
+      "items": {
+       "type": "string"
+      },
+      "maxItems": 10,
+      "title": "Next Nos",
+      "type": "array"
+     },
+     "no": {
+      "maxLength": 20,
+      "minLength": 1,
+      "title": "No",
+      "type": "string"
+     },
+     "projectId": {
+      "title": "Projectid",
+      "type": "string"
+     },
+     "type": {
+      "const": "process_step",
+      "default": "process_step",
+      "title": "Type",
+      "type": "string"
+     },
+     "updated_at": {
+      "title": "Updated At",
+      "type": "string"
+     },
+     "variant": {
+      "$ref": "#/components/schemas/ProcessVariant"
+     }
+    },
+    "required": [
+     "type",
+     "variant",
+     "no",
+     "assignee",
+     "content",
+     "next_nos",
+     "id",
+     "projectId",
+     "created_at",
+     "updated_at",
+     "created_by"
+    ],
+    "title": "ProcessStep",
+    "type": "object"
+   },
+   "ProcessStepFields": {
+    "properties": {
+     "assignee": {
+      "default": "",
+      "maxLength": 50,
+      "title": "Assignee",
+      "type": "string"
+     },
+     "content": {
+      "maxLength": 1000,
+      "minLength": 1,
+      "title": "Content",
+      "type": "string"
+     },
+     "next_nos": {
+      "items": {
+       "type": "string"
+      },
+      "maxItems": 10,
+      "title": "Next Nos",
+      "type": "array"
+     },
+     "no": {
+      "maxLength": 20,
+      "minLength": 1,
+      "title": "No",
+      "type": "string"
+     },
+     "type": {
+      "const": "process_step",
+      "default": "process_step",
+      "title": "Type",
+      "type": "string"
+     },
+     "variant": {
+      "$ref": "#/components/schemas/ProcessVariant"
+     }
+    },
+    "required": [
+     "variant",
+     "no",
+     "content"
+    ],
+    "title": "ProcessStepFields",
+    "type": "object"
+   },
+   "ProcessVariant": {
+    "enum": [
+     "asis",
+     "tobe"
+    ],
+    "title": "ProcessVariant",
+    "type": "string"
+   },
    "Project": {
     "properties": {
      "created_at": {
@@ -2112,6 +2329,20 @@
       "title": "Feedback",
       "type": "array"
      },
+     "process_steps": {
+      "items": {
+       "$ref": "#/components/schemas/ProcessStep"
+      },
+      "title": "Process Steps",
+      "type": "array"
+     },
+     "requests": {
+      "items": {
+       "$ref": "#/components/schemas/Request"
+      },
+      "title": "Requests",
+      "type": "array"
+     },
      "tasks": {
       "items": {
        "$ref": "#/components/schemas/Task"
@@ -2126,6 +2357,8 @@
      "tasks",
      "evidence",
      "decisions",
+     "requests",
+     "process_steps",
      "feedback"
     ],
     "title": "ProjectItems",
@@ -2487,6 +2720,157 @@
     ],
     "title": "ReportOption",
     "type": "object"
+   },
+   "Request": {
+    "properties": {
+     "action": {
+      "$ref": "#/components/schemas/RequestAction",
+      "default": "undecided"
+     },
+     "action_reason": {
+      "default": "",
+      "maxLength": 1000,
+      "title": "Action Reason",
+      "type": "string"
+     },
+     "created_at": {
+      "title": "Created At",
+      "type": "string"
+     },
+     "created_by": {
+      "title": "Created By",
+      "type": "string"
+     },
+     "description": {
+      "default": "",
+      "maxLength": 1000,
+      "title": "Description",
+      "type": "string"
+     },
+     "id": {
+      "title": "Id",
+      "type": "string"
+     },
+     "kind": {
+      "$ref": "#/components/schemas/RequestKind",
+      "default": "request"
+     },
+     "priority": {
+      "$ref": "#/components/schemas/Priority",
+      "default": "medium"
+     },
+     "projectId": {
+      "title": "Projectid",
+      "type": "string"
+     },
+     "requester": {
+      "default": "",
+      "maxLength": 50,
+      "title": "Requester",
+      "type": "string"
+     },
+     "title": {
+      "maxLength": 100,
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+     },
+     "type": {
+      "const": "request",
+      "default": "request",
+      "title": "Type",
+      "type": "string"
+     },
+     "updated_at": {
+      "title": "Updated At",
+      "type": "string"
+     }
+    },
+    "required": [
+     "type",
+     "kind",
+     "title",
+     "description",
+     "requester",
+     "priority",
+     "action",
+     "action_reason",
+     "id",
+     "projectId",
+     "created_at",
+     "updated_at",
+     "created_by"
+    ],
+    "title": "Request",
+    "type": "object"
+   },
+   "RequestAction": {
+    "enum": [
+     "undecided",
+     "needed",
+     "not_needed"
+    ],
+    "title": "RequestAction",
+    "type": "string"
+   },
+   "RequestFields": {
+    "properties": {
+     "action": {
+      "$ref": "#/components/schemas/RequestAction",
+      "default": "undecided"
+     },
+     "action_reason": {
+      "default": "",
+      "maxLength": 1000,
+      "title": "Action Reason",
+      "type": "string"
+     },
+     "description": {
+      "default": "",
+      "maxLength": 1000,
+      "title": "Description",
+      "type": "string"
+     },
+     "kind": {
+      "$ref": "#/components/schemas/RequestKind",
+      "default": "request"
+     },
+     "priority": {
+      "$ref": "#/components/schemas/Priority",
+      "default": "medium"
+     },
+     "requester": {
+      "default": "",
+      "maxLength": 50,
+      "title": "Requester",
+      "type": "string"
+     },
+     "title": {
+      "maxLength": 100,
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+     },
+     "type": {
+      "const": "request",
+      "default": "request",
+      "title": "Type",
+      "type": "string"
+     }
+    },
+    "required": [
+     "title"
+    ],
+    "title": "RequestFields",
+    "type": "object"
+   },
+   "RequestKind": {
+    "enum": [
+     "request",
+     "issue"
+    ],
+    "title": "RequestKind",
+    "type": "string"
    },
    "ScheduleView": {
     "properties": {
@@ -3413,6 +3797,31 @@
     ]
    }
   },
+  "/api/projects/samples": {
+   "post": {
+    "operationId": "create_samples_api_projects_samples_post",
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/Project"
+         },
+         "title": "Response Create Samples Api Projects Samples Post",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Create Samples",
+    "tags": [
+     "projects"
+    ]
+   }
+  },
   "/api/projects/{project_id}": {
    "delete": {
     "operationId": "delete_project_api_projects__project_id__delete",
@@ -3998,6 +4407,8 @@
            "decision": "#/components/schemas/DecisionItem",
            "evidence": "#/components/schemas/Evidence",
            "feedback": "#/components/schemas/Feedback",
+           "process_step": "#/components/schemas/ProcessStep",
+           "request": "#/components/schemas/Request",
            "task": "#/components/schemas/Task"
           },
           "propertyName": "type"
@@ -4017,6 +4428,12 @@
           },
           {
            "$ref": "#/components/schemas/DecisionItem"
+          },
+          {
+           "$ref": "#/components/schemas/Request"
+          },
+          {
+           "$ref": "#/components/schemas/ProcessStep"
           },
           {
            "$ref": "#/components/schemas/Feedback"
@@ -4109,6 +4526,8 @@
           "criterion": "#/components/schemas/CriterionFields",
           "decision": "#/components/schemas/DecisionFields",
           "evidence": "#/components/schemas/EvidenceFields",
+          "process_step": "#/components/schemas/ProcessStepFields",
+          "request": "#/components/schemas/RequestFields",
           "task": "#/components/schemas/TaskFields"
          },
          "propertyName": "type"
@@ -4128,6 +4547,12 @@
          },
          {
           "$ref": "#/components/schemas/DecisionFields"
+         },
+         {
+          "$ref": "#/components/schemas/RequestFields"
+         },
+         {
+          "$ref": "#/components/schemas/ProcessStepFields"
          }
         ],
         "title": "Body"
@@ -4148,6 +4573,8 @@
            "decision": "#/components/schemas/DecisionItem",
            "evidence": "#/components/schemas/Evidence",
            "feedback": "#/components/schemas/Feedback",
+           "process_step": "#/components/schemas/ProcessStep",
+           "request": "#/components/schemas/Request",
            "task": "#/components/schemas/Task"
           },
           "propertyName": "type"
@@ -4167,6 +4594,12 @@
           },
           {
            "$ref": "#/components/schemas/DecisionItem"
+          },
+          {
+           "$ref": "#/components/schemas/Request"
+          },
+          {
+           "$ref": "#/components/schemas/ProcessStep"
           },
           {
            "$ref": "#/components/schemas/Feedback"
@@ -4232,6 +4665,8 @@
             "decision": "#/components/schemas/DecisionItem",
             "evidence": "#/components/schemas/Evidence",
             "feedback": "#/components/schemas/Feedback",
+            "process_step": "#/components/schemas/ProcessStep",
+            "request": "#/components/schemas/Request",
             "task": "#/components/schemas/Task"
            },
            "propertyName": "type"
@@ -4251,6 +4686,12 @@
            },
            {
             "$ref": "#/components/schemas/DecisionItem"
+           },
+           {
+            "$ref": "#/components/schemas/Request"
+           },
+           {
+            "$ref": "#/components/schemas/ProcessStep"
            },
            {
             "$ref": "#/components/schemas/Feedback"
@@ -4368,6 +4809,8 @@
            "decision": "#/components/schemas/DecisionItem",
            "evidence": "#/components/schemas/Evidence",
            "feedback": "#/components/schemas/Feedback",
+           "process_step": "#/components/schemas/ProcessStep",
+           "request": "#/components/schemas/Request",
            "task": "#/components/schemas/Task"
           },
           "propertyName": "type"
@@ -4387,6 +4830,12 @@
           },
           {
            "$ref": "#/components/schemas/DecisionItem"
+          },
+          {
+           "$ref": "#/components/schemas/Request"
+          },
+          {
+           "$ref": "#/components/schemas/ProcessStep"
           },
           {
            "$ref": "#/components/schemas/Feedback"

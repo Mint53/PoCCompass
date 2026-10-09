@@ -2,7 +2,7 @@ import type { Config } from "tailwindcss";
 
 // Tokens live in app/globals.css (:root). Do not hard-code brand colors in components.
 const config: Config = {
-  content: ["./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}"],
+  content: ["./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./lib/**/*.{ts,tsx}"],
   theme: {
     extend: {
       colors: {

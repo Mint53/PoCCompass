@@ -9,7 +9,7 @@ import re
 from pathlib import Path
 
 from app.constants import limits
-from app.constants.enums import Container, Mode, Verdict
+from app.constants.enums import Container, ItemType, Mode, ProcessVariant, RequestAction, RequestKind, Verdict
 from app.modes.defaults import DEFAULT_MODES
 
 SPEC = (Path(__file__).resolve().parents[2] / "docs" / "SPEC.md").read_text(encoding="utf-8")
@@ -66,3 +66,21 @@ def test_user_master_numbers_match_spec():
     assert f"| name | str (1〜{limits.USER_NAME_MAX})" in SPEC
     assert f"| department | str (0〜{limits.DEPARTMENT_MAX})" in SPEC
     assert f"`limit` 既定 **{limits.USER_SEARCH_DEFAULT}**・最大 **{limits.USER_LIST_MAX}**" in SPEC
+
+
+def test_item_types_and_new_enums_documented():
+    for t in ItemType:
+        assert f"| `{t.value}` |" in SPEC, f"item type {t.value} missing in SPEC §3.2"
+    for e in (*RequestKind, *RequestAction, *ProcessVariant):
+        assert f"`{e.value}`" in SPEC
+
+
+def test_process_no_limit_matches_spec():
+    assert f"最大 {limits.PROCESS_NO_MAX} 字" in SPEC
+
+
+def test_samples_documented_and_cover_every_mode():
+    from app.services.sample_data import SAMPLE_TITLE_PREFIX, SAMPLES
+
+    assert set(SAMPLES) == set(Mode)
+    assert f"`{SAMPLE_TITLE_PREFIX}`" in SPEC

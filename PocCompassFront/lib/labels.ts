@@ -42,6 +42,22 @@ export const EVIDENCE_RESULT = [
   { value: "inconclusive", label: "判断できない" },
 ] as const;
 
+export const REQUEST_KIND = [
+  { value: "request", label: "要望" },
+  { value: "issue", label: "課題" },
+] as const;
+
+export const REQUEST_ACTION = [
+  { value: "undecided", label: "未判断" },
+  { value: "needed", label: "対応要" },
+  { value: "not_needed", label: "対応不要" },
+] as const;
+
+export const PROCESS_VARIANT = [
+  { value: "asis", label: "AsIs（現状）" },
+  { value: "tobe", label: "ToBe（あるべき姿）" },
+] as const;
+
 export const PROJECT_STATUS: Record<string, { label: string; variant: BadgeVariant }> = {
   active: { label: "進行中", variant: "brand" },
   stopped: { label: "停止", variant: "slate" },
