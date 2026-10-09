@@ -7,6 +7,7 @@ import { api, errorMessage, type Mode } from "@/lib/api/client";
 import { PRIORITY } from "@/lib/labels";
 import { cn, todayIso } from "@/lib/utils";
 import ListEditor, { type ListRow } from "../../components/ListEditor";
+import MemberPicker, { type PickerMember } from "../../components/MemberPicker";
 import Button from "../../components/ui/Button";
 import Card from "../../components/ui/Card";
 import DateField from "../../components/ui/DateField";
@@ -17,17 +18,10 @@ import Textarea from "../../components/ui/Textarea";
 import { useToast } from "../../components/ui/ToastProvider";
 import { useApp } from "../../contexts/AppContext";
 
-type Errors = Partial<Record<"title" | "goal" | "deadline" | "assumptions" | "criteria" | "members", string>>;
-
-function parseEmails(text: string): string[] {
-  return text
-    .split(/[\s,、]+/)
-    .map((s) => s.trim())
-    .filter(Boolean);
-}
+type Errors = Partial<Record<"title" | "goal" | "deadline" | "assumptions" | "criteria", string>>;
 
 function NewProjectForm() {
-  const { modes, modeOf } = useApp();
+  const { modes, modeOf, me } = useApp();
   const router = useRouter();
   const { toast } = useToast();
   const params = useSearchParams();
@@ -40,7 +34,7 @@ function NewProjectForm() {
   const [deadline, setDeadline] = useState("");
   const [assumptions, setAssumptions] = useState<ListRow[]>([{ text: "", extra: "high" }]);
   const [criteria, setCriteria] = useState<ListRow[]>([{ text: "", extra: "" }]);
-  const [members, setMembers] = useState("");
+  const [picked, setPicked] = useState<PickerMember[]>([]);
   const [errors, setErrors] = useState<Errors>({});
   const [saving, setSaving] = useState(false);
 
@@ -86,8 +80,6 @@ function NewProjectForm() {
     else if (startDate && deadline < startDate) e.deadline = `${lb.deadline}は開始日以降の日付にしてください。`;
     if (!assumptions.some((a) => a.text.trim())) e.assumptions = `${lb.assumption}を 1 つ以上入力してください（AI の判定に必要です）。`;
     if (!criteria.some((c) => c.text.trim())) e.criteria = `${lb.criterion}を 1 つ以上入力してください（AI の判定に必要です）。`;
-    const bad = parseEmails(members).filter((m) => !/^[^@\s]+@[^@\s]+$/.test(m));
-    if (bad.length) e.members = `メールアドレスの形式が正しくありません: ${bad.join(", ")}`;
     return e;
   };
 
@@ -103,7 +95,8 @@ function NewProjectForm() {
         goal: goal.trim(),
         start_date: startDate || null,
         deadline,
-        members: parseEmails(members),
+        members: picked.filter((m) => m.role === "editor").map((m) => m.email),
+        viewers: picked.filter((m) => m.role === "viewer").map((m) => m.email),
         assumptions: assumptions
           .filter((a) => a.text.trim())
           .map((a) => ({ text: a.text.trim(), priority: a.extra as "high" | "medium" | "low" })),
@@ -175,9 +168,13 @@ function NewProjectForm() {
       </Card>
 
       <Card title="メンバー">
-        <Field label="一緒に使うメンバーのメールアドレス" htmlFor="members" error={errors.members} hint="カンマ・空白・改行区切り。あなた（作成者）は自動で含まれます。メンバーだけが閲覧・編集できます。">
-          <Textarea id="members" rows={2} value={members} placeholder="taro.yamada@example.com, hanako.sato@example.com" onChange={(e) => setMembers(e.target.value)} disabled={saving} />
-        </Field>
+        <MemberPicker
+          members={[{ email: me.email, name: me.name, department: "", role: "owner" }, ...picked]}
+          onChange={(next) => setPicked(next.filter((m) => m.role !== "owner"))}
+          disabled={saving}
+          isAdmin={me.is_admin}
+        />
+        <p className="mt-3 text-xs text-slate-500">あなた（作成者）は自動で編集者として含まれます。メンバーに入っていない人は、この取り組みを見ることができません。</p>
       </Card>
 
       <div className="flex justify-end gap-2">

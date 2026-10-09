@@ -32,6 +32,11 @@ class NotFound(AppError):
     code = "NOT_FOUND"
 
 
+class Conflict(AppError):
+    status_code = 409
+    code = "CONFLICT"
+
+
 class AiNotConfigured(AppError):
     status_code = 503
     code = "AI_NOT_CONFIGURED"

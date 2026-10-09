@@ -15,7 +15,7 @@ from app.models.dashboard import Dashboard
 from app.models.evaluation import Evaluation
 from app.models.project import ProjectSummary
 from app.services import metrics
-from app.services.access import load_project_for
+from app.services.access import load_project_for, load_project_for_edit
 from app.services.alignment_evaluator import evaluate_tasks
 from app.services.context import Repos
 from app.services.llm_client import LlmClient
@@ -78,7 +78,7 @@ def _refresh_summary(repos: Repos, project: dict, items: list[dict], evaluation:
 
 
 def evaluate_project(repos: Repos, llm: LlmClient, project_id: str, user: UserContext) -> dict:
-    project = load_project_for(repos, project_id, user)
+    project = load_project_for_edit(repos, project_id, user)
     return run_evaluation(repos, llm, project, EvaluationTrigger.MANUAL)
 
 

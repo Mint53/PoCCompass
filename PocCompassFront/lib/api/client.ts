@@ -30,6 +30,11 @@ export type Evaluation = S["Evaluation"];
 export type Report = S["Report"];
 export type ExtractedTask = S["ExtractedTask"];
 export type UserContext = S["UserContext"];
+export type UserRecord = S["UserRecord"];
+export type UserBody = S["UserBody"];
+export type UserCreate = S["UserCreate"];
+export type ProjectMember = S["ProjectMember"];
+export type MemberRole = S["MemberRole"];
 export type Verdict = S["Verdict"];
 export type ChatMessage = S["ChatMessage"];
 export type ChatOperation = S["Operation"];
@@ -100,6 +105,13 @@ export const api = {
   getProject: (id: string) => request<Project>("GET", p(id)),
   updateProject: (id: string, body: ProjectUpdate) => request<Project>("PATCH", p(id), body),
   deleteProject: (id: string) => request<void>("DELETE", p(id)),
+  listMembers: (id: string) => request<ProjectMember[]>("GET", `${p(id)}/members`),
+
+  searchUsers: (q: string, limit?: number) =>
+    request<UserRecord[]>("GET", `/users?q=${encodeURIComponent(q)}${limit ? `&limit=${limit}` : ""}`),
+  createUser: (body: UserCreate) => request<UserRecord>("POST", "/users", body),
+  updateUser: (email: string, body: UserBody) => request<UserRecord>("PUT", `/users/${encodeURIComponent(email)}`, body),
+  deleteUser: (email: string) => request<void>("DELETE", `/users/${encodeURIComponent(email)}`),
 
   listItems: (id: string) => request<ProjectItems>("GET", `${p(id)}/items`),
   createItem: (id: string, body: ItemCreate) => request<S["Assumption"] | Task | Criterion | Evidence | DecisionItem | Request | ProcessStep>(

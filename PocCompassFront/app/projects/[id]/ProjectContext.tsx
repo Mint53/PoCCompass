@@ -10,6 +10,8 @@ type ProjectState = {
   items: ProjectItems;
   mode: ModeDefinition;
   isOwner: boolean;
+  /** Editors, the owner and admins may change things; viewers are read-only (SPEC 9). */
+  canEdit: boolean;
   /** bumps after every evaluation / item change so the dashboard refetches */
   version: number;
   evaluating: boolean;
@@ -86,6 +88,7 @@ export function useProjectLoader(id: string) {
       items,
       mode: modeOf(project.mode),
       isOwner: me.is_admin || project.owner_email === me.email,
+      canEdit: me.is_admin || project.members.includes(me.email),
       version,
       evaluating,
       reloadProject,

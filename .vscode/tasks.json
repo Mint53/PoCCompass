@@ -1,0 +1,172 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "func",
+      "label": "func: host start",
+      "command": "host start",
+      "problemMatcher": "$func-python-watch",
+      "isBackground": true,
+      "dependsOn": "pip install (functions)",
+      "options": {
+        "cwd": "${workspaceFolder}/PocCompassFunc"
+      }
+    },
+    {
+      "label": "pip install (functions)",
+      "type": "shell",
+      "osx": {
+        "command": "${config:azureFunctions.pythonVenv}/bin/python -m pip install -r requirements.txt"
+      },
+      "windows": {
+        "command": "${config:azureFunctions.pythonVenv}\\Scripts\\python -m pip install -r requirements.txt"
+      },
+      "linux": {
+        "command": "${config:azureFunctions.pythonVenv}/bin/python -m pip install -r requirements.txt"
+      },
+      "problemMatcher": [],
+      "options": {
+        "cwd": "${workspaceFolder}/PocCompassFunc"
+      }
+    },
+    {
+      "label": "deploy: web (画面)",
+      "type": "shell",
+      "detail": "Next.js をビルドして Web App へ配布。事前に az login",
+      "command": "C:\\Program Files\\Git\bin\bash.exe",
+      "args": [
+        "-lc",
+        "./scripts/deploy.sh web"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "deploy: api (Functions)",
+      "type": "shell",
+      "detail": "check.sh 実行後に Functions へ配布、ホストキー再発行、Web 再起動",
+      "command": "C:\\Program Files\\Git\bin\bash.exe",
+      "args": [
+        "-lc",
+        "./scripts/deploy.sh api"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "deploy: infra (Bicep)",
+      "type": "shell",
+      "detail": "what-if 表示後、ターミナルで yes 入力で実行",
+      "command": "C:\\Program Files\\Git\bin\bash.exe",
+      "args": [
+        "-lc",
+        "./scripts/deploy.sh infra"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "deploy: all (infra+api+web)",
+      "type": "shell",
+      "detail": "infra の確認プロンプトあり",
+      "command": "C:\\Program Files\\Git\bin\bash.exe",
+      "args": [
+        "-lc",
+        "./scripts/deploy.sh all"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "deploy: web (SSL検査回避)",
+      "type": "shell",
+      "detail": "SCM が社内 SSL 検査で CERTIFICATE_VERIFY_FAILED になるときだけ使う",
+      "command": "C:\\Program Files\\Git\bin\bash.exe",
+      "args": [
+        "-lc",
+        "./scripts/deploy.sh web"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "AZURE_CLI_DISABLE_CONNECTION_VERIFICATION": "1"
+        }
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "deploy: api (SSL検査回避)",
+      "type": "shell",
+      "detail": "同上",
+      "command": "C:\\Program Files\\Git\bin\bash.exe",
+      "args": [
+        "-lc",
+        "./scripts/deploy.sh api"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "AZURE_CLI_DISABLE_CONNECTION_VERIFICATION": "1"
+        }
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "check: scripts/check.sh",
+      "type": "shell",
+      "detail": "完了判定（約1分）",
+      "command": "C:\\Program Files\\Git\bin\bash.exe",
+      "args": [
+        "-lc",
+        "./scripts/check.sh"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": []
+    }
+  ]
+}

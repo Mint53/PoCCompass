@@ -22,7 +22,7 @@ from app.models.common import UserContext
 from app.models.items import CREATE_MODELS, ItemPatch
 from app.models.project import ProjectUpdate
 from app.services import item_service, project_service
-from app.services.access import load_project_for
+from app.services.access import load_project_for_edit
 from app.services.chat_prompts import CHAT_SCHEMA, chat_system_prompt, chat_user_prompt
 from app.services.context import Repos
 from app.services.evaluation_service import build_dashboard
@@ -250,7 +250,7 @@ def _build_operation(ctx: _Ctx, raw: dict) -> Operation:
 # ---------------- public API ----------------
 
 def list_messages(repos: Repos, project_id: str, user: UserContext) -> list[dict]:
-    load_project_for(repos, project_id, user)
+    load_project_for_edit(repos, project_id, user)
     docs = repos.chat.list_for_user(project_id, user.email)[-CHAT_LIST_MAX:]
     return [ChatMessage.model_validate(d).model_dump(mode="json") for d in docs]
 
@@ -265,7 +265,7 @@ def _history_line(doc: dict) -> dict:
 
 
 def send_message(repos: Repos, llm: LlmClient, project_id: str, text: str, user: UserContext) -> dict:
-    project = load_project_for(repos, project_id, user)
+    project = load_project_for_edit(repos, project_id, user)
     text = text.strip()
     if not text:
         raise ValidationFailed("メッセージを入力してください。")
@@ -323,7 +323,7 @@ def _execute(repos: Repos, project_id: str, op: dict, user: UserContext) -> None
 
 def apply_proposal(repos: Repos, project_id: str, message_id: str, indexes: list[int] | None,
                    user: UserContext) -> dict:
-    load_project_for(repos, project_id, user)
+    load_project_for_edit(repos, project_id, user)
     doc = _own_message(repos, project_id, message_id, user)
     ops = doc["proposal"]["operations"]
     selected = set(range(len(ops))) if indexes is None else {i for i in indexes if 0 <= i < len(ops)}
@@ -348,7 +348,7 @@ def apply_proposal(repos: Repos, project_id: str, message_id: str, indexes: list
 
 
 def discard_proposal(repos: Repos, project_id: str, message_id: str, user: UserContext) -> dict:
-    load_project_for(repos, project_id, user)
+    load_project_for_edit(repos, project_id, user)
     doc = _own_message(repos, project_id, message_id, user)
     doc["proposal"]["status"] = ProposalStatus.DISCARDED.value
     repos.chat.save(doc)
@@ -356,6 +356,6 @@ def discard_proposal(repos: Repos, project_id: str, message_id: str, user: UserC
 
 
 def clear_thread(repos: Repos, project_id: str, user: UserContext) -> None:
-    load_project_for(repos, project_id, user)
+    load_project_for_edit(repos, project_id, user)
     for d in repos.chat.list_for_user(project_id, user.email):
         repos.chat.delete(project_id, d["id"])

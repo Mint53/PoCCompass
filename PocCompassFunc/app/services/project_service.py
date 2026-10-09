@@ -2,13 +2,29 @@ from __future__ import annotations
 
 import uuid
 
-from app.constants.enums import AssumptionStatus, CriterionStatus, ItemType, ProjectStatus
+from app.constants.enums import AssumptionStatus, CriterionStatus, ItemType, MemberRole, ProjectStatus
 from app.core.clock import today_jst, utc_now_iso
 from app.core.errors import ValidationFailed
 from app.models.common import UserContext
 from app.models.project import Project, ProjectCreate, ProjectUpdate
-from app.services.access import ensure_owner, load_project_for
+from app.models.user import ProjectMember
+from app.services import user_service
+from app.services.access import ensure_owner, load_project_for, load_project_for_edit
 from app.services.context import Repos
+
+
+def _split_roles(owner: str, members: list[str], viewers: list[str]) -> tuple[list[str], list[str]]:
+    """Owner is always an editor; a person listed as both editor and viewer is an editor."""
+    editors = [owner, *[m for m in members if m != owner]]
+    return editors, [v for v in viewers if v not in editors]
+
+
+def _ensure_registered(repos: Repos, emails: list[str]) -> None:
+    """Newly added members must be in the user master (SPEC section 9). Existing members are never re-checked."""
+    unknown = [e for e in emails if not repos.users.get(e)]
+    if unknown:
+        raise ValidationFailed(
+            f"ユーザーマスタに登録されていないユーザーです: {', '.join(unknown)}。管理者にユーザー登録を依頼してください。")
 
 
 def _new_item(project_id: str, item_type: ItemType, user: UserContext, fields: dict) -> dict:
@@ -22,10 +38,11 @@ def create_project(repos: Repos, body: ProjectCreate, user: UserContext) -> dict
     start = body.start_date or today_jst()
     if body.deadline < start:
         raise ValidationFailed("期限は開始日以降の日付にしてください。")
-    members = [user.email] + [m for m in body.members if m != user.email]
+    members, viewers = _split_roles(user.email, body.members, body.viewers)
+    _ensure_registered(repos, [e for e in [*members, *viewers] if e != user.email])
     project = Project(
         id=str(uuid.uuid4()), mode=body.mode, title=body.title, goal=body.goal, start_date=start,
-        deadline=body.deadline, status=ProjectStatus.ACTIVE, owner_email=user.email, members=members,
+        deadline=body.deadline, status=ProjectStatus.ACTIVE, owner_email=user.email, members=members, viewers=viewers,
         deleted=False, created_at=now, updated_at=now,
     ).model_dump(mode="json")
     repos.projects.save(project)
@@ -50,15 +67,19 @@ def get_project(repos: Repos, project_id: str, user: UserContext) -> dict:
 
 
 def update_project(repos: Repos, project_id: str, body: ProjectUpdate, user: UserContext) -> dict:
-    project = load_project_for(repos, project_id, user)
+    project = load_project_for_edit(repos, project_id, user)
     patch = body.model_dump(mode="json", exclude_unset=True)
-    if any(k in patch for k in ("members", "mode")):
+    if any(k in patch for k in ("members", "viewers", "mode")):
         ensure_owner(project, user)
-    if "members" in patch:
-        members = patch["members"]
-        if project["owner_email"] not in members:
-            members = [project["owner_email"], *members]
-        patch["members"] = members
+    if patch.get("members") is not None or patch.get("viewers") is not None:
+        current_viewers = project.get("viewers", [])
+        members, viewers = _split_roles(
+            project["owner_email"],
+            patch["members"] if patch.get("members") is not None else project["members"],
+            patch["viewers"] if patch.get("viewers") is not None else current_viewers)
+        before = {*project["members"], *current_viewers}
+        _ensure_registered(repos, [e for e in [*members, *viewers] if e not in before])
+        patch["members"], patch["viewers"] = members, viewers
     merged = {**project, **{k: v for k, v in patch.items() if v is not None}}
     if merged["deadline"] < merged["start_date"]:
         raise ValidationFailed("期限は開始日以降の日付にしてください。")
@@ -74,6 +95,17 @@ def delete_project(repos: Repos, project_id: str, user: UserContext) -> None:
     project["deleted"] = True
     project["updated_at"] = utc_now_iso()
     repos.projects.save(project)
+
+
+def list_members(repos: Repos, project_id: str, user: UserContext) -> list[dict]:
+    project = load_project_for(repos, project_id, user)
+    owner = project["owner_email"]
+    roles = [(e, MemberRole.OWNER if e == owner else MemberRole.EDITOR) for e in project["members"]]
+    roles += [(e, MemberRole.VIEWER) for e in project.get("viewers", [])]
+    known = user_service.lookup(repos, [e for e, _ in roles])
+    return [ProjectMember(email=e, name=known[e]["name"] if e in known else e,
+                          department=known[e].get("department", "") if e in known else "", role=r).model_dump(mode="json")
+            for e, r in roles]
 
 
 def touch(repos: Repos, project: dict) -> None:

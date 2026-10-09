@@ -42,7 +42,13 @@ ACTION_MAX = 100
 # §13 compass
 COMPASS_MAX_FRAMES = 8
 
-# §14 requests / process steps
+# §3.7 / §14 user master
+USER_NAME_MAX = 50
+DEPARTMENT_MAX = 50
+USER_SEARCH_DEFAULT = 20
+USER_LIST_MAX = 500
+
+# §16 requests / process steps
 PROCESS_NO_MAX = 20
 ASSIGNEE_MAX = 50
 NEXT_NOS_MAX = 10

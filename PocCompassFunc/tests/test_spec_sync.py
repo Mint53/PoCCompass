@@ -62,6 +62,12 @@ def test_cosmos_containers_match_bicep():
         assert f"'{c.value}'" in text, f"container {c.value} missing in bicep"
 
 
+def test_user_master_numbers_match_spec():
+    assert f"| name | str (1〜{limits.USER_NAME_MAX})" in SPEC
+    assert f"| department | str (0〜{limits.DEPARTMENT_MAX})" in SPEC
+    assert f"`limit` 既定 **{limits.USER_SEARCH_DEFAULT}**・最大 **{limits.USER_LIST_MAX}**" in SPEC
+
+
 def test_item_types_and_new_enums_documented():
     for t in ItemType:
         assert f"| `{t.value}` |" in SPEC, f"item type {t.value} missing in SPEC §3.2"

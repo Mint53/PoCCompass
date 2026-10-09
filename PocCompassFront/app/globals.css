@@ -159,3 +159,21 @@ html { scroll-behavior: smooth; }
   .guide-type, .guide-reveal, .guide-press, .guide-cursor, .guide-cursor2, .guide-ping, .guide-pressed { animation: none; }
   .guide-drift { animation: none; }
 }
+
+/* ---- manual page scenes (app/manual) ---- */
+@keyframes manual-tab-hl {
+  0%, 22% { background: #fff; color: rgb(var(--primary)); box-shadow: 0 1px 2px rgb(15 23 42 / 0.12); }
+  26%, 100% { background: transparent; color: rgb(71 85 105); box-shadow: none; }
+}
+.manual-tab-hl { animation: manual-tab-hl 6s ease-in-out infinite; }
+@keyframes manual-caret { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+.manual-caret { animation: manual-caret 1s steps(1) infinite; }
+@keyframes manual-slide-in { from { opacity: 0; transform: translateX(-14px); } }
+.manual-slide-in { animation: manual-slide-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes manual-pop-row { 0% { opacity: 0; transform: scale(0.96); background: rgb(224 231 255); } 60% { background: rgb(224 231 255); } 100% { opacity: 1; transform: scale(1); background: transparent; } }
+.manual-pop-row { animation: manual-pop-row 0.9s ease-out both; }
+@keyframes manual-dots { 0%, 80%, 100% { opacity: 0.25; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-3px); } }
+.manual-dot { display: inline-block; height: 6px; width: 6px; border-radius: 9999px; background: rgb(100 116 139); animation: manual-dots 1.2s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .manual-tab-hl, .manual-caret, .manual-slide-in, .manual-pop-row, .manual-dot { animation: none; }
+}

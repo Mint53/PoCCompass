@@ -10,7 +10,7 @@ from app.core.clock import utc_now_iso
 from app.core.errors import AiFailed, ValidationFailed
 from app.models.common import UserContext
 from app.models.report import ExtractResponse, Report, ReportContent
-from app.services.access import load_project_for
+from app.services.access import load_project_for, load_project_for_edit
 from app.services.context import Repos
 from app.services.evaluation_service import build_dashboard
 from app.services.llm_client import LlmClient
@@ -29,7 +29,7 @@ _DECISION_ORDER = [Decision.CONTINUE.value, Decision.PIVOT.value, Decision.STOP.
 
 
 def generate_report(repos: Repos, llm: LlmClient, project_id: str, user: UserContext) -> dict:
-    project = load_project_for(repos, project_id, user)
+    project = load_project_for_edit(repos, project_id, user)
     mode = get_mode(repos, project["mode"])
     items = repos.items.list(project_id)
 
@@ -63,7 +63,7 @@ def list_reports(repos: Repos, project_id: str, user: UserContext) -> list[dict]
 
 
 def extract_tasks(repos: Repos, llm: LlmClient, project_id: str, text: str, user: UserContext) -> dict:
-    project = load_project_for(repos, project_id, user)
+    project = load_project_for_edit(repos, project_id, user)
     text = text.strip()
     if not text:
         raise ValidationFailed("テキストを入力してください。")

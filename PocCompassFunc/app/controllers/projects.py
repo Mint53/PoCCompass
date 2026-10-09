@@ -10,6 +10,7 @@ from app.models.dashboard import Dashboard
 from app.models.evaluation import Evaluation
 from app.models.project import Project, ProjectCreate, ProjectUpdate
 from app.models.report import ExtractRequest, ExtractResponse, Report
+from app.models.user import ProjectMember
 from app.services import compass_service, evaluation_service, project_service, report_service
 from app.services.context import Repos
 from app.services.llm_client import LlmClient
@@ -38,6 +39,11 @@ def get_project(project_id: str, user: UserContext = Depends(get_current_user), 
 def update_project(project_id: str, body: ProjectUpdate, user: UserContext = Depends(get_current_user),
                    repos: Repos = Depends(get_repos)):
     return project_service.update_project(repos, project_id, body, user)
+
+
+@router.get("/{project_id}/members", response_model=list[ProjectMember])
+def list_members(project_id: str, user: UserContext = Depends(get_current_user), repos: Repos = Depends(get_repos)):
+    return project_service.list_members(repos, project_id, user)
 
 
 @router.delete("/{project_id}", status_code=204)

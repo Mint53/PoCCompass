@@ -96,3 +96,12 @@ def test_process_next_nos_follow_rename_and_delete(client):
     steps = {s["id"]: s for s in _items(client, pid)["process_steps"]}
     assert steps[s1["id"]]["next_nos"] == ["2a"]
     assert tobe["id"] in steps
+
+
+def test_viewer_can_read_but_not_write(client):
+    viewer = {"x-poccompass-user-email": "viewer@example.com"}
+    pid = make_project(client, viewers=["viewer@example.com"])["id"]
+    req = _post(client, pid, {"type": "request", "title": "要望"}).json()
+    assert _post(client, pid, {"type": "request", "title": "x"}, viewer).status_code == 403
+    assert client.patch(f"/api/projects/{pid}/items/{req['id']}", json={"action": "needed"}, headers=viewer).status_code == 403
+    assert len(client.get(f"/api/projects/{pid}/items", headers=viewer).json()["requests"]) == 1

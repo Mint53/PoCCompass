@@ -6,6 +6,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["--prefix", "PocCompassFront", "run", "dev"],
       "port": 3200
+    },
+    {
+      "name": "poc-compass-func",
+      "runtimeExecutable": "C:/Program Files/Git/bin/bash.exe",
+      "runtimeArgs": ["scripts/dev-func.sh"],
+      "port": 7072
     }
   ]
 }
