@@ -101,9 +101,11 @@
   pointer-events: none;
   animation: flash-ring 1.1s ease-out 1;
 }
+/* First-visit attention cue for the AI launcher: a few ring pulses, then still. */
+.launcher-attention { animation: flash-ring 1.6s ease-out 3; }
 html { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) {
-  .stagger, .skeleton, .flash-target:target::after { animation: none; }
+  .stagger, .skeleton, .flash-target:target::after, .launcher-attention { animation: none; }
   html { scroll-behavior: auto; }
 }
 
