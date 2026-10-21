@@ -44,6 +44,7 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
     { href: `${base}/design`, label: "設計" },
     { href: `${base}/requests`, label: "要望・課題", count: items.requests.length },
     { href: `${base}/process`, label: "業務整理" },
+    { href: `${base}/mocks`, label: "画面モック" },
     { href: `${base}/tasks`, label: lb.task, count: items.tasks.length },
     { href: `${base}/evidence`, label: lb.evidence, count: items.evidence.length },
     { href: `${base}/report`, label: "判断レポート" },
@@ -53,7 +54,7 @@ export default function ProjectLayout({ children }: { children: React.ReactNode 
   // Viewers cannot edit: these screens are made of inputs and buttons, so lock them wholesale (the API also answers 403).
   const readOnlyPage = !canEdit && [`${base}/tasks`, `${base}/evidence`, `${base}/design`].includes(pathname);
   // SPEC §12.3: these screens fit the viewport at 100% zoom; their content scrolls inside, not the page.
-  const fit = [base, `${base}/analysis`, `${base}/wbs`, `${base}/compass`, `${base}/report`, `${base}/process`, `${base}/requests`].includes(pathname);
+  const fit = [base, `${base}/analysis`, `${base}/wbs`, `${base}/compass`, `${base}/report`, `${base}/process`, `${base}/requests`, `${base}/mocks`].includes(pathname);
 
   return (
     <ProjectProvider value={value}>

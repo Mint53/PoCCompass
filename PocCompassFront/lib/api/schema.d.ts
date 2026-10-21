@@ -370,6 +370,128 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/projects/{project_id}/screens": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Screens */
+        get: operations["list_screens_api_projects__project_id__screens_get"];
+        put?: never;
+        /** Create Screen */
+        post: operations["create_screen_api_projects__project_id__screens_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/projects/{project_id}/screens/{screen_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Screen */
+        get: operations["get_screen_api_projects__project_id__screens__screen_id__get"];
+        put?: never;
+        post?: never;
+        /** Delete Screen */
+        delete: operations["delete_screen_api_projects__project_id__screens__screen_id__delete"];
+        options?: never;
+        head?: never;
+        /** Update Screen */
+        patch: operations["update_screen_api_projects__project_id__screens__screen_id__patch"];
+        trace?: never;
+    };
+    "/api/projects/{project_id}/screens/{screen_id}/handoff": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Save Handoff */
+        put: operations["save_handoff_api_projects__project_id__screens__screen_id__handoff_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/projects/{project_id}/screens/{screen_id}/handoff/draft": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Draft Handoff */
+        post: operations["draft_handoff_api_projects__project_id__screens__screen_id__handoff_draft_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/projects/{project_id}/screens/{screen_id}/handoff/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Export Handoff */
+        get: operations["export_handoff_api_projects__project_id__screens__screen_id__handoff_export_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/projects/{project_id}/screens/{screen_id}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Send */
+        post: operations["send_api_projects__project_id__screens__screen_id__messages_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/projects/{project_id}/screens/{screen_id}/versions/{version_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Version */
+        get: operations["get_version_api_projects__project_id__screens__screen_id__versions__version_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/projects/{project_id}/tasks/extract": {
         parameters: {
             query?: never;
@@ -916,6 +1038,63 @@ export interface components {
         HTTPValidationError: {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
+        };
+        /** Handoff */
+        Handoff: {
+            /** Acceptance */
+            acceptance: string;
+            /** Agents */
+            agents: string;
+            /** Screen Spec */
+            screen_spec: string;
+            /**
+             * Tech Notes
+             * @default
+             */
+            tech_notes: string;
+            /** Updated At */
+            updated_at: string;
+            /** Updated By */
+            updated_by: string;
+            /** Version Id */
+            version_id: string;
+        };
+        /** HandoffDraft */
+        HandoffDraft: {
+            /** Acceptance */
+            acceptance: string;
+            /** Agents */
+            agents: string;
+            /** Screen Spec */
+            screen_spec: string;
+            /** Version Id */
+            version_id: string;
+        };
+        /** HandoffDraftRequest */
+        HandoffDraftRequest: {
+            /**
+             * Tech Notes
+             * @default
+             */
+            tech_notes?: string;
+            /** Version Id */
+            version_id?: string | null;
+        };
+        /** HandoffSave */
+        HandoffSave: {
+            /** Acceptance */
+            acceptance: string;
+            /** Agents */
+            agents: string;
+            /** Screen Spec */
+            screen_spec: string;
+            /**
+             * Tech Notes
+             * @default
+             */
+            tech_notes?: string;
+            /** Version Id */
+            version_id: string;
         };
         /** HealthComponents */
         HealthComponents: {
@@ -1472,6 +1651,137 @@ export interface components {
             elapsed: number;
             /** Progress */
             progress: number;
+        };
+        /** Screen */
+        Screen: {
+            /** Adopted Version Id */
+            adopted_version_id: string | null;
+            /** Created At */
+            created_at: string;
+            /** Created By */
+            created_by: string;
+            /**
+             * Description
+             * @default
+             */
+            description: string;
+            handoff: components["schemas"]["Handoff"] | null;
+            /** Id */
+            id: string;
+            /**
+             * Latest Version No
+             * @default 0
+             */
+            latest_version_no: number;
+            /** Name */
+            name: string;
+            /** Projectid */
+            projectId: string;
+            /** Updated At */
+            updated_at: string;
+        };
+        /** ScreenCreate */
+        ScreenCreate: {
+            /**
+             * Description
+             * @default
+             */
+            description?: string;
+            /** Name */
+            name: string;
+        };
+        /** ScreenDetail */
+        ScreenDetail: {
+            /** Messages */
+            messages: components["schemas"]["ScreenMessage"][];
+            screen: components["schemas"]["Screen"];
+            /** Versions */
+            versions: components["schemas"]["ScreenVersionMeta"][];
+        };
+        /** ScreenMessage */
+        ScreenMessage: {
+            /**
+             * Author Name
+             * @default
+             */
+            author_name: string;
+            /** Content */
+            content: string;
+            /** Created At */
+            created_at: string;
+            /** Created By */
+            created_by: string;
+            /** Id */
+            id: string;
+            role: components["schemas"]["ChatRole"];
+            /** Screen Id */
+            screen_id: string;
+            /** Version Id */
+            version_id: string | null;
+        };
+        /** ScreenPatch */
+        ScreenPatch: {
+            /** Adopted Version Id */
+            adopted_version_id?: string | null;
+            /** Description */
+            description?: string | null;
+            /** Name */
+            name?: string | null;
+        };
+        /** ScreenSend */
+        ScreenSend: {
+            /** Base Version Id */
+            base_version_id?: string | null;
+            /** Message */
+            message: string;
+        };
+        /** ScreenSendResponse */
+        ScreenSendResponse: {
+            assistant_message: components["schemas"]["ScreenMessage"];
+            user_message: components["schemas"]["ScreenMessage"];
+            version: components["schemas"]["ScreenVersionMeta"] | null;
+        };
+        /** ScreenVersion */
+        ScreenVersion: {
+            /** Created At */
+            created_at: string;
+            /** Created By */
+            created_by: string;
+            /** Html */
+            html: string;
+            /** Id */
+            id: string;
+            /** Message Id */
+            message_id: string | null;
+            /** No */
+            no: number;
+            /** Screen Id */
+            screen_id: string;
+            /**
+             * Summary
+             * @default
+             */
+            summary: string;
+        };
+        /** ScreenVersionMeta */
+        ScreenVersionMeta: {
+            /** Created At */
+            created_at: string;
+            /** Created By */
+            created_by: string;
+            /** Id */
+            id: string;
+            /** Message Id */
+            message_id: string | null;
+            /** No */
+            no: number;
+            /** Screen Id */
+            screen_id: string;
+            /**
+             * Summary
+             * @default
+             */
+            summary: string;
         };
         /** Task */
         Task: {
@@ -2629,6 +2939,343 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Report"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_screens_api_projects__project_id__screens_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Screen"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_screen_api_projects__project_id__screens_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ScreenCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Screen"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_screen_api_projects__project_id__screens__screen_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                screen_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScreenDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_screen_api_projects__project_id__screens__screen_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                screen_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_screen_api_projects__project_id__screens__screen_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                screen_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ScreenPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Screen"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    save_handoff_api_projects__project_id__screens__screen_id__handoff_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                screen_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HandoffSave"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Screen"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    draft_handoff_api_projects__project_id__screens__screen_id__handoff_draft_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                screen_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HandoffDraftRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HandoffDraft"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    export_handoff_api_projects__project_id__screens__screen_id__handoff_export_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                screen_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description 引き渡しパック（ZIP） */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/zip": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    send_api_projects__project_id__screens__screen_id__messages_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                screen_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ScreenSend"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScreenSendResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_version_api_projects__project_id__screens__screen_id__versions__version_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                screen_id: string;
+                version_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScreenVersion"];
                 };
             };
             /** @description Validation Error */

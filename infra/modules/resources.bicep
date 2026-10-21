@@ -38,6 +38,7 @@ var cosmosContainers = [
   { name: 'mode_definitions', partitionKey: '/id' }
   { name: 'chat_messages', partitionKey: '/projectId' }
   { name: 'users', partitionKey: '/id' }
+  { name: 'screen_mocks', partitionKey: '/projectId' }
 ]
 
 // Built-in role definition IDs

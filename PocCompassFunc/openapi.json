@@ -1271,6 +1271,141 @@
     "title": "HTTPValidationError",
     "type": "object"
    },
+   "Handoff": {
+    "properties": {
+     "acceptance": {
+      "title": "Acceptance",
+      "type": "string"
+     },
+     "agents": {
+      "title": "Agents",
+      "type": "string"
+     },
+     "screen_spec": {
+      "title": "Screen Spec",
+      "type": "string"
+     },
+     "tech_notes": {
+      "default": "",
+      "title": "Tech Notes",
+      "type": "string"
+     },
+     "updated_at": {
+      "title": "Updated At",
+      "type": "string"
+     },
+     "updated_by": {
+      "title": "Updated By",
+      "type": "string"
+     },
+     "version_id": {
+      "title": "Version Id",
+      "type": "string"
+     }
+    },
+    "required": [
+     "version_id",
+     "tech_notes",
+     "screen_spec",
+     "acceptance",
+     "agents",
+     "updated_at",
+     "updated_by"
+    ],
+    "title": "Handoff",
+    "type": "object"
+   },
+   "HandoffDraft": {
+    "properties": {
+     "acceptance": {
+      "title": "Acceptance",
+      "type": "string"
+     },
+     "agents": {
+      "title": "Agents",
+      "type": "string"
+     },
+     "screen_spec": {
+      "title": "Screen Spec",
+      "type": "string"
+     },
+     "version_id": {
+      "title": "Version Id",
+      "type": "string"
+     }
+    },
+    "required": [
+     "version_id",
+     "screen_spec",
+     "acceptance",
+     "agents"
+    ],
+    "title": "HandoffDraft",
+    "type": "object"
+   },
+   "HandoffDraftRequest": {
+    "properties": {
+     "tech_notes": {
+      "default": "",
+      "maxLength": 2000,
+      "title": "Tech Notes",
+      "type": "string"
+     },
+     "version_id": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Version Id"
+     }
+    },
+    "title": "HandoffDraftRequest",
+    "type": "object"
+   },
+   "HandoffSave": {
+    "properties": {
+     "acceptance": {
+      "maxLength": 20000,
+      "minLength": 1,
+      "title": "Acceptance",
+      "type": "string"
+     },
+     "agents": {
+      "maxLength": 20000,
+      "minLength": 1,
+      "title": "Agents",
+      "type": "string"
+     },
+     "screen_spec": {
+      "maxLength": 20000,
+      "minLength": 1,
+      "title": "Screen Spec",
+      "type": "string"
+     },
+     "tech_notes": {
+      "default": "",
+      "maxLength": 2000,
+      "title": "Tech Notes",
+      "type": "string"
+     },
+     "version_id": {
+      "title": "Version Id",
+      "type": "string"
+     }
+    },
+    "required": [
+     "version_id",
+     "screen_spec",
+     "acceptance",
+     "agents"
+    ],
+    "title": "HandoffSave",
+    "type": "object"
+   },
    "HealthComponents": {
     "properties": {
      "alignment": {
@@ -2920,6 +3055,385 @@
      "days_left"
     ],
     "title": "ScheduleView",
+    "type": "object"
+   },
+   "Screen": {
+    "properties": {
+     "adopted_version_id": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Adopted Version Id"
+     },
+     "created_at": {
+      "title": "Created At",
+      "type": "string"
+     },
+     "created_by": {
+      "title": "Created By",
+      "type": "string"
+     },
+     "description": {
+      "default": "",
+      "title": "Description",
+      "type": "string"
+     },
+     "handoff": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/Handoff"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "id": {
+      "title": "Id",
+      "type": "string"
+     },
+     "latest_version_no": {
+      "default": 0,
+      "title": "Latest Version No",
+      "type": "integer"
+     },
+     "name": {
+      "title": "Name",
+      "type": "string"
+     },
+     "projectId": {
+      "title": "Projectid",
+      "type": "string"
+     },
+     "updated_at": {
+      "title": "Updated At",
+      "type": "string"
+     }
+    },
+    "required": [
+     "id",
+     "projectId",
+     "name",
+     "description",
+     "adopted_version_id",
+     "latest_version_no",
+     "handoff",
+     "created_by",
+     "created_at",
+     "updated_at"
+    ],
+    "title": "Screen",
+    "type": "object"
+   },
+   "ScreenCreate": {
+    "properties": {
+     "description": {
+      "default": "",
+      "maxLength": 1000,
+      "title": "Description",
+      "type": "string"
+     },
+     "name": {
+      "maxLength": 100,
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+     }
+    },
+    "required": [
+     "name"
+    ],
+    "title": "ScreenCreate",
+    "type": "object"
+   },
+   "ScreenDetail": {
+    "properties": {
+     "messages": {
+      "items": {
+       "$ref": "#/components/schemas/ScreenMessage"
+      },
+      "title": "Messages",
+      "type": "array"
+     },
+     "screen": {
+      "$ref": "#/components/schemas/Screen"
+     },
+     "versions": {
+      "items": {
+       "$ref": "#/components/schemas/ScreenVersionMeta"
+      },
+      "title": "Versions",
+      "type": "array"
+     }
+    },
+    "required": [
+     "screen",
+     "versions",
+     "messages"
+    ],
+    "title": "ScreenDetail",
+    "type": "object"
+   },
+   "ScreenMessage": {
+    "properties": {
+     "author_name": {
+      "default": "",
+      "title": "Author Name",
+      "type": "string"
+     },
+     "content": {
+      "title": "Content",
+      "type": "string"
+     },
+     "created_at": {
+      "title": "Created At",
+      "type": "string"
+     },
+     "created_by": {
+      "title": "Created By",
+      "type": "string"
+     },
+     "id": {
+      "title": "Id",
+      "type": "string"
+     },
+     "role": {
+      "$ref": "#/components/schemas/ChatRole"
+     },
+     "screen_id": {
+      "title": "Screen Id",
+      "type": "string"
+     },
+     "version_id": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Version Id"
+     }
+    },
+    "required": [
+     "id",
+     "screen_id",
+     "role",
+     "content",
+     "author_name",
+     "version_id",
+     "created_by",
+     "created_at"
+    ],
+    "title": "ScreenMessage",
+    "type": "object"
+   },
+   "ScreenPatch": {
+    "properties": {
+     "adopted_version_id": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Adopted Version Id"
+     },
+     "description": {
+      "anyOf": [
+       {
+        "maxLength": 1000,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Description"
+     },
+     "name": {
+      "anyOf": [
+       {
+        "maxLength": 100,
+        "minLength": 1,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Name"
+     }
+    },
+    "title": "ScreenPatch",
+    "type": "object"
+   },
+   "ScreenSend": {
+    "properties": {
+     "base_version_id": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Base Version Id"
+     },
+     "message": {
+      "maxLength": 4000,
+      "minLength": 1,
+      "title": "Message",
+      "type": "string"
+     }
+    },
+    "required": [
+     "message"
+    ],
+    "title": "ScreenSend",
+    "type": "object"
+   },
+   "ScreenSendResponse": {
+    "properties": {
+     "assistant_message": {
+      "$ref": "#/components/schemas/ScreenMessage"
+     },
+     "user_message": {
+      "$ref": "#/components/schemas/ScreenMessage"
+     },
+     "version": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/ScreenVersionMeta"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     }
+    },
+    "required": [
+     "user_message",
+     "assistant_message",
+     "version"
+    ],
+    "title": "ScreenSendResponse",
+    "type": "object"
+   },
+   "ScreenVersion": {
+    "properties": {
+     "created_at": {
+      "title": "Created At",
+      "type": "string"
+     },
+     "created_by": {
+      "title": "Created By",
+      "type": "string"
+     },
+     "html": {
+      "title": "Html",
+      "type": "string"
+     },
+     "id": {
+      "title": "Id",
+      "type": "string"
+     },
+     "message_id": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Message Id"
+     },
+     "no": {
+      "title": "No",
+      "type": "integer"
+     },
+     "screen_id": {
+      "title": "Screen Id",
+      "type": "string"
+     },
+     "summary": {
+      "default": "",
+      "title": "Summary",
+      "type": "string"
+     }
+    },
+    "required": [
+     "id",
+     "screen_id",
+     "no",
+     "summary",
+     "message_id",
+     "created_by",
+     "created_at",
+     "html"
+    ],
+    "title": "ScreenVersion",
+    "type": "object"
+   },
+   "ScreenVersionMeta": {
+    "properties": {
+     "created_at": {
+      "title": "Created At",
+      "type": "string"
+     },
+     "created_by": {
+      "title": "Created By",
+      "type": "string"
+     },
+     "id": {
+      "title": "Id",
+      "type": "string"
+     },
+     "message_id": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Message Id"
+     },
+     "no": {
+      "title": "No",
+      "type": "integer"
+     },
+     "screen_id": {
+      "title": "Screen Id",
+      "type": "string"
+     },
+     "summary": {
+      "default": "",
+      "title": "Summary",
+      "type": "string"
+     }
+    },
+    "required": [
+     "id",
+     "screen_id",
+     "no",
+     "summary",
+     "message_id",
+     "created_by",
+     "created_at"
+    ],
+    "title": "ScreenVersionMeta",
     "type": "object"
    },
    "Task": {
@@ -5065,6 +5579,544 @@
     "summary": "Create Report",
     "tags": [
      "projects"
+    ]
+   }
+  },
+  "/api/projects/{project_id}/screens": {
+   "get": {
+    "operationId": "list_screens_api_projects__project_id__screens_get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "project_id",
+      "required": true,
+      "schema": {
+       "title": "Project Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/Screen"
+         },
+         "title": "Response List Screens Api Projects  Project Id  Screens Get",
+         "type": "array"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "List Screens",
+    "tags": [
+     "mocks"
+    ]
+   },
+   "post": {
+    "operationId": "create_screen_api_projects__project_id__screens_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "project_id",
+      "required": true,
+      "schema": {
+       "title": "Project Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ScreenCreate"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Screen"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Create Screen",
+    "tags": [
+     "mocks"
+    ]
+   }
+  },
+  "/api/projects/{project_id}/screens/{screen_id}": {
+   "delete": {
+    "operationId": "delete_screen_api_projects__project_id__screens__screen_id__delete",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "project_id",
+      "required": true,
+      "schema": {
+       "title": "Project Id",
+       "type": "string"
+      }
+     },
+     {
+      "in": "path",
+      "name": "screen_id",
+      "required": true,
+      "schema": {
+       "title": "Screen Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Delete Screen",
+    "tags": [
+     "mocks"
+    ]
+   },
+   "get": {
+    "operationId": "get_screen_api_projects__project_id__screens__screen_id__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "project_id",
+      "required": true,
+      "schema": {
+       "title": "Project Id",
+       "type": "string"
+      }
+     },
+     {
+      "in": "path",
+      "name": "screen_id",
+      "required": true,
+      "schema": {
+       "title": "Screen Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ScreenDetail"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Get Screen",
+    "tags": [
+     "mocks"
+    ]
+   },
+   "patch": {
+    "operationId": "update_screen_api_projects__project_id__screens__screen_id__patch",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "project_id",
+      "required": true,
+      "schema": {
+       "title": "Project Id",
+       "type": "string"
+      }
+     },
+     {
+      "in": "path",
+      "name": "screen_id",
+      "required": true,
+      "schema": {
+       "title": "Screen Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ScreenPatch"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Screen"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Update Screen",
+    "tags": [
+     "mocks"
+    ]
+   }
+  },
+  "/api/projects/{project_id}/screens/{screen_id}/handoff": {
+   "put": {
+    "operationId": "save_handoff_api_projects__project_id__screens__screen_id__handoff_put",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "project_id",
+      "required": true,
+      "schema": {
+       "title": "Project Id",
+       "type": "string"
+      }
+     },
+     {
+      "in": "path",
+      "name": "screen_id",
+      "required": true,
+      "schema": {
+       "title": "Screen Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/HandoffSave"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Screen"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Save Handoff",
+    "tags": [
+     "mocks"
+    ]
+   }
+  },
+  "/api/projects/{project_id}/screens/{screen_id}/handoff/draft": {
+   "post": {
+    "operationId": "draft_handoff_api_projects__project_id__screens__screen_id__handoff_draft_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "project_id",
+      "required": true,
+      "schema": {
+       "title": "Project Id",
+       "type": "string"
+      }
+     },
+     {
+      "in": "path",
+      "name": "screen_id",
+      "required": true,
+      "schema": {
+       "title": "Screen Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/HandoffDraftRequest"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HandoffDraft"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Draft Handoff",
+    "tags": [
+     "mocks"
+    ]
+   }
+  },
+  "/api/projects/{project_id}/screens/{screen_id}/handoff/export": {
+   "get": {
+    "operationId": "export_handoff_api_projects__project_id__screens__screen_id__handoff_export_get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "project_id",
+      "required": true,
+      "schema": {
+       "title": "Project Id",
+       "type": "string"
+      }
+     },
+     {
+      "in": "path",
+      "name": "screen_id",
+      "required": true,
+      "schema": {
+       "title": "Screen Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/zip": {}
+      },
+      "description": "引き渡しパック（ZIP）"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Export Handoff",
+    "tags": [
+     "mocks"
+    ]
+   }
+  },
+  "/api/projects/{project_id}/screens/{screen_id}/messages": {
+   "post": {
+    "operationId": "send_api_projects__project_id__screens__screen_id__messages_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "project_id",
+      "required": true,
+      "schema": {
+       "title": "Project Id",
+       "type": "string"
+      }
+     },
+     {
+      "in": "path",
+      "name": "screen_id",
+      "required": true,
+      "schema": {
+       "title": "Screen Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ScreenSend"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ScreenSendResponse"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Send",
+    "tags": [
+     "mocks"
+    ]
+   }
+  },
+  "/api/projects/{project_id}/screens/{screen_id}/versions/{version_id}": {
+   "get": {
+    "operationId": "get_version_api_projects__project_id__screens__screen_id__versions__version_id__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "project_id",
+      "required": true,
+      "schema": {
+       "title": "Project Id",
+       "type": "string"
+      }
+     },
+     {
+      "in": "path",
+      "name": "screen_id",
+      "required": true,
+      "schema": {
+       "title": "Screen Id",
+       "type": "string"
+      }
+     },
+     {
+      "in": "path",
+      "name": "version_id",
+      "required": true,
+      "schema": {
+       "title": "Version Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ScreenVersion"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Get Version",
+    "tags": [
+     "mocks"
     ]
    }
   },

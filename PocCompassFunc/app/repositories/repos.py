@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from app.constants.enums import Container, ItemType
+from app.constants.enums import Container, ItemType, MockDocKind
 from app.repositories.store import DocumentStore
 
 
@@ -139,3 +139,26 @@ class ChatRepository:
 
     def delete(self, project_id: str, message_id: str) -> None:
         self.s.delete(Container.CHAT, message_id, project_id)
+
+
+class ScreenMockRepository:
+    """Screens, their versions and the shared hearing thread (SPEC §18.2). One container, told apart by `kind`."""
+
+    def __init__(self, store: DocumentStore):
+        self.s = store
+
+    def list(self, project_id: str, kind: MockDocKind, screen_id: str | None = None) -> list[dict]:
+        equals: dict = {"kind": kind.value}
+        if screen_id is not None:
+            equals["screen_id"] = screen_id
+        docs = self.s.find(Container.SCREEN_MOCKS, partition_key=project_id, equals=equals)
+        return sorted(docs, key=lambda d: d["created_at"])
+
+    def get(self, project_id: str, doc_id: str) -> dict | None:
+        return self.s.get(Container.SCREEN_MOCKS, doc_id, project_id)
+
+    def save(self, doc: dict) -> dict:
+        return self.s.upsert(Container.SCREEN_MOCKS, doc)
+
+    def delete(self, project_id: str, doc_id: str) -> None:
+        self.s.delete(Container.SCREEN_MOCKS, doc_id, project_id)

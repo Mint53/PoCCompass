@@ -84,3 +84,16 @@ def test_samples_documented_and_cover_every_mode():
 
     assert set(SAMPLES) == set(Mode)
     assert f"`{SAMPLE_TITLE_PREFIX}`" in SPEC
+
+
+def test_screen_mock_numbers_match_spec():
+    from app.constants.enums import MockDocKind
+
+    assert f"html（最大 **{limits.MOCK_HTML_MAX}** 字）" in SPEC
+    assert f"各最大 **{limits.HANDOFF_DOC_MAX}** 字、tech_notes は最大 **{limits.TECH_NOTES_MAX}** 字" in SPEC
+    assert f"画面は最大 **{limits.MOCK_SCREENS_MAX}** 個" in SPEC
+    assert f"この画面の会話の直近 **{limits.MOCK_HISTORY_FOR_AI}** 件" in SPEC
+    assert f"この画面の会話の直近 **{limits.HANDOFF_HISTORY_FOR_AI}** 件" in SPEC
+    assert f"（201）。メッセージは最大 **{limits.MOCK_MESSAGE_MAX}** 字。base_version_id" in SPEC
+    for k in MockDocKind:
+        assert f"| `{k.value}` |" in SPEC

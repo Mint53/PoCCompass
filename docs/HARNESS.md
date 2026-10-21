@@ -42,7 +42,7 @@ AI エージェント（Claude Code / Codex）と人が交互に手を入れて�
 - すべての AI 呼び出しは Structured Outputs（JSON Schema 強制）。
 - verdict とスコアの矛盾、存在しない ID、別名（A1/C2）の残りはコード側で正規化（SPEC §4.3）。
 - 数値は AI に計算させない（SPEC §5）。
-- プロンプトは `app/services/prompts.py` / `chat_prompts.py` のみに置く。変更したら下の「精度確認」を行う。
+- プロンプトは `app/services/prompts.py` / `chat_prompts.py` / `mock_prompts.py`（画面モック・引き渡しパック）のみに置く。変更したら下の「精度確認」を行う。
 
 ### 精度確認（プロンプト変更時）
 

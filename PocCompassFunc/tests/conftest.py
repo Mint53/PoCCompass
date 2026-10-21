@@ -27,6 +27,8 @@ class FakeLlm:
         self.calls: list[dict[str, Any]] = []
         self.fail = False
         self.chat_reply: dict[str, Any] = {"reply": "了解しました。", "operations": []}
+        self.mock_reply: dict[str, Any] = {"reply": "作りました。", "html": "<!doctype html><p>v</p>", "summary": "初版"}
+        self.handoff_reply: dict[str, Any] = {"screen_spec": "# 仕様", "acceptance": "- [ ] 表示できる"}
 
     def complete_json(self, *, system: str, user: str, schema_name: str, schema: dict[str, Any]) -> dict[str, Any]:
         self.calls.append({"schema": schema_name, "system": system, "user": user})
@@ -63,6 +65,10 @@ class FakeLlm:
                                                                      "linked_criterion_ids": []}]}
         if schema_name == "chat_reply":
             return self.chat_reply
+        if schema_name == "mock_reply":
+            return self.mock_reply
+        if schema_name == "handoff_draft":
+            return self.handoff_reply
         raise AssertionError(schema_name)
 
 

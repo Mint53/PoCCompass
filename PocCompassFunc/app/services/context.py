@@ -11,6 +11,7 @@ from app.repositories.repos import (
     ModeRepository,
     ProjectRepository,
     ReportRepository,
+    ScreenMockRepository,
     SnapshotRepository,
     UserRepository,
 )
@@ -27,12 +28,13 @@ class Repos:
     modes: ModeRepository
     chat: ChatRepository
     users: UserRepository
+    mocks: ScreenMockRepository
 
     @classmethod
     def from_store(cls, store: DocumentStore) -> Repos:
         return cls(ProjectRepository(store), ItemRepository(store), EvaluationRepository(store),
                    SnapshotRepository(store), ReportRepository(store), ModeRepository(store), ChatRepository(store),
-                   UserRepository(store))
+                   UserRepository(store), ScreenMockRepository(store))
 
 
 def default_repos() -> Repos:

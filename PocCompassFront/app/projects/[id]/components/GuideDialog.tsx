@@ -211,6 +211,28 @@ function SceneNotes() {
   );
 }
 
+function SceneMockGuide() {
+  return (
+    <Stage>
+      <div className="flex flex-wrap items-center justify-center gap-1.5 px-3">
+        <Chip tone="slate" style={{ "--i": 0 } as CSSProperties}>聞き取り</Chip>
+        <svg width="22" height="12" viewBox="0 0 22 12" className="stagger text-slate-400" style={{ "--i": 1 } as CSSProperties}>
+          <path d="M1 6h18m-5-5 5 5-5 5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+        <Chip tone="slate" style={{ "--i": 2 } as CSSProperties}>v1 → v2</Chip>
+        <svg width="22" height="12" viewBox="0 0 22 12" className="stagger text-slate-400" style={{ "--i": 3 } as CSSProperties}>
+          <path d="M1 6h18m-5-5 5 5-5 5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+        <Chip tone="emerald" style={{ "--i": 4 } as CSSProperties}>採用</Chip>
+        <svg width="22" height="12" viewBox="0 0 22 12" className="stagger text-slate-400" style={{ "--i": 5 } as CSSProperties}>
+          <path d="M1 6h18m-5-5 5 5-5 5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+        <Chip tone="brand" style={{ "--i": 6 } as CSSProperties}>ZIP</Chip>
+      </div>
+    </Stage>
+  );
+}
+
 /* ---- dialog ---- */
 
 export default function GuideDialog({ open, onClose, labels: l }: { open: boolean; onClose: () => void; labels: Labels }) {
@@ -286,6 +308,16 @@ export default function GuideDialog({ open, onClose, labels: l }: { open: boolea
         </p>
       ),
       scene: <SceneNotes />,
+    },
+    {
+      title: "7. 画面モックで聞き取り、実装を依頼する",
+      tab: "画面モック",
+      body: (
+        <p>
+          「画面モック」タブで画面を追加し、聞き取った内容を書くと AI が画面のモックを作ります。頼むたびに新しい版ができ、前の版も残ります。正にしたい版を「採用」し、「引き渡しパック」で画面仕様・受け入れ条件・作業指示の下書きを作って保存すると、Codex などに渡せる ZIP をダウンロードできます。ヒアリングの会話はメンバー全員で共有され、発言は「要望・課題」に登録できます。
+        </p>
+      ),
+      scene: <SceneMockGuide />,
     },
   ];
 

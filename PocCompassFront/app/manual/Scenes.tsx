@@ -133,12 +133,12 @@ export function SceneDesign({ l }: { l: Labels }) {
 
 /* 3. tab strip: each tab lights up in turn */
 export function SceneTabs({ l }: { l: Labels }) {
-  const tabs = ["ダッシュボード", "羅針盤", "分析", "WBS", "設計", l.task, l.evidence, "判断レポート", "設定"];
+  const tabs = ["ダッシュボード", "羅針盤", "分析", "WBS", "設計", "要望・課題", "業務整理", "画面モック", l.task, l.evidence, "判断レポート", "設定"];
   return (
     <div className="w-[92%] space-y-3">
-      <div className="flex gap-1 overflow-hidden rounded-2xl bg-slate-100 p-1 ring-1 ring-slate-200">
+      <div className="flex flex-wrap gap-1 overflow-hidden rounded-2xl bg-slate-100 p-1 ring-1 ring-slate-200">
         {tabs.map((t, i) => (
-          <span key={t} className="manual-tab-hl whitespace-nowrap rounded-xl px-2.5 py-1.5 text-[11px] font-bold" style={{ animationDelay: `${i * 0.66}s` }}>
+          <span key={t} className="manual-tab-hl whitespace-nowrap rounded-xl px-2.5 py-1.5 text-[11px] font-bold" style={{ animationDelay: `${(i * 6) / tabs.length}s` }}>
             {t}
           </span>
         ))}
@@ -327,6 +327,53 @@ export function SceneUsers() {
           <b className="w-20 text-slate-900">山田 太郎</b>
           <span className="flex-1 truncate text-slate-500">taro.yamada@example.com</span>
           <span className="text-slate-500">開発部</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* 11. screen mock: ask -> new version in the preview -> handoff ZIP */
+export function SceneMock() {
+  const files = ["mock.html", "SCREEN_SPEC.md", "ACCEPTANCE.md", "AGENTS.md"];
+  return (
+    <div className="flex w-[94%] items-stretch gap-2.5">
+      <div className="flex w-[42%] flex-col justify-center gap-1.5">
+        <div className="manual-slide-in ml-auto w-fit max-w-full rounded-2xl rounded-br-md bg-primary px-2.5 py-1.5 text-[10px] font-semibold text-white" style={delay(100)}>
+          承認日の列を足して
+        </div>
+        <div className="manual-slide-in flex w-fit items-center gap-1 rounded-2xl rounded-bl-md bg-white px-2.5 py-1.5 shadow-sm ring-1 ring-slate-200" style={delay(700)}>
+          <span className="manual-dot" /><span className="manual-dot" style={{ animationDelay: "0.2s" }} /><span className="manual-dot" style={{ animationDelay: "0.4s" }} />
+        </div>
+        <div className="manual-slide-in w-fit rounded-2xl rounded-bl-md bg-white px-2.5 py-1.5 text-[10px] text-slate-700 shadow-sm ring-1 ring-slate-200" style={delay(1700)}>
+          足しました <span className="ml-1 rounded-full bg-accent px-1.5 py-0.5 text-[9px] font-bold text-primary">v2 を表示</span>
+        </div>
+        <span className="guide-pressed mt-1 w-fit rounded-lg bg-slate-900 px-2.5 py-1 text-[10px] font-bold text-white" style={{ animationDelay: "3s" }}>
+          引き渡しパック
+        </span>
+      </div>
+      <div className="flex flex-1 flex-col gap-1.5">
+        <div className="flex items-center justify-between text-[10px] font-bold text-slate-500">
+          <span>プレビュー</span>
+          <span className="guide-reveal rounded-md bg-emerald-50 px-1.5 py-0.5 text-emerald-700 ring-1 ring-emerald-200" style={delay(2300)}>v2 を採用</span>
+        </div>
+        <div className="rounded-xl bg-white p-2 shadow-sm ring-1 ring-slate-200">
+          <div className="mb-1.5 h-2 w-1/2 rounded bg-slate-300" />
+          {[0, 1, 2].map((r) => (
+            <div key={r} className="flex gap-1 border-t border-slate-100 py-1">
+              <div className="h-1.5 flex-1 rounded bg-slate-200" />
+              <div className="h-1.5 flex-1 rounded bg-slate-200" />
+              <div className="guide-reveal h-1.5 flex-1 rounded bg-indigo-300" style={delay(1800 + r * 120)} />
+            </div>
+          ))}
+        </div>
+        <div className="guide-reveal rounded-xl bg-white p-1.5 text-[9px] font-semibold text-slate-600 shadow-md ring-1 ring-indigo-200" style={delay(3600)}>
+          <p className="mb-0.5 font-bold text-primary">画面名.zip</p>
+          <div className="flex flex-wrap gap-1">
+            {files.map((f) => (
+              <span key={f} className="rounded bg-slate-100 px-1 py-0.5">{f}</span>
+            ))}
+          </div>
         </div>
       </div>
     </div>

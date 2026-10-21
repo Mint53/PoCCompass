@@ -112,6 +112,7 @@ class Container(StrEnum):
     MODES = "mode_definitions"
     CHAT = "chat_messages"
     USERS = "users"
+    SCREEN_MOCKS = "screen_mocks"
 
 
 # Partition key path per container (must match infra/modules/resources.bicep).
@@ -124,6 +125,7 @@ PARTITION_KEYS: dict[Container, str] = {
     Container.MODES: "id",
     Container.CHAT: "projectId",
     Container.USERS: "id",
+    Container.SCREEN_MOCKS: "projectId",
 }
 
 
@@ -136,6 +138,14 @@ class MemberRole(StrEnum):
 class ChatRole(StrEnum):
     USER = "user"
     ASSISTANT = "assistant"
+
+
+class MockDocKind(StrEnum):
+    """Document kinds in the screen_mocks container (SPEC §18.2)."""
+
+    SCREEN = "screen"
+    VERSION = "version"
+    MESSAGE = "message"
 
 
 class ProposalStatus(StrEnum):

@@ -9,5 +9,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from app.api import app  # noqa: E402
 
 out = Path(__file__).resolve().parents[1] / "openapi.json"
-out.write_text(json.dumps(app.openapi(), ensure_ascii=False, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+# newline="\n": keep LF on Windows (openapi.json is eol=lf in .gitattributes)
+with out.open("w", encoding="utf-8", newline="\n") as f:
+    f.write(json.dumps(app.openapi(), ensure_ascii=False, indent=1, sort_keys=True) + "\n")
 print(f"wrote {out}")

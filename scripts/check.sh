@@ -30,7 +30,7 @@ contract() {
 import json, sys
 sys.path.insert(0, '.')
 from app.api import app
-open('../.harness/contract/openapi.json', 'w', encoding='utf-8').write(json.dumps(app.openapi(), ensure_ascii=False, indent=1, sort_keys=True) + '\n')
+open('../.harness/contract/openapi.json', 'w', encoding='utf-8', newline='\n').write(json.dumps(app.openapi(), ensure_ascii=False, indent=1, sort_keys=True) + '\n')
 ") || return 1
   if ! diff -q "$tmp/openapi.json" "$FUNC/openapi.json" >/dev/null; then
     echo "openapi.json is stale -> run scripts/gen-api.sh"; return 1

@@ -38,6 +38,14 @@ export type MemberRole = S["MemberRole"];
 export type Verdict = S["Verdict"];
 export type ChatMessage = S["ChatMessage"];
 export type ChatOperation = S["Operation"];
+export type Screen = S["Screen"];
+export type ScreenDetail = S["ScreenDetail"];
+export type ScreenVersion = S["ScreenVersion"];
+export type ScreenVersionMeta = S["ScreenVersionMeta"];
+export type ScreenMessage = S["ScreenMessage"];
+export type ScreenSendResponse = S["ScreenSendResponse"];
+export type HandoffDraft = S["HandoffDraft"];
+export type HandoffSave = S["HandoffSave"];
 export type ItemCreate =
   | S["AssumptionFields"]
   | S["CriterionFields"]
@@ -90,6 +98,30 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
   return json as T;
 }
 
+/** For file downloads (e.g. the handoff ZIP). Errors still arrive as the JSON envelope. */
+async function requestBlob(path: string): Promise<Blob> {
+  let res: Response;
+  try {
+    res = await fetch(`${BASE}${path}`, { cache: "no-store" });
+  } catch {
+    throw new ApiError(0, "NETWORK_ERROR", "通信に失敗しました。ネットワーク接続を確認して再度お試しください。");
+  }
+  if (!res.ok) {
+    let err: { code?: string; message?: string } | undefined;
+    try {
+      err = ((await res.json()) as { error?: { code?: string; message?: string } }).error;
+    } catch {
+      // non-JSON
+    }
+    throw new ApiError(
+      res.status,
+      err?.code ?? "HTTP_ERROR",
+      err?.message ?? `サーバーエラーが発生しました（${res.status}）。時間をおいて再度お試しください。`,
+    );
+  }
+  return res.blob();
+}
+
 const p = (id: string) => `/projects/${encodeURIComponent(id)}`;
 
 export const api = {
@@ -140,6 +172,28 @@ export const api = {
   discardChat: (id: string, messageId: string) =>
     request<ChatMessage>("POST", `${p(id)}/chat/${encodeURIComponent(messageId)}/discard`),
   clearChat: (id: string) => request<void>("DELETE", `${p(id)}/chat`),
+
+  listScreens: (id: string) => request<Screen[]>("GET", `${p(id)}/screens`),
+  createScreen: (id: string, body: S["ScreenCreate"]) => request<Screen>("POST", `${p(id)}/screens`, body),
+  getScreen: (id: string, sid: string) => request<ScreenDetail>("GET", `${p(id)}/screens/${encodeURIComponent(sid)}`),
+  updateScreen: (id: string, sid: string, body: S["ScreenPatch"]) =>
+    request<Screen>("PATCH", `${p(id)}/screens/${encodeURIComponent(sid)}`, body),
+  deleteScreen: (id: string, sid: string) => request<void>("DELETE", `${p(id)}/screens/${encodeURIComponent(sid)}`),
+  getScreenVersion: (id: string, sid: string, vid: string) =>
+    request<ScreenVersion>("GET", `${p(id)}/screens/${encodeURIComponent(sid)}/versions/${encodeURIComponent(vid)}`),
+  sendScreenMessage: (id: string, sid: string, message: string, baseVersionId?: string | null) =>
+    request<ScreenSendResponse>("POST", `${p(id)}/screens/${encodeURIComponent(sid)}/messages`, {
+      message,
+      base_version_id: baseVersionId ?? null,
+    }),
+  draftHandoff: (id: string, sid: string, techNotes: string, versionId?: string | null) =>
+    request<HandoffDraft>("POST", `${p(id)}/screens/${encodeURIComponent(sid)}/handoff/draft`, {
+      tech_notes: techNotes,
+      version_id: versionId ?? null,
+    }),
+  saveHandoff: (id: string, sid: string, body: HandoffSave) =>
+    request<Screen>("PUT", `${p(id)}/screens/${encodeURIComponent(sid)}/handoff`, body),
+  exportHandoff: (id: string, sid: string) => requestBlob(`${p(id)}/screens/${encodeURIComponent(sid)}/handoff/export`),
 };
 
 export function errorMessage(e: unknown): string {
